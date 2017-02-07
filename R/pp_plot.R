@@ -54,12 +54,6 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 		}
 		
 	}
-	# if(ncol(ps) == 2 & !is.null(legend)) {
-	# 	if(legend == TRUE) {
-	# 		warning("`legend` not available with two groups (axis labels provide all the information needed about the line)")
-	# 	}
-	# }
-
 
 	if(is.null(ref_group)) ref_group <- colnames(ps)[1]
 	
