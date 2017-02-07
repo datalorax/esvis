@@ -1,0 +1,15 @@
+Package: esvis
+Title: Calculation and visualization of effect sizes.
+Version: 0.0.0.9000
+Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
+	   role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends:
+    R (>= 3.3.2)
+Imports:
+    sfsmisc
+License: MIT + file LICENSE
+COPYRIGHT HOLDER: Daniel Anderson
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 5.0.1
