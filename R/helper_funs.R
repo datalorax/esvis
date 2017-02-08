@@ -37,6 +37,7 @@ splt
 #' @return By default the Cohen's \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a matrix, with the reference group 
 #'  reported by rows and the focal group reported by columns.
+#' @import stats
 #' @export
 coh_d <- function(formula, data, matrix = TRUE) {
 	splt <- parse_form(formula, data)
@@ -53,8 +54,8 @@ coh_d <- function(formula, data, matrix = TRUE) {
 						(ns[ vec[1] ] + ns[ vec[2] ]) - 2 )
 	}
 
-	combos_1 <- t(combn(1:length(splt), 2))
-	combos_2 <- t(combn(length(splt):1, 2))
+	combos_1 <- t(utils::combn(1:length(splt), 2))
+	combos_2 <- t(utils::combn(length(splt):1, 2))
 
 	effects_1 <- mapply(es_d, split(combos_1, 1:nrow(combos_1)))
 	effects_2 <- mapply(es_d, split(combos_2, 1:nrow(combos_2)))
@@ -87,7 +88,7 @@ t(mat)
 
 cdfs <- function(formula, data) {
 	splt <- parse_form(formula, data)
-lapply(splt, ecdf)
+lapply(splt, stats::ecdf)
 }
 
 #' Compute probabilities from the empirical CDFs of a grouping variable for
@@ -156,7 +157,7 @@ ps
 #' 				frl = c(rep("free_reduced", 800),  
 #' 						rep("pay", 500)))
 #' 
-#' auc(probs(score ~ frl, d))
+#' auc(score ~ frl, d)
 #' @export
 
 auc <- function(formula, data, matrix = TRUE) {
@@ -193,6 +194,7 @@ auc <- function(formula, data, matrix = TRUE) {
 #'  reported are missing (typically the lower triangle of the matrix). When
 #'  only two groups are included in the grouping factor, a single value is
 #'  returned.
+#' @import stats
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -200,7 +202,7 @@ auc <- function(formula, data, matrix = TRUE) {
 #' 				frl = c(rep("free_reduced", 800),  
 #' 						rep("pay", 500)))
 #' 
-#' v(probs(score ~ frl, d))
+#' v(score ~ frl, d)
 #' @export
 
 v <- function(formula, data) {
@@ -232,5 +234,5 @@ v <- function(formula, data) {
 
 col_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
-  hcl(h = hues, c = 100, l = 65)[1:n]
+  grDevices::hcl(h = hues, c = 100, l = 65)[1:n]
 }

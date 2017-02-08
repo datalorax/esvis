@@ -5,8 +5,8 @@
 \title{Produces the paired probability plot for two groups}
 \usage{
 pp_plot(formula, data, ref_group = NULL, refline = TRUE, text = NULL,
-  shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, max = 255),
-  legend = NULL, colors = NULL, ...)
+  shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
+  255), legend = NULL, colors = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -38,6 +38,11 @@ light blue color.}
 \item{legend}{Logical. Should the legend be plotted? Defaults to \code{TRUE}
 when the number of groups is greater than 2. Legend not available when
 the number of groups == 2.}
+
+\item{colors}{Color of the lines to be plotted. Defaults to
+\code{\link{col_hue}} with the corresponding number of groups.}
+
+\item{...}{Additional arguments passed to \link[graphics]{plot}.}
 }
 \description{
 The paired probability plot maps the probability of obtaining a specific

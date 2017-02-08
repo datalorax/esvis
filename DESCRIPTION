@@ -1,5 +1,5 @@
 Package: esvis
-Title: Calculation and visualization of effect sizes.
+Title: Calculation and Visualization of Effect Sizes
 Version: 0.0.0.9000
 Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
 	   role = c("aut", "cre"))

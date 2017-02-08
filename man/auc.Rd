@@ -37,6 +37,6 @@ d <- data.frame(score = c(free_reduced, pay),
 				frl = c(rep("free_reduced", 800),  
 						rep("pay", 500)))
 
-auc(probs(score ~ frl, d))
+auc(score ~ frl, d)
 }
 

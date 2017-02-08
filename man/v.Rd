@@ -35,6 +35,6 @@ d <- data.frame(score = c(free_reduced, pay),
 				frl = c(rep("free_reduced", 800),  
 						rep("pay", 500)))
 
-v(probs(score ~ frl, d))
+v(score ~ frl, d)
 }
 

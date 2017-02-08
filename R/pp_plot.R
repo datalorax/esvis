@@ -26,7 +26,11 @@
 #'    light blue color.
 #' @param legend Logical. Should the legend be plotted? Defaults to \code{TRUE}
 #'    when the number of groups is greater than 2. Legend not available when
-#'    the number of groups == 2. 
+#'    the number of groups == 2.
+#' @param colors Color of the lines to be plotted. Defaults to
+#'    \code{\link{col_hue}} with the corresponding number of groups.
+#' @param ... Additional arguments passed to \link[graphics]{plot}.
+#' @import graphics grDevices
 #' @export
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
@@ -39,7 +43,7 @@
 
 pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, 
 	text = NULL, shade = NULL, 
-	shade_rgb = rgb(102, 178, 255, alpha = 30, max = 255), 
+	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
  	legend = NULL, colors = NULL, ...) {
 
 	op <- par()
