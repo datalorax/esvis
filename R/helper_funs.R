@@ -1,5 +1,29 @@
-#' Compute empirical CDFs by grouping variable and return the probabilities
-#' for each group.
+#' Compute the empirical distribution functions for each of several groups.
+#' 
+#' This function is a simple wrapper that splits the data frame by the 
+#' grouping variable, then loops \link[stats]{ecdf} through the split
+#' data to return a CDF function for each group.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @return A list with one function per group (level in the grouping factor).
+#' @export
+
+cdfs <- function(formula, data, order = TRUE) {
+	out <- data[[ all.vars(formula)[1] ]]
+	group <- data[[ all.vars(formula)[2] ]]	
+
+	splt <- split(out, group)
+	if(order == TRUE) {
+		means <- sapply(splt, mean, na.rm = TRUE)
+		splt <- splt[order(means, decreasing = TRUE)]
+	}
+lapply(splt, ecdf)
+}
+
+#' Compute probabilities from the empirical CDFs of a grouping variable for
+#' each group.
 #' 
 #' This formula returns the paired probabilities for any 
 #' @param formula A formula of the type \code{out ~ group} where \code{out} is
@@ -23,23 +47,15 @@
 #' @export
 
 probs <- function(formula, data) {
-	form_args <- all.vars(formula)
-	out <- data[[ form_args[1] ]]
-	group <- data[[ form_args[2] ]]	
-
-	splt <- split(out, group)
-
-	means <- sapply(splt, mean, na.rm = TRUE)
-
-	splt <- splt[order(means, decreasing = TRUE)]
-
-	ecdfs <- lapply(splt, ecdf)
+	ecdfs <- cdfs(formula, data)
+	out <- data[[ all.vars(formula)[1] ]]
+	
 	ps <- sapply(ecdfs, function(x) {
 			x(seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
 				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
 				  .1))
 		})
-	colnames(ps) <- names(splt)
+	colnames(ps) <- names(ecdfs)
 	rownames(ps) <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
 				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
 				  .1)
