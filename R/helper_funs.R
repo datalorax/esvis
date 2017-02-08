@@ -1,3 +1,78 @@
+#' Parse formula
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param order Logical. Defaults to \code{TRUE}. Should the groups be ordered 
+#' according to their mean?
+#' @return A list of data split by the grouping factor.
+parse_form <- function(formula, data, order = TRUE) {
+	out <- data[[ all.vars(formula)[1] ]]
+	group <- data[[ all.vars(formula)[2] ]]	
+
+	splt <- split(out, group)
+	if(order == TRUE) {
+		means <- sapply(splt, mean, na.rm = TRUE)
+		splt <- splt[order(means, decreasing = TRUE)]
+	}
+splt
+}
+
+#' Compute Cohen's \emph{d}
+#' 
+#' This function calculates effect sizes in terms of Cohen's \emph{d}, also
+#' called the uncorrected effect size. See \code{\link{hedg_g}} for the sample
+#' size corrected version. Also see 
+#' \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3840331/}{Lakens (2013)}
+#' for a discussion on different types of effect sizes and their
+#' interpretation. Note that missing data are removed from the calculations of 
+#' the means and standard deviations.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param matrix Logical. If only two groups are being compared, should the
+#' full matrix of all possible comparisons be returned? If \code{FALSE} only
+#' the positive effect size is returned.
+#' @return By default the Cohen's \emph{d} for all possible pairings of
+#'  the grouping factor are returned as a matrix, with the reference group 
+#'  reported by rows and the focal group reported by columns.
+#' @export
+coh_d <- function(formula, data, matrix = TRUE) {
+	splt <- parse_form(formula, data)
+
+	means <- sapply(splt, mean, na.rm = TRUE)
+	vars <- sapply(splt, var, na.rm = TRUE)
+	ns <- sapply(splt, length)
+
+	# vec is a vector to subset means/vars/ns for the appropriate comparison
+	es_d <- function(vec) {
+		(means[ vec[1] ] - means[ vec[2] ]) / 
+		sqrt( (((ns[ vec[1] ]-1) * vars[ vec[1] ]) + 
+			  ((ns[ vec[2] ]-1) * vars[ vec[2] ])) / 
+						(ns[ vec[1] ] + ns[ vec[2] ]) - 2 )
+	}
+
+	combos_1 <- t(combn(1:length(splt), 2))
+	combos_2 <- t(combn(length(splt):1, 2))
+
+	effects_1 <- mapply(es_d, split(combos_1, 1:nrow(combos_1)))
+	effects_2 <- mapply(es_d, split(combos_2, 1:nrow(combos_2)))
+
+	mat <- matrix(rep(NA, length(splt)^2), ncol = length(splt))
+	diag(mat) <- 0
+	mat[lower.tri(mat)] <- effects_1
+	mat[upper.tri(mat)] <- rev(effects_2)
+	rownames(mat) <- names(splt)
+	colnames(mat) <- names(splt)
+	
+	if(length(splt) == 2 & matrix == FALSE) {
+		return(mat[2, 1])
+	}
+t(mat)
+}
+
+
 #' Compute the empirical distribution functions for each of several groups.
 #' 
 #' This function is a simple wrapper that splits the data frame by the 
@@ -10,15 +85,8 @@
 #' @return A list with one function per group (level in the grouping factor).
 #' @export
 
-cdfs <- function(formula, data, order = TRUE) {
-	out <- data[[ all.vars(formula)[1] ]]
-	group <- data[[ all.vars(formula)[2] ]]	
-
-	splt <- split(out, group)
-	if(order == TRUE) {
-		means <- sapply(splt, mean, na.rm = TRUE)
-		splt <- splt[order(means, decreasing = TRUE)]
-	}
+cdfs <- function(formula, data) {
+	splt <- parse_form(formula, data)
 lapply(splt, ecdf)
 }
 
