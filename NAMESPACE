@@ -2,6 +2,7 @@
 
 export(auc)
 export(cdfs)
+export(coh_d)
 export(col_hue)
 export(pp_plot)
 export(probs)
