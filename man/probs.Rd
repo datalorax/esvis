@@ -5,7 +5,7 @@
 \title{Compute empirical CDFs by grouping variable and return the probabilities
 for each group.}
 \usage{
-probs(formula, data, ...)
+probs(formula, data)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is

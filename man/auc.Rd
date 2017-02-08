@@ -4,16 +4,31 @@
 \alias{auc}
 \title{Calculate the area under the curve}
 \usage{
-auc(ps)
+auc(formula, data, matrix = TRUE)
 }
 \arguments{
-\item{ps}{The paired probabilities for two groups, calculated from 
-\code{\link{probs}}. Note that the probabilities must only be from two
-groups.}
+\item{formula}{A formula of the type \code{out ~ group} where \code{out} is
+the outcome variable and \code{group} is the grouping variable. Note this
+variable can include any arbitrary number of groups.}
+
+\item{data}{The data frame that the data in the formula come from.}
+
+\item{matrix}{Logical. If only two groups are being compared, should the
+full matrix of all possible comparisons be returned? If \code{FALSE} the
+greater of the two aucs is returned.}
+}
+\value{
+By default the area under the curve for all possible pairings of
+ the grouping factor are returned as a matrix, with the reference group 
+ (x-axis of the pp plot) reported by columns and the focal group 
+ (y-axis) reported by rows.
 }
 \description{
 This function is used within \code{\link{pp_plot}} to calculate the area 
-under the \code{pp} curve.
+under the \code{pp} curve. The area under the curve is also a useful 
+effect-size like statistic, representing the probability that a randomly 
+selected individual from distribution a will have a higher value than a 
+randomly selected individual from distribution b.
 }
 \examples{
 free_reduced <- rnorm(800, 80, 20)

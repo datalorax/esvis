@@ -22,8 +22,7 @@
 #' probs(score ~ frl, d)
 #' @export
 
-
-probs <- function(formula, data, ...) {
+probs <- function(formula, data) {
 	form_args <- all.vars(formula)
 	out <- data[[ form_args[1] ]]
 	group <- data[[ form_args[2] ]]	
@@ -50,10 +49,22 @@ ps
 #' Calculate the area under the curve
 #' 
 #' This function is used within \code{\link{pp_plot}} to calculate the area 
-#' under the \code{pp} curve. 
-#' @param ps The paired probabilities for two groups, calculated from 
-#' \code{\link{probs}}. Note that the probabilities must only be from two
-#' groups.
+#' under the \code{pp} curve. The area under the curve is also a useful 
+#' effect-size like statistic, representing the probability that a randomly 
+#' selected individual from distribution a will have a higher value than a 
+#' randomly selected individual from distribution b.
+#' 
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param matrix Logical. If only two groups are being compared, should the
+#' full matrix of all possible comparisons be returned? If \code{FALSE} the
+#' greater of the two aucs is returned. 
+#' @return By default the area under the curve for all possible pairings of
+#'  the grouping factor are returned as a matrix, with the reference group 
+#'  (x-axis of the pp plot) reported by columns and the focal group 
+#'  (y-axis) reported by rows.
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -64,15 +75,39 @@ ps
 #' auc(probs(score ~ frl, d))
 #' @export
 
-auc <- function(ps) sfsmisc::integrate.xy(ps[ ,1], ps[ ,2])
+auc <- function(formula, data, matrix = TRUE) {
+	ps <- probs(formula, data)
+	if(ncol(ps) == 2 & matrix == FALSE) { 
+		return(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2]))
+	}
 
+	auc_fun <- function(x, y) sfsmisc::integrate.xy(ps[ ,x], ps[ ,y])	
+	aucs <- mapply(auc_fun, 
+				   rep(1:ncol(ps), ncol(ps)),
+				   rep(1:ncol(ps), each = ncol(ps)))
+
+	matrix(aucs, 
+		ncol = ncol(ps),
+		byrow = TRUE,
+		dimnames = list(colnames(ps), colnames(ps)))
+} 
 
 #' Calculate the V effect size statistic
 #' 
-#' This function calculates the effect size V, as discussed by Ho.
-#' @param ps The paired probabilities for two groups, calculated from 
-#' \code{\link{probs}}. Note that the probabilities must only be from two
-#' groups.
+#' This function calculates the effect size V, as discussed by Ho, 2009. The V
+#' statistic is a transformation of \code{\link{auc}}, interpreted as the 
+#' average difference between the distributions in standard deviation units.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @return By default the V statistic for all possible pairings of
+#'  the grouping factor are returned as a matrix, with the reference group 
+#'  (x-axis of the pp plot) reported by columns and the focal group 
+#'  (y-axis) reported by rows. Note that V cannot be negative (given that the
+#'  square root of a negative number is imaginary) and half the values reported
+#'  are missing (typically the upper triangle of the matrix). When only two 
+#'  groups are included in the grouping factor, a single value is returned.
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -83,14 +118,32 @@ auc <- function(ps) sfsmisc::integrate.xy(ps[ ,1], ps[ ,2])
 #' v(probs(score ~ frl, d))
 #' @export
 
-v <- function(ps) sqrt(2*qnorm(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2])))
+v <- function(formula, data) {
+	ps <- probs(formula, data)
+	if(ncol(ps) == 2 ) { 
+		return(sqrt(2*qnorm(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2]))))
+	}
 
+	v_fun <- function(x, y) {
+		sqrt(2*qnorm(sfsmisc::integrate.xy(ps[ ,x], ps[ ,y])))
+	}
+	suppressWarnings(
+		vs <- mapply(v_fun, 
+					   rep(1:ncol(ps), ncol(ps)),
+					   rep(1:ncol(ps), each = ncol(ps)))
+	)
+	matrix(vs, 
+		ncol = ncol(ps),
+		byrow = TRUE,
+		dimnames = list(colnames(ps), colnames(ps)))
+} 
 
 #' Color hues
 #'
 #' Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
 #' 
 #' @param n The number of colors to be produced
+#' @export
 
 col_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)

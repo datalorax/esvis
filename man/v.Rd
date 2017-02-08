@@ -4,15 +4,28 @@
 \alias{v}
 \title{Calculate the V effect size statistic}
 \usage{
-v(ps)
+v(formula, data)
 }
 \arguments{
-\item{ps}{The paired probabilities for two groups, calculated from 
-\code{\link{probs}}. Note that the probabilities must only be from two
-groups.}
+\item{formula}{A formula of the type \code{out ~ group} where \code{out} is
+the outcome variable and \code{group} is the grouping variable. Note this
+variable can include any arbitrary number of groups.}
+
+\item{data}{The data frame that the data in the formula come from.}
+}
+\value{
+By default the V statistic for all possible pairings of
+ the grouping factor are returned as a matrix, with the reference group 
+ (x-axis of the pp plot) reported by columns and the focal group 
+ (y-axis) reported by rows. Note that V cannot be negative (given that the
+ square root of a negative number is imaginary) and half the values reported
+ are missing (typically the upper triangle of the matrix). When only two 
+ groups are included in the grouping factor, a single value is returned.
 }
 \description{
-This function calculates the effect size V, as discussed by Ho.
+This function calculates the effect size V, as discussed by Ho, 2009. The V
+statistic is a transformation of \code{\link{auc}}, interpreted as the 
+average difference between the distributions in standard deviation units.
 }
 \examples{
 free_reduced <- rnorm(800, 80, 20)
