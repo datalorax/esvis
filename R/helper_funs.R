@@ -70,9 +70,51 @@ coh_d <- function(formula, data, matrix = TRUE) {
 	if(length(splt) == 2 & matrix == FALSE) {
 		return(mat[2, 1])
 	}
+	if(length(splt) > 2 & matrix == FALSE) {
+		warning("Single value cannot be returned when the number of groups > 2. Returning entire matrix. Please subset the matrix manually to select the specific value of interest.")
+	}
 t(mat)
 }
 
+
+#' Compute Hedges' \emph{g}
+#' This function calculates effect sizes in terms of Hedges' \emph{g}, also
+#' called the corrected (for sample size) effect size. See
+#' \code{\link{coh_d}} for the uncorrected version. Also see 
+#' \href{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3840331/}{Lakens (2013)}
+#' for a discussion on different types of effect sizes and their
+#' interpretation. Note that missing data are removed from the calculations of 
+#' the means and standard deviations.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param matrix Logical. If only two groups are being compared, should the
+#' full matrix of all possible comparisons be returned? If \code{FALSE} only
+#' the positive effect size is returned.
+#' @return By default the Hedges' \emph{d} for all possible pairings of
+#'  the grouping factor are returned as a matrix, with the reference group 
+#'  reported by rows and the focal group reported by columns.
+#' @import stats
+#' @export
+
+hedg_g <- function(formula, data, matrix = TRUE) {
+	splt <- parse_form(formula, data)
+
+	ns <- sapply(splt, length)
+	ns <- outer(ns, ns, "+")
+	
+	ds <- coh_d(formula, data)
+
+	mat <- ds * (1 - ( 3 /( (4*ns) - 9) ) )
+	if(length(splt) == 2 & matrix == FALSE) {
+		return(mat[1, 2])
+	}
+	if(length(splt) > 2 & matrix == FALSE) {
+		warning("Single value cannot be returned when the number of groups > 2. Returning entire matrix. Please subset the matrix manually to select the specific value of interest.")
+	}
+mat
+}
 
 #' Compute the empirical distribution functions for each of several groups.
 #' 
