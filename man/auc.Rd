@@ -20,8 +20,8 @@ greater of the two aucs is returned.}
 \value{
 By default the area under the curve for all possible pairings of
  the grouping factor are returned as a matrix, with the reference group 
- (x-axis of the pp plot) reported by columns and the focal group 
- (y-axis) reported by rows.
+ (x-axis of the pp plot) reported by rows and the focal group 
+ (y-axis) reported by columns.
 }
 \description{
 This function is used within \code{\link{pp_plot}} to calculate the area 

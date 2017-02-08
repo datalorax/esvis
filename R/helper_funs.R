@@ -147,8 +147,8 @@ ps
 #' greater of the two aucs is returned. 
 #' @return By default the area under the curve for all possible pairings of
 #'  the grouping factor are returned as a matrix, with the reference group 
-#'  (x-axis of the pp plot) reported by columns and the focal group 
-#'  (y-axis) reported by rows.
+#'  (x-axis of the pp plot) reported by rows and the focal group 
+#'  (y-axis) reported by columns.
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -170,10 +170,10 @@ auc <- function(formula, data, matrix = TRUE) {
 				   rep(1:ncol(ps), ncol(ps)),
 				   rep(1:ncol(ps), each = ncol(ps)))
 
-	matrix(aucs, 
-		ncol = ncol(ps),
-		byrow = TRUE,
-		dimnames = list(colnames(ps), colnames(ps)))
+	t(matrix(aucs, 
+			ncol = ncol(ps),
+			byrow = TRUE,
+			dimnames = list(colnames(ps), colnames(ps))))
 } 
 
 #' Calculate the V effect size statistic
@@ -187,11 +187,12 @@ auc <- function(formula, data, matrix = TRUE) {
 #' @param data The data frame that the data in the formula come from.
 #' @return By default the V statistic for all possible pairings of
 #'  the grouping factor are returned as a matrix, with the reference group 
-#'  (x-axis of the pp plot) reported by columns and the focal group 
-#'  (y-axis) reported by rows. Note that V cannot be negative (given that the
-#'  square root of a negative number is imaginary) and half the values reported
-#'  are missing (typically the upper triangle of the matrix). When only two 
-#'  groups are included in the grouping factor, a single value is returned.
+#'  (x-axis of the pp plot) reported by rows and the focal group 
+#'  (y-axis) reported by columns. Note that V cannot be negative (given that
+#'  the square root of a negative number is imaginary) and half the values
+#'  reported are missing (typically the lower triangle of the matrix). When
+#'  only two groups are included in the grouping factor, a single value is
+#'  returned.
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -216,10 +217,10 @@ v <- function(formula, data) {
 					   rep(1:ncol(ps), ncol(ps)),
 					   rep(1:ncol(ps), each = ncol(ps)))
 	)
-	matrix(vs, 
-		ncol = ncol(ps),
-		byrow = TRUE,
-		dimnames = list(colnames(ps), colnames(ps)))
+	t(matrix(vs, 
+			ncol = ncol(ps),
+			byrow = TRUE,
+			dimnames = list(colnames(ps), colnames(ps))))
 } 
 
 #' Color hues

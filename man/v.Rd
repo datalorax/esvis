@@ -16,11 +16,12 @@ variable can include any arbitrary number of groups.}
 \value{
 By default the V statistic for all possible pairings of
  the grouping factor are returned as a matrix, with the reference group 
- (x-axis of the pp plot) reported by columns and the focal group 
- (y-axis) reported by rows. Note that V cannot be negative (given that the
- square root of a negative number is imaginary) and half the values reported
- are missing (typically the upper triangle of the matrix). When only two 
- groups are included in the grouping factor, a single value is returned.
+ (x-axis of the pp plot) reported by rows and the focal group 
+ (y-axis) reported by columns. Note that V cannot be negative (given that
+ the square root of a negative number is imaginary) and half the values
+ reported are missing (typically the lower triangle of the matrix). When
+ only two groups are included in the grouping factor, a single value is
+ returned.
 }
 \description{
 This function calculates the effect size V, as discussed by Ho, 2009. The V
