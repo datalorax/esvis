@@ -111,7 +111,9 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 
 	if(text == TRUE) {
 		text(0.8, 0.2, cex = 2, 
-			paste0("AUC = ", round(auc(ps), 2), "\n", "V = ", round(v(ps), 2)))
+			paste0("AUC = ", round(auc(formula, data, FALSE), 2), 
+				   "\n", 
+				   "V = ", round(v(formula, data), 2)))
 			
 	}
 
