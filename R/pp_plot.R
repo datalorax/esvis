@@ -21,7 +21,7 @@
 #' @param shade Logical. Should the area under the curve be shaded? Defaults
 #'    to \code{TRUE} if there are only two group. Currently it cannot be 
 #'    produced for more than two groups.
-#' @param shade_rgb The color of the shading via \code{\link{grDevices::rgb}}. 
+#' @param shade_rgb The color of the shading via \link[grDevices]{rgb}. 
 #'    Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
 #'    light blue color.
 #' @param legend Logical. Should the legend be plotted? Defaults to \code{TRUE}
