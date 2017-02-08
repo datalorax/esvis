@@ -31,7 +31,7 @@ statistics be displayed on the plot? Defaults to \code{TRUE} when there
 to \code{TRUE} if there are only two group. Currently it cannot be 
 produced for more than two groups.}
 
-\item{shade_rgb}{The color of the shading via \code{\link{grDevices::rgb}}. 
+\item{shade_rgb}{The color of the shading via \link[grDevices]{rgb}. 
 Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
 light blue color.}
 
