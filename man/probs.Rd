@@ -2,8 +2,8 @@
 % Please edit documentation in R/helper_funs.R
 \name{probs}
 \alias{probs}
-\title{Compute empirical CDFs by grouping variable and return the probabilities
-for each group.}
+\title{Compute probabilities from the empirical CDFs of a grouping variable for
+each group.}
 \usage{
 probs(formula, data)
 }
