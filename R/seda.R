@@ -1,0 +1,32 @@
+#' Portion of the Stanford Educational Data Archive (SEDA). 
+#' 
+#' The full SEDA dataset contains mean test scores on statewide testing data in
+#' reading and math for every school district in the United States. See a
+#' description of the data 
+#' \href{https://cepa.stanford.edu/seda/data-archive}{here}. The data 
+#' represented in this package represent a random sample of 10% of all the 
+#' cases in the full dataset. To access the full data, please visit the 
+#' data archive in the above link.
+#' 
+#' 
+#' @format A data frame with 32625 rows and 8 columns.
+#'   \describe{
+#'     \item{leaid}{Integer. Local education authority identifier.}
+#' 	   \item{leaname}{Character. Local education authority name.}
+#'     \item{stateabb}{Character. State abbreviation.}
+#' 	   \item{year}{Integer. Year the data were collected.}
+#' 	   \item{grade}{Integer. Grade level the data were collected.}
+#'     \item{subject}{Character. Whether the data were from reading or
+#' 			 mathematics.}
+#'     \item{mean}{Double. Mean test score for the LEA in the corresponding
+#' 				   subject/grade/year.}
+#'     \item{se}{Double. Standard error of the mean.}
+#' }
+#' 
+#' @source 
+#' Sean F. Reardon, Demetra Kalogrides, Andrew Ho, Ben Shear, Kenneth Shores,
+#' Erin Fahle. (2016). Stanford Education Data Archive. 
+#' \href{http://purl.stanford.edu/db586ns4974}{
+#'  http://purl.stanford.edu/db586ns4974}. For more information, please visit
+#' \href{http://seda.stanford.edu}{http://seda.stanford.edu}.
+"seda"
