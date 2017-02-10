@@ -49,9 +49,8 @@ coh_d <- function(formula, data, matrix = TRUE) {
 	# vec is a vector to subset means/vars/ns for the appropriate comparison
 	es_d <- function(vec) {
 		(means[ vec[1] ] - means[ vec[2] ]) / 
-		sqrt( (((ns[ vec[1] ]-1) * vars[ vec[1] ]) + 
-			  ((ns[ vec[2] ]-1) * vars[ vec[2] ])) / 
-						(ns[ vec[1] ] + ns[ vec[2] ]) - 2 )
+		sqrt((((ns[1] - 1)*vars[1]) + ((ns[2] - 1)*vars[2])) / 
+			(sum(ns[vec]) - 2))
 	}
 
 	combos_1 <- t(utils::combn(1:length(splt), 2))
