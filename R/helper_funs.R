@@ -18,6 +18,44 @@ parse_form <- function(formula, data, order = TRUE) {
 splt
 }
 
+#' Create Matrix of all possible combinations
+#' 
+#' @param levs The levels of the grouping factor from which to create the
+#' matrix
+#' @param fun The function to apply.
+#' @param diagonal What elements should go on the diagonal of the matrix?
+#' Defaults to 0. 
+#' @param vec Logical. Should a vector rather than a matrix be returned? 
+#' Defaults to FALSE.
+#' @return Matrix of values according to the function supplied.
+
+create_mat <- function(levs, fun, diagonal = 0, vec = FALSE) {
+	combos_1 <- t(utils::combn(levs, 2))
+	combos_2 <- t(utils::combn(rev(levs), 2))
+
+	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
+	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
+
+	mat <- matrix(rep(NA, length(levs)^2), ncol = length(levs))
+	diag(mat) <- diagonal
+	mat[lower.tri(mat)] <- diff_1
+	mat[upper.tri(mat)] <- rev(diff_2)
+	rownames(mat) <- levs
+	colnames(mat) <- levs
+	if(vec == TRUE) {
+		set1 <- sapply(split(combos_1, 1:nrow(combos_1)), 
+					paste0, collapse = "-")
+		set2 <- sapply(split(combos_2, 1:nrow(combos_2)), 
+					paste0, collapse = "-")
+
+		vec <- c(mapply(fun, split(combos_1, 1:nrow(combos_1))),
+				 mapply(fun, split(combos_2, 1:nrow(combos_2))))
+		names(vec) <- c(set1, set2)
+	return(vec)
+	}
+t(mat)
+}
+
 #' Compute Cohen's \emph{d}
 #' 
 #' This function calculates effect sizes in terms of Cohen's \emph{d}, also
@@ -53,18 +91,7 @@ coh_d <- function(formula, data, matrix = TRUE) {
 			(sum(ns[vec]) - 2))
 	}
 
-	combos_1 <- t(utils::combn(1:length(splt), 2))
-	combos_2 <- t(utils::combn(length(splt):1, 2))
-
-	effects_1 <- mapply(es_d, split(combos_1, 1:nrow(combos_1)))
-	effects_2 <- mapply(es_d, split(combos_2, 1:nrow(combos_2)))
-
-	mat <- matrix(rep(NA, length(splt)^2), ncol = length(splt))
-	diag(mat) <- 0
-	mat[lower.tri(mat)] <- effects_1
-	mat[upper.tri(mat)] <- rev(effects_2)
-	rownames(mat) <- names(splt)
-	colnames(mat) <- names(splt)
+	mat <- create_mat(names(splt), es_d)
 	
 	if(length(splt) == 2 & matrix == FALSE) {
 		return(mat[2, 1])
@@ -72,7 +99,7 @@ coh_d <- function(formula, data, matrix = TRUE) {
 	if(length(splt) > 2 & matrix == FALSE) {
 		warning("Single value cannot be returned when the number of groups > 2. Returning entire matrix. Please subset the matrix manually to select the specific value of interest.")
 	}
-t(mat)
+mat
 }
 
 
@@ -130,6 +157,132 @@ mat
 cdfs <- function(formula, data) {
 	splt <- parse_form(formula, data)
 lapply(splt, stats::ecdf)
+}
+
+#' Compute the proportion above a specific cut location
+#' 
+#' This rather simple function  calls \link{cdfs}, to compute the
+#' empirical cumulative distribution function for all levels of the grouping 
+#' factor, and then calculates the proportion of the sample above any generic
+#' point on the scale for all groups. Alternatively only specific proportions
+#' can be returned.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param cut The point at the scale from which the proportion above should
+#' be calculated from.
+#' @param groups The groups to return the proportion above the cut. Defaults
+#'  to \code{"all"}. Argument takes a character or character vector as its
+#'  argument corresponding to the levels of the grouping factor.
+#' @param diff Logical, defaults to \code{TRUE}. Should the difference between
+#' the groups be returned? If \code{FALSE} the raw proportion above
+#' the cut is returned for each group.
+#' @param matrix Logical, defaults to \code{TRUE}. Should the results be
+#' returned as a matrix? Only relevant when \code{diff == TRUE}.
+#' @return Matrix (or vector) of the proportion above the cutoff.
+#' @export 
+
+pac <- function(formula, data, cut, groups = "all", diff = TRUE, 
+			matrix = TRUE) {
+	if(is.numeric(groups)) {
+		groups <- as.character(groups)
+		warning("Numeric input for `groups` coerced to character.")
+	}
+
+	ecdfs <- cdfs(formula, data)
+	pacs <- sapply(ecdfs, function(f) 1 - f(cut))
+	if(diff == FALSE) {
+		if(length(groups) > 1|(length(groups) == 1 & groups != "all")) {
+			return(pacs[groups])
+		}
+		else {
+			return(pacs)
+		}
+
+	}
+	
+	if(diff == TRUE) {
+		diff_pac <- function(vec) pacs[[ vec[1] ]] - pacs[[ vec[2] ]]
+		if(matrix == TRUE) {
+			if(length(groups) > 1) {
+				pacs <- pacs[groups]
+				mat <- create_mat(names(pacs), diff_pac)
+			}
+			if(groups == "all") {
+				mat <- create_mat(names(pacs), diff_pac)
+			}
+		}
+
+		if(matrix == FALSE) {
+			if(length(groups) > 1) {
+				pacs <- pacs[groups]
+				vec <- create_mat(names(pacs), diff_pac, vec = TRUE)
+			return(vec)
+			}
+			if(groups == "all") {
+				vec <- create_mat(names(pacs), diff_pac, vec = TRUE)
+			return(vec)
+			}
+		}
+	}
+mat
+}
+
+#' Transformed proportion above the cut
+#' 
+#' This function transforms calls to \link{pac} into standard deviation units.
+#' Function assumes that each distribution is distributed normally with 
+#' common variances. See 
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
+#'  Reardon, 2012}
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param cut The point at the scale from which the proportion above should
+#' be calculated from.
+#' @param groups The groups to return the proportion above the cut. Defaults
+#'  to \code{"all"}. Argument takes a character or character vector as its
+#'  argument corresponding to the levels of the grouping factor.
+#' @param diff Logical, defaults to \code{TRUE}. Should the difference between
+#' the groups be returned? If \code{FALSE} the raw transformed proportion above
+#' the cut is returned for each group, in standard deviation units.
+#' @param matrix Logical, defaults to \code{TRUE}. Should the results be
+#' returned as a matrix? Only relevant when \code{diff == TRUE}.
+#' @return Matrix (or vector) of the transformed proportion above the cutoff.
+#' @export 
+
+tpac <- function(formula, data, cut, groups = "all", diff = TRUE, 
+			matrix = TRUE) {
+	pacs <- pac(formula, data, cut, groups, diff = FALSE, matrix = FALSE)
+	tpacs <- qnorm(pacs)
+	if(diff == FALSE) {
+		return(tpacs)
+	}
+	if(length(tpacs) == 1 & diff == TRUE) {
+		warning("Only one group specified with `dif = TRUE`. Call to `diff` will be ignored")
+		return(tpacs)
+	}
+
+	
+	if(diff == TRUE) {
+		diff_tpac <- function(vec) tpacs[[ vec[1] ]] - tpacs[[ vec[2] ]]
+
+		if(matrix == FALSE) {
+			vec <- create_mat(names(tpacs), diff_tpac, vec = TRUE)
+			if(any(vec == Inf|vec == -Inf)) {
+				warning("100% or 0% of the sample (for one or more groups)scored above/below this cut point. Cannot transform to normal scale.")
+			}
+		return(vec)
+		}
+		
+		mat <- create_mat(names(tpacs), diff_tpac)
+		if(any(mat == Inf)) {
+			warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
+		}
+	}
+mat
 }
 
 #' Compute probabilities from the empirical CDFs of a grouping variable for
