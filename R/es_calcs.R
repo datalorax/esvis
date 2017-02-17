@@ -12,15 +12,17 @@
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param matrix Logical. If only two groups are being compared, should the
-#' full matrix of all possible comparisons be returned? If \code{FALSE} only
-#' the positive effect size is returned.
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
-#'  the grouping factor are returned as a matrix, with the reference group 
-#'  reported by rows and the focal group reported by columns.
+#'  the grouping factor are returned as a tidy data frame.
 #' @import stats
 #' @export
-coh_d <- function(formula, data, matrix = TRUE) {
+coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
 
 	means <- sapply(splt, mean, na.rm = TRUE)
@@ -34,15 +36,17 @@ coh_d <- function(formula, data, matrix = TRUE) {
 			(sum(ns[vec]) - 2))
 	}
 
-	mat <- create_mat(names(splt), es_d)
-	
-	if(length(splt) == 2 & matrix == FALSE) {
-		return(mat[2, 1])
+	td <- tidy_out(names(splt), es_d)
+	if(!is.null(ref_group)) {
+		td <- td[td$ref_group == ref_group, ]
 	}
-	if(length(splt) > 2 & matrix == FALSE) {
-		warning("Single value cannot be returned when the number of groups > 2. Returning entire matrix. Please subset the matrix manually to select the specific value of interest.")
+
+	if(tidy == FALSE) {
+		vec <- td$estimate
+		names(vec) <- paste(td$ref_group, td$foc_group, sep = "-")
+		return(vec)
 	}
-mat
+td
 }
 
 
@@ -58,31 +62,38 @@ mat
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param matrix Logical. If only two groups are being compared, should the
-#' full matrix of all possible comparisons be returned? If \code{FALSE} only
-#' the positive effect size is returned.
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
 #' @return By default the Hedges' \emph{d} for all possible pairings of
-#'  the grouping factor are returned as a matrix, with the reference group 
-#'  reported by rows and the focal group reported by columns.
+#'  the grouping factor are returned as a tidy data frame.
 #' @import stats
 #' @export
 
-hedg_g <- function(formula, data, matrix = TRUE) {
+hedg_g <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
 
 	ns <- sapply(splt, length)
 	ns <- outer(ns, ns, "+")
-	
-	ds <- coh_d(formula, data)
+	diag(ns) <- 0
+	v <- as.vector(ns)
 
-	mat <- ds * (1 - ( 3 /( (4*ns) - 9) ) )
-	if(length(splt) == 2 & matrix == FALSE) {
-		return(mat[1, 2])
+	td <- coh_d(formula, data)
+	
+	td$estimate <- td$estimate * (1 - ( 3 /( (4*v[v!=0]) - 9) ) )
+	if(!is.null(ref_group)) {
+		td <- td[td$ref_group == ref_group, ]
 	}
-	if(length(splt) > 2 & matrix == FALSE) {
-		warning("Single value cannot be returned when the number of groups > 2. Returning entire matrix. Please subset the matrix manually to select the specific value of interest.")
+
+	if(tidy == FALSE) {
+		vec <- td$estimate
+		names(vec) <- paste(td$ref_group, td$foc_group, sep = "-")
+		return(vec)
 	}
-mat
+td
 }
 
 #' Compute the proportion above a specific cut location
