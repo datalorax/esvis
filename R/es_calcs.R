@@ -109,61 +109,67 @@ td
 #' @param data The data frame that the data in the formula come from.
 #' @param cut The point at the scale from which the proportion above should
 #' be calculated from.
-#' @param groups The groups to return the proportion above the cut. Defaults
-#'  to \code{"all"}. Argument takes a character or character vector as its
-#'  argument corresponding to the levels of the grouping factor.
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
 #' @param diff Logical, defaults to \code{TRUE}. Should the difference between
 #' the groups be returned? If \code{FALSE} the raw proportion above
 #' the cut is returned for each group.
-#' @param matrix Logical, defaults to \code{TRUE}. Should the results be
-#' returned as a matrix? Only relevant when \code{diff == TRUE}.
-#' @return Matrix (or vector) of the proportion above the cutoff.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
+#' @return Tidy data frame (or vector) of the proportion above the cutoff for 
+#' each (or selected) groups.
 #' @export 
 
-pac <- function(formula, data, cut, groups = "all", diff = TRUE, 
-			matrix = TRUE) {
-	if(is.numeric(groups)) {
-		groups <- as.character(groups)
-		warning("Numeric input for `groups` coerced to character.")
-	}
+pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
+			tidy = TRUE) {
 
 	ecdfs <- cdfs(formula, data)
 	pacs <- sapply(ecdfs, function(f) 1 - f(cut))
+	
 	if(diff == FALSE) {
-		if(length(groups) > 1|(length(groups) == 1 & groups != "all")) {
-			return(pacs[groups])
+		if(tidy == TRUE) {
+			td <- data.frame(group = names(pacs), 
+							  estimate = pacs)
+			rownames(td) <- NULL
+			if(!is.null(ref_group)) {
+				td <- td[td$group == ref_group, ]
+			}
+			return(td)
 		}
-		else {
-			return(pacs)
+		if(tidy == FALSE) {
+			return(pacs[as.character(ref_group)])
 		}
-
 	}
 	
 	if(diff == TRUE) {
 		diff_pac <- function(vec) pacs[[ vec[1] ]] - pacs[[ vec[2] ]]
-		if(matrix == TRUE) {
-			if(length(groups) > 1) {
-				pacs <- pacs[groups]
-				mat <- create_mat(names(pacs), diff_pac)
+		if(tidy == TRUE) {
+			td <- tidy_out(names(pacs), diff_pac)
+
+			if(!is.null(ref_group)) {
+				td <- td[td$ref_group == ref_group, ]
 			}
-			if(groups == "all") {
-				mat <- create_mat(names(pacs), diff_pac)
+		}
+		if(tidy == FALSE) {
+			vec <- create_vec(names(pacs), diff_pac)
+
+			if(!is.null(ref_group)) {
+				td <- td[td$ref_group == ref_group, ]
 			}
 		}
 
-		if(matrix == FALSE) {
-			if(length(groups) > 1) {
-				pacs <- pacs[groups]
-				vec <- create_mat(names(pacs), diff_pac, vec = TRUE)
-			return(vec)
+
+		if(tidy == FALSE) {
+			vec <- create_vec(names(pacs), diff_pac)
+			if(!is.null(ref_group)) {
+				vec <- vec[grep(paste0("^", ref_group), names(vec))]
 			}
-			if(groups == "all") {
-				vec <- create_mat(names(pacs), diff_pac, vec = TRUE)
 			return(vec)
-			}
 		}
 	}
-mat
+td
 }
 
 #' Transformed proportion above the cut
