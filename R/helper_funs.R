@@ -18,44 +18,31 @@ parse_form <- function(formula, data, order = TRUE) {
 splt
 }
 
-#' Create Matrix of all possible combinations
+#' Create a named vector of all possible combinations
 #' 
-#' Archived Code: Data are now returned in a tidy data format
+#' Alternative to tidied data frame return.
 #' 
 #' @param levs The levels of the grouping factor from which to create the
 #' matrix
 #' @param fun The function to apply.
-#' @param diagonal What elements should go on the diagonal of the matrix?
-#' Defaults to 0. 
-#' @param vec Logical. Should a vector rather than a matrix be returned? 
-#' Defaults to FALSE.
 #' @return Matrix of values according to the function supplied.
 
-create_mat <- function(levs, fun, diagonal = 0, vec = FALSE) {
+create_vec <- function(levs, fun) {
 	combos_1 <- t(utils::combn(levs, 2))
 	combos_2 <- t(utils::combn(rev(levs), 2))
 
 	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
 	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
 
-	mat <- matrix(rep(NA, length(levs)^2), ncol = length(levs))
-	diag(mat) <- diagonal
-	mat[lower.tri(mat)] <- diff_1
-	mat[upper.tri(mat)] <- rev(diff_2)
-	rownames(mat) <- levs
-	colnames(mat) <- levs
-	if(vec == TRUE) {
-		set1 <- sapply(split(combos_1, 1:nrow(combos_1)), 
-					paste0, collapse = "-")
-		set2 <- sapply(split(combos_2, 1:nrow(combos_2)), 
-					paste0, collapse = "-")
+	set1 <- sapply(split(combos_1, 1:nrow(combos_1)), 
+				paste0, collapse = "-")
+	set2 <- sapply(split(combos_2, 1:nrow(combos_2)), 
+				paste0, collapse = "-")
 
-		vec <- c(mapply(fun, split(combos_1, 1:nrow(combos_1))),
-				 mapply(fun, split(combos_2, 1:nrow(combos_2))))
-		names(vec) <- c(set1, set2)
-	return(vec)
-	}
-t(mat)
+	vec <- c(mapply(fun, split(combos_1, 1:nrow(combos_1))),
+			 mapply(fun, split(combos_2, 1:nrow(combos_2))))
+	names(vec) <- c(set1, set2)
+vec
 }
 
 
