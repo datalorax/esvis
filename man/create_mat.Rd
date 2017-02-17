@@ -22,6 +22,6 @@ Defaults to FALSE.}
 Matrix of values according to the function supplied.
 }
 \description{
-Create Matrix of all possible combinations
+Archived Code: Data are now returned in a tidy data format
 }
 
