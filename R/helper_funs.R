@@ -402,11 +402,11 @@ auc <- function(formula, data, matrix = TRUE) {
 v <- function(formula, data) {
 	ps <- probs(formula, data)
 	if(ncol(ps) == 2 ) { 
-		return(sqrt(2*qnorm(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2]))))
+		return(sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2])))
 	}
 
 	v_fun <- function(x, y) {
-		sqrt(2*qnorm(sfsmisc::integrate.xy(ps[ ,x], ps[ ,y])))
+		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,x], ps[ ,y]))
 	}
 	suppressWarnings(
 		vs <- mapply(v_fun, 
