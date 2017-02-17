@@ -20,6 +20,8 @@ splt
 
 #' Create Matrix of all possible combinations
 #' 
+#' Archived Code: Data are now returned in a tidy data format
+#' 
 #' @param levs The levels of the grouping factor from which to create the
 #' matrix
 #' @param fun The function to apply.
@@ -54,6 +56,20 @@ create_mat <- function(levs, fun, diagonal = 0, vec = FALSE) {
 	return(vec)
 	}
 t(mat)
+}
+
+
+tidy_out <- function(levs, fun, diagonal = 0, vec = FALSE) {
+	combos_1 <- t(utils::combn(levs, 2))
+	combos_2 <- t(utils::combn(rev(levs), 2))
+
+	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
+	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
+
+	df <- as.data.frame(rbind(combos_1, combos_2))
+	names(df) <- c("ref_group", "foc_group")
+	df$estimate <- c(diff_1, diff_2)
+df
 }
 
 
