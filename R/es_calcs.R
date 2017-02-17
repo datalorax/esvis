@@ -139,7 +139,10 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 			return(td)
 		}
 		if(tidy == FALSE) {
-			return(pacs[as.character(ref_group)])
+			if(!is.null(ref_group)) {
+				pacs <- pacs[as.character(ref_group)]
+			}
+		return(pacs)
 		}
 	}
 	
@@ -185,26 +188,29 @@ td
 #' @param data The data frame that the data in the formula come from.
 #' @param cut The point at the scale from which the proportion above should
 #' be calculated from.
-#' @param groups The groups to return the proportion above the cut. Defaults
-#'  to \code{"all"}. Argument takes a character or character vector as its
-#'  argument corresponding to the levels of the grouping factor.
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
 #' @param diff Logical, defaults to \code{TRUE}. Should the difference between
-#' the groups be returned? If \code{FALSE} the raw transformed proportion above
-#' the cut is returned for each group, in standard deviation units.
-#' @param matrix Logical, defaults to \code{TRUE}. Should the results be
-#' returned as a matrix? Only relevant when \code{diff == TRUE}.
-#' @return Matrix (or vector) of the transformed proportion above the cutoff.
+#' the groups be returned? If \code{FALSE} the raw proportion above
+#' the cut is returned for each group.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
+#' @return A tidy data frame (or vector) of the transformed proportion above
+#' the cutoff. Optionally (and by default) all pairwise comparisons are 
+#' calculated and returned.
 #' @export 
 
-tpac <- function(formula, data, cut, groups = "all", diff = TRUE, 
-			matrix = TRUE) {
-	pacs <- pac(formula, data, cut, groups, diff = FALSE, matrix = FALSE)
+tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
+			tidy = TRUE) {
+	pacs <- pac(formula, data, cut, diff = FALSE, tidy = FALSE)
 	tpacs <- qnorm(pacs)
 	if(diff == FALSE) {
 		return(tpacs)
 	}
 	if(length(tpacs) == 1 & diff == TRUE) {
-		warning("Only one group specified with `dif = TRUE`. Call to `diff` will be ignored")
+		warning("Only one group specified with `diff = TRUE`. Call to `diff` will be ignored")
 		return(tpacs)
 	}
 
@@ -212,20 +218,27 @@ tpac <- function(formula, data, cut, groups = "all", diff = TRUE,
 	if(diff == TRUE) {
 		diff_tpac <- function(vec) tpacs[[ vec[1] ]] - tpacs[[ vec[2] ]]
 
-		if(matrix == FALSE) {
-			vec <- create_mat(names(tpacs), diff_tpac, vec = TRUE)
+		if(tidy == FALSE) {
+			vec <- create_vec(names(tpacs), diff_tpac)
 			if(any(vec == Inf|vec == -Inf)) {
 				warning("100% or 0% of the sample (for one or more groups)scored above/below this cut point. Cannot transform to normal scale.")
 			}
+			if(!is.null(ref_group)) {
+				vec <- vec[grep(paste0("^", ref_group), names(vec))]
+			}
 		return(vec)
 		}
-		
-		mat <- create_mat(names(tpacs), diff_tpac)
-		if(any(mat == Inf)) {
-			warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
-		}
+		if(tidy == TRUE) {
+			td <- tidy_out(names(tpacs), diff_tpac)
+			if(!is.null(ref_group)) {
+				td <- td[td$ref_group == ref_group, ]
+			}
+			if(any(td$estimate == Inf|td$estimate == -Inf)) {
+				warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
+			}
+		}	
 	}
-mat
+td
 }
 
 #' Calculate the area under the curve

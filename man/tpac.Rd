@@ -4,7 +4,7 @@
 \alias{tpac}
 \title{Transformed proportion above the cut}
 \usage{
-tpac(formula, data, cut, groups = "all", diff = TRUE, matrix = TRUE)
+tpac(formula, data, cut, ref_group = NULL, diff = TRUE, tidy = TRUE)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -16,19 +16,22 @@ variable can include any arbitrary number of groups.}
 \item{cut}{The point at the scale from which the proportion above should
 be calculated from.}
 
-\item{groups}{The groups to return the proportion above the cut. Defaults
-to \code{"all"}. Argument takes a character or character vector as its
-argument corresponding to the levels of the grouping factor.}
+\item{ref_group}{Optional. If the name of the reference group is provided
+(must be character and match the grouping level exactly), only the
+estimates corresponding to the given reference group will be returned.}
 
 \item{diff}{Logical, defaults to \code{TRUE}. Should the difference between
-the groups be returned? If \code{FALSE} the raw transformed proportion above
-the cut is returned for each group, in standard deviation units.}
+the groups be returned? If \code{FALSE} the raw proportion above
+the cut is returned for each group.}
 
-\item{matrix}{Logical, defaults to \code{TRUE}. Should the results be
-returned as a matrix? Only relevant when \code{diff == TRUE}.}
+\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
+\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+ as a vector.}
 }
 \value{
-Matrix (or vector) of the transformed proportion above the cutoff.
+A tidy data frame (or vector) of the transformed proportion above
+the cutoff. Optionally (and by default) all pairwise comparisons are 
+calculated and returned.
 }
 \description{
 This function transforms calls to \link{pac} into standard deviation units.
