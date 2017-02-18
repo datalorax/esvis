@@ -29,6 +29,8 @@
 #'    the number of groups == 2.
 #' @param colors Color of the lines to be plotted. Defaults to
 #'    \code{\link{col_hue}} with the corresponding number of groups.
+#' @param return Logical. Should the arguments passed to \link[graphics]{plot}
+#' returned (in quoted form)? Defaults to \code{FALSE}.
 #' @param ... Additional arguments passed to \link[graphics]{plot}.
 #' @import graphics grDevices
 #' @export
@@ -44,7 +46,7 @@
 pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, 
 	text = NULL, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
- 	legend = NULL, colors = NULL, ...) {
+ 	legend = NULL, colors = NULL, return = FALSE, ...) {
 
 	op <- par()
 	op <- op[-grep(c("cin|cra|csi|cxy|din|page"), names(op))]
@@ -54,7 +56,13 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 
 	if(ncol(ps) > 2 & !is.null(shade)) {
 		if(shade == TRUE) {
-			stop("The area under the curve can only be shaded with two groups. Remove `shade = TRUE` argument.")	
+			warning("The area under the curve can only be shaded with two groups. Argument `shade = TRUE` ignored")	
+		}
+		
+	}
+	if(ncol(ps) > 2 & !is.null(text)) {
+		if(text == TRUE) {
+			warning("Text annotations can only be produced automatically with two groups. Argument `text = TRUE` ignored")	
 		}
 		
 	}
@@ -78,46 +86,58 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 
 	sq <- 1:ncol(ps)
 	ref_group_d <- ps[ ,sq[colnames(ps) == as.character(ref_group)] ]
-	plot(ref_group_d, ps[ ,2], 
-		type = "n",
-		lwd = 2, 
-		xlim = c(0, 1), 
-		ylim = c(0, 1),
-		xlab = "",
-		ylab = "",
-		main = paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
-		bty = "n",
-		...)
-	
-	if(ncol(ps) == 2) {
-		title(xlab = paste0("p(", colnames(ps)[1], ")"), 	
-			  ylab = paste0("p(", colnames(ps)[2], ")"))
-	} 
-	
-	if(ncol(ps) > 2) {
-		title(xlab = paste0("p(", ref_group, ")"),
-			  ylab = "p(Focal Group)")	
-	} 
 
+	pargs <- list(x = quote(ref_group_d), 
+				  y = quote(ps[ ,2]),
+				  type = "n",
+				  ...)
+	
+	if(is.null(pargs$xlim)) {
+		pargs$xlim <- quote(c(0, 1))
+	}
+	if(is.null(pargs$ylim)) {
+		pargs$ylim <- quote(c(0, 1))
+	}	
+	if(is.null(pargs$xlab)) {
+		if(ncol(ps) == 2) pargs$xlab <- quote(paste0("p(",colnames(ps)[1],")"))
+		if(ncol(ps) > 2) pargs$xlab <- quote(paste0("p(", ref_group, ")"))
+	}
+	if(is.null(pargs$ylab)) {
+		if(ncol(ps) == 2) pargs$ylab <- quote(paste0("p(",colnames(ps)[2],")"))
+		if(ncol(ps) > 2) pargs$ylab <- quote("p(Focal Group)")
+	}
+	if(is.null(pargs$main)) {
+		pargs$main <- quote(paste(as.character(formula)[c(2, 1, 3)], 
+						collapse = " "))
+	}
+	if(is.null(pargs$bty)) {
+		pargs$bty <- quote("n")
+	}
+	do.call("plot", pargs)
+	
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
 
 	if(is.null(colors)) colors <- col_hue(ncol(ps_subset))
 	
-	for(i in 1:(ncol(ps) - 1)) {
+	if(is.null(pargs$lwd)) pargs$lwd <- 2
+	if(is.null(pargs$lty)) pargs$lty <- 1
+	
+	for(i in 1:ncol(ps_subset)) {
 		lines(ref_group_d, 
 			  ps_subset[ ,i], 
 			  col = colors[i], 
-			  lwd = 2) 	
+			  lwd = pargs$lwd,
+			  lty = pargs$lty) 	
 	} 
 	
 	if(refline == TRUE)	abline(0, 1, col = "gray", lty = 2)
 
 	if(text == TRUE) {
 		text(0.8, 0.2, cex = 2, 
-			paste0("AUC = ", round(auc(formula, data, tidy = FALSE)[1], 2), 
+			paste0("AUC = ", round(auc(formula, data, ref_group, FALSE), 2), 
 				   "\n", 
-				   "V = ", round(v(formula, data, tidy = FALSE)[1], 2)))
+				   "V = ", round(v(formula, data, ref_group, FALSE), 2)))
 			
 	}
 
@@ -153,5 +173,5 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 			labels = colnames(ps_subset), 
 			las = 2)
 	}
-	
+if(return == TRUE) pargs
 }

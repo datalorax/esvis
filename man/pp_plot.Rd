@@ -6,7 +6,7 @@
 \usage{
 pp_plot(formula, data, ref_group = NULL, refline = TRUE, text = NULL,
   shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
-  255), legend = NULL, colors = NULL, ...)
+  255), legend = NULL, colors = NULL, return = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -41,6 +41,9 @@ the number of groups == 2.}
 
 \item{colors}{Color of the lines to be plotted. Defaults to
 \code{\link{col_hue}} with the corresponding number of groups.}
+
+\item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
+returned (in quoted form)? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}.}
 }
