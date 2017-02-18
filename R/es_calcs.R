@@ -30,10 +30,10 @@ coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ns <- sapply(splt, length)
 
 	# vec is a vector to subset means/vars/ns for the appropriate comparison
-	es_d <- function(vec) {
-		(means[ vec[1] ] - means[ vec[2] ]) / 
+	es_d <- function(v) {
+		(means[ v[1] ] - means[ v[2] ]) / 
 		sqrt((((ns[1] - 1)*vars[1]) + ((ns[2] - 1)*vars[2])) / 
-			(sum(ns[vec]) - 2))
+			(sum(ns[v]) - 2))
 	}
 
 	td <- tidy_out(names(splt), es_d)
@@ -147,7 +147,7 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 	}
 	
 	if(diff == TRUE) {
-		diff_pac <- function(vec) pacs[[ vec[1] ]] - pacs[[ vec[2] ]]
+		diff_pac <- function(v) pacs[[ v[1] ]] - pacs[[ v[2] ]]
 		if(tidy == TRUE) {
 			td <- tidy_out(names(pacs), diff_pac)
 
@@ -216,7 +216,7 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 
 	
 	if(diff == TRUE) {
-		diff_tpac <- function(vec) tpacs[[ vec[1] ]] - tpacs[[ vec[2] ]]
+		diff_tpac <- function(v) tpacs[[ v[1] ]] - tpacs[[ v[2] ]]
 
 		if(tidy == FALSE) {
 			vec <- create_vec(names(tpacs), diff_tpac)
@@ -253,13 +253,16 @@ td
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param matrix Logical. If only two groups are being compared, should the
-#' full matrix of all possible comparisons be returned? If \code{FALSE} the
-#' greater of the two aucs is returned. 
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
 #' @return By default the area under the curve for all possible pairings of
-#'  the grouping factor are returned as a matrix, with the reference group 
-#'  (x-axis of the pp plot) reported by rows and the focal group 
-#'  (y-axis) reported by columns.
+#' the grouping factor are returned as a tidy data frame. Alternatively, a 
+#' vector can be returned, and/or only the auc corresponding to a specific
+#' reference group can be returned.
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)
@@ -270,21 +273,26 @@ td
 #' auc(score ~ frl, d)
 #' @export
 
-auc <- function(formula, data, matrix = TRUE) {
+auc <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ps <- probs(formula, data)
-	if(ncol(ps) == 2 & matrix == FALSE) { 
-		return(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2]))
+	
+	auc_fun <- function(v) sfsmisc::integrate.xy(ps[ ,v[1]], ps[ ,v[2]])	
+	
+	if(tidy == FALSE) {
+		vec <- create_vec(colnames(ps), auc_fun)
+		if(!is.null(ref_group)) {
+			vec <- vec[grep(paste0("^", ref_group), names(vec))]
+		}
+	return(vec)
 	}
-
-	auc_fun <- function(x, y) sfsmisc::integrate.xy(ps[ ,x], ps[ ,y])	
-	aucs <- mapply(auc_fun, 
-				   rep(1:ncol(ps), ncol(ps)),
-				   rep(1:ncol(ps), each = ncol(ps)))
-
-	t(matrix(aucs, 
-			ncol = ncol(ps),
-			byrow = TRUE,
-			dimnames = list(colnames(ps), colnames(ps))))
+	
+	if(tidy == TRUE) {
+		td <- tidy_out(colnames(ps), auc_fun)
+		if(!is.null(ref_group)) {
+			td <- td[td$ref_group == ref_group, ]
+		}	
+	}
+td
 } 
 
 #' Calculate the V effect size statistic
@@ -296,14 +304,16 @@ auc <- function(formula, data, matrix = TRUE) {
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
+#' @param ref_group Optional. If the name of the reference group is provided
+#' (must be character and match the grouping level exactly), only the
+#' estimates corresponding to the given reference group will be returned.
+#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+#'  as a vector.
 #' @return By default the V statistic for all possible pairings of
-#'  the grouping factor are returned as a matrix, with the reference group 
-#'  (x-axis of the pp plot) reported by rows and the focal group 
-#'  (y-axis) reported by columns. Note that V cannot be negative (given that
-#'  the square root of a negative number is imaginary) and half the values
-#'  reported are missing (typically the lower triangle of the matrix). When
-#'  only two groups are included in the grouping factor, a single value is
-#'  returned.
+#'  the grouping factor are returned as a tidy data frame. Alternatively, a 
+#' vector can be returned, and/or only the V corresponding to a specific
+#' reference group can be returned.
 #' @import stats
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
@@ -315,22 +325,26 @@ auc <- function(formula, data, matrix = TRUE) {
 #' v(score ~ frl, d)
 #' @export
 
-v <- function(formula, data) {
+v <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ps <- probs(formula, data)
-	if(ncol(ps) == 2 ) { 
-		return(sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,1], ps[ ,2])))
-	}
 
-	v_fun <- function(x, y) {
-		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,x], ps[ ,y]))
+	v_fun <- function(v) {
+		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,v[1]], ps[ ,v[2]]))
 	}
-	suppressWarnings(
-		vs <- mapply(v_fun, 
-					   rep(1:ncol(ps), ncol(ps)),
-					   rep(1:ncol(ps), each = ncol(ps)))
-	)
-	t(matrix(vs, 
-			ncol = ncol(ps),
-			byrow = TRUE,
-			dimnames = list(colnames(ps), colnames(ps))))
+	
+	if(tidy == FALSE) {
+		vec <- create_vec(colnames(ps), v_fun)
+		if(!is.null(ref_group)) {
+			vec <- vec[grep(paste0("^", ref_group), names(vec))]
+		}
+	return(vec)
+	}
+	
+	if(tidy == TRUE) {
+		td <- tidy_out(colnames(ps), v_fun)
+		if(!is.null(ref_group)) {
+			td <- td[td$ref_group == ref_group, ]
+		}	
+	}
+td	
 } 

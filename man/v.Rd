@@ -4,7 +4,7 @@
 \alias{v}
 \title{Calculate the V effect size statistic}
 \usage{
-v(formula, data)
+v(formula, data, ref_group = NULL, tidy = TRUE)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -12,16 +12,20 @@ the outcome variable and \code{group} is the grouping variable. Note this
 variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
+
+\item{ref_group}{Optional. If the name of the reference group is provided
+(must be character and match the grouping level exactly), only the
+estimates corresponding to the given reference group will be returned.}
+
+\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
+\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+ as a vector.}
 }
 \value{
 By default the V statistic for all possible pairings of
- the grouping factor are returned as a matrix, with the reference group 
- (x-axis of the pp plot) reported by rows and the focal group 
- (y-axis) reported by columns. Note that V cannot be negative (given that
- the square root of a negative number is imaginary) and half the values
- reported are missing (typically the lower triangle of the matrix). When
- only two groups are included in the grouping factor, a single value is
- returned.
+ the grouping factor are returned as a tidy data frame. Alternatively, a 
+vector can be returned, and/or only the V corresponding to a specific
+reference group can be returned.
 }
 \description{
 This function calculates the effect size V, as discussed by Ho, 2009. The V

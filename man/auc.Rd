@@ -4,7 +4,7 @@
 \alias{auc}
 \title{Calculate the area under the curve}
 \usage{
-auc(formula, data, matrix = TRUE)
+auc(formula, data, ref_group = NULL, tidy = TRUE)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -13,15 +13,19 @@ variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
 
-\item{matrix}{Logical. If only two groups are being compared, should the
-full matrix of all possible comparisons be returned? If \code{FALSE} the
-greater of the two aucs is returned.}
+\item{ref_group}{Optional. If the name of the reference group is provided
+(must be character and match the grouping level exactly), only the
+estimates corresponding to the given reference group will be returned.}
+
+\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
+\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
+ as a vector.}
 }
 \value{
 By default the area under the curve for all possible pairings of
- the grouping factor are returned as a matrix, with the reference group 
- (x-axis of the pp plot) reported by rows and the focal group 
- (y-axis) reported by columns.
+the grouping factor are returned as a tidy data frame. Alternatively, a 
+vector can be returned, and/or only the auc corresponding to a specific
+reference group can be returned.
 }
 \description{
 This function is used within \code{\link{pp_plot}} to calculate the area 
