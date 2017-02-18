@@ -46,7 +46,7 @@ vec
 }
 
 
-tidy_out <- function(levs, fun, diagonal = 0, vec = FALSE) {
+tidy_out <- function(levs, fun) {
 	combos_1 <- t(utils::combn(levs, 2))
 	combos_2 <- t(utils::combn(rev(levs), 2))
 
