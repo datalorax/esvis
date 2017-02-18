@@ -6,7 +6,6 @@ os:
 
 r:
 - release
-- oldrelease
 - devel
 
 language: R
