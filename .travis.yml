@@ -5,8 +5,8 @@ os:
 - osx
 
 r:
+- oldrelease
 - release
-- devel
 
 language: R
 sudo: required
