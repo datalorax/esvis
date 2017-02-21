@@ -27,11 +27,13 @@
 #' @param legend Logical. Should the legend be plotted? Defaults to \code{TRUE}
 #'    when the number of groups is greater than 2. Legend not available when
 #'    the number of groups == 2.
-#' @param colors Color of the lines to be plotted. Defaults to
-#'    \code{\link{col_hue}} with the corresponding number of groups.
 #' @param return Logical. Should the arguments passed to \link[graphics]{plot}
 #' returned (in quoted form)? Defaults to \code{FALSE}.
-#' @param ... Additional arguments passed to \link[graphics]{plot}.
+#' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
+#' it is best to use the full argument rather than partial matching, given the
+#' method used to call the plot. While some partial matching is supported 
+#' (e.g., \code{m} for \code{main}, it is generally safest to supply the full
+#' argument).
 #' @import graphics grDevices
 #' @export
 #' @examples
@@ -46,7 +48,7 @@
 pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, 
 	text = NULL, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
- 	legend = NULL, colors = NULL, return = FALSE, ...) {
+ 	legend = NULL, return = FALSE, ...) {
 
 	op <- par()
 	op <- op[-grep(c("cin|cra|csi|cxy|din|page"), names(op))]
@@ -92,45 +94,56 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 				  type = "n",
 				  ...)
 	
-	if(is.null(pargs$xlim)) {
-		pargs$xlim <- quote(c(0, 1))
-	}
-	if(is.null(pargs$ylim)) {
-		pargs$ylim <- quote(c(0, 1))
-	}	
 	if(is.null(pargs$xlab)) {
-		if(ncol(ps) == 2) pargs$xlab <- quote(paste0("p(",colnames(ps)[1],")"))
-		if(ncol(ps) > 2) pargs$xlab <- quote(paste0("p(", ref_group, ")"))
+		if(ncol(ps) == 2) pargs$xlab <- paste0("p(",colnames(ps)[1],")")
+		if(ncol(ps) > 2) pargs$xlab <- paste0("p(", ref_group, ")")
+
+		# check for partial matching
+		if(!is.null(pargs$xla)) {
+			pargs$xlab <- pargs$xla
+			pargs$xla <- NULL
+		}
 	}
 	if(is.null(pargs$ylab)) {
-		if(ncol(ps) == 2) pargs$ylab <- quote(paste0("p(",colnames(ps)[2],")"))
-		if(ncol(ps) > 2) pargs$ylab <- quote("p(Focal Group)")
+		if(ncol(ps) == 2) pargs$ylab <- paste0("p(",colnames(ps)[2],")")
+		if(ncol(ps) > 2) pargs$ylab <- "p(Focal Group)"
+
+		if(!is.null(pargs$yla)) {
+			pargs$ylab <- pargs$yla
+			pargs$yla <- NULL
+		}
 	}
 	if(is.null(pargs$main)) {
-		pargs$main <- quote(paste(as.character(formula)[c(2, 1, 3)], 
-						collapse = " "))
+		if(length(grep("m", names(pargs))) > 0) {
+			pargs$main <- pargs[[grep("m", names(pargs))]]
+			pargs[grep("m", names(pargs))[1]] <- NULL
+		}
+		else { 
+			pargs$main <- paste(as.character(formula)[c(2, 1, 3)],
+							collapse = " ")
+		}
 	}
-	if(is.null(pargs$bty)) {
-		pargs$bty <- quote("n")
-	}
+	if(is.null(pargs$bty)) pargs$bty <- "n"
+	
 	do.call("plot", pargs)
 	
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
-
-	if(is.null(colors)) colors <- col_hue(ncol(ps_subset))
+	
 	
 	if(is.null(pargs$lwd)) pargs$lwd <- 2
 	if(is.null(pargs$lty)) pargs$lty <- 1
-	
-	for(i in 1:ncol(ps_subset)) {
-		lines(ref_group_d, 
-			  ps_subset[ ,i], 
-			  col = colors[i], 
-			  lwd = pargs$lwd,
-			  lty = pargs$lty) 	
-	} 
-	
+	if(is.null(pargs$col)) pargs$col <- col_hue(ncol(ps_subset))
+
+	x_axs <- rep(ref_group_d, ncol(ps_subset))
+
+	Map(lines, 
+		x = split(x_axs, rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
+		y = split(ps_subset, rep(1:ncol(ps_subset), each = nrow(ps_subset))),
+	    col = pargs$col, 
+		lwd = pargs$lwd,
+		lty = pargs$lty)
+
 	if(refline == TRUE)	abline(0, 1, col = "gray", lty = 2)
 
 	if(text == TRUE) {
@@ -165,8 +178,9 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 		Map(lines, 
 			split(axes[ ,1], axes[ ,2]), 
 			split(axes[ ,2], axes[ ,2]),
-			col = as.list(colors),
-			lwd = 2)
+			col = pargs$col,
+			lwd = pargs$lwd,
+			lty = pargs$lty)
 		axis(2, 
 			lwd = 0, 
 			at = 1:ncol(ps_subset), 

@@ -6,7 +6,7 @@
 \usage{
 pp_plot(formula, data, ref_group = NULL, refline = TRUE, text = NULL,
   shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
-  255), legend = NULL, colors = NULL, return = FALSE, ...)
+  255), legend = NULL, return = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -39,13 +39,14 @@ light blue color.}
 when the number of groups is greater than 2. Legend not available when
 the number of groups == 2.}
 
-\item{colors}{Color of the lines to be plotted. Defaults to
-\code{\link{col_hue}} with the corresponding number of groups.}
-
 \item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
 returned (in quoted form)? Defaults to \code{FALSE}.}
 
-\item{...}{Additional arguments passed to \link[graphics]{plot}.}
+\item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
+it is best to use the full argument rather than partial matching, given the
+method used to call the plot. While some partial matching is supported 
+(e.g., \code{m} for \code{main}, it is generally safest to supply the full
+argument).}
 }
 \description{
 The paired probability plot maps the probability of obtaining a specific
