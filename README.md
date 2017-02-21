@@ -60,7 +60,7 @@ Currently, the `pp_plot` function is the most fully developed visualization.
 pp_plot(mean ~ subject, seda)
 ```
 
-<img src="temp_files/figure-html/pp_plot1-1.png" width="672" />
+<img src="./assets/img/pp_plot1-1.png" width="672" />
 
 When comparing more than one group, the reference group (which can be changed) is plotted along the x-axis.
 
@@ -69,4 +69,4 @@ When comparing more than one group, the reference group (which can be changed) i
 pp_plot(mean ~ grade, seda)
 ```
 
-<img src="temp_files/figure-html/pp_plot2-1.png" width="672" />
+<img src="./assets/img/pp_plot2-1.png" width="672" />
