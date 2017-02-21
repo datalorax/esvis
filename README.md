@@ -10,7 +10,8 @@ This package was designed primarily for visualizing achievement differences (ach
 ## Installation
 Install with *devtools* with
 
-```{r}
+
+```r
 # install devtools, if not already installed
 # install.packages("devtools")
 
@@ -22,28 +23,50 @@ devtools::install_github("DJAnderson07/esvis")
 
 Compute effect sizes for all possible pairwise comparisons.
 
-```{r}
+
+```r
 library(esvis)
 coh_d(mean ~ subject, seda)
-``` 
+```
+
+```
+##   ref_group foc_group   estimate
+## 1      math       ela  0.8312519
+## 2       ela      math -0.8312519
+```
 
 Or specify a reference group
 
-```{r }
+
+```r
 coh_d(mean ~ grade, seda, 8)
+```
+
+```
+##   ref_group foc_group estimate
+## 1         8         7 0.593485
+## 2         8         6 1.165106
+## 3         8         5 1.819459
+## 4         8         4 2.416754
+## 5         8         3 3.004039
 ```
 
 Currently implemented effect size calculations include Cohen's *d*, Hedge's *g*, percent above the cut, transformed percent above the cut, area under the curve, and the *V* statistic, as outlined by [Ho & Reardon, 2012](http://journals.sagepub.com/doi/abs/10.3102/1076998611411918).
 
 Currently, the `pp_plot` function is the most fully developed visualization.
 
-```{r}
+
+```r
 pp_plot(mean ~ subject, seda)
 ```
 
+<img src="temp_files/figure-html/pp_plot1-1.png" width="672" />
+
 When comparing more than one group, the reference group (which can be changed) is plotted along the x-axis.
 
-```{r}
-pp_plot(mean ~ grade, seda)
 
+```r
+pp_plot(mean ~ grade, seda)
 ```
+
+<img src="temp_files/figure-html/pp_plot2-1.png" width="672" />
