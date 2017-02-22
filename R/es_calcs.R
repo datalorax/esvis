@@ -206,6 +206,11 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 			tidy = TRUE) {
 	pacs <- pac(formula, data, cut, diff = FALSE, tidy = FALSE)
 	tpacs <- qnorm(pacs)
+	
+	if(any(tpacs == Inf|tpacs == -Inf)) {
+				warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
+	}
+	
 	if(diff == FALSE) {
 		return(tpacs)
 	}
@@ -220,9 +225,7 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 
 		if(tidy == FALSE) {
 			vec <- create_vec(names(tpacs), diff_tpac)
-			if(any(vec == Inf|vec == -Inf)) {
-				warning("100% or 0% of the sample (for one or more groups)scored above/below this cut point. Cannot transform to normal scale.")
-			}
+			
 			if(!is.null(ref_group)) {
 				vec <- vec[grep(paste0("^", ref_group), names(vec))]
 			}
@@ -232,9 +235,6 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 			td <- tidy_out(names(tpacs), diff_tpac)
 			if(!is.null(ref_group)) {
 				td <- td[td$ref_group == ref_group, ]
-			}
-			if(any(td$estimate == Inf|td$estimate == -Inf)) {
-				warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
 			}
 		}	
 	}
