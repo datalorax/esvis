@@ -114,6 +114,8 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 		}
 	}
 	if(is.null(pargs$main)) {
+		
+		# check for partial matching
 		if(length(grep("m", names(pargs))) > 0) {
 			pargs$main <- pargs[[grep("m", names(pargs))]]
 			pargs[grep("m", names(pargs))[1]] <- NULL
@@ -135,6 +137,13 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 	if(is.null(pargs$lty)) pargs$lty <- 1
 	if(is.null(pargs$col)) pargs$col <- col_hue(ncol(ps_subset))
 
+	if((length(pargs$col) !=1) & (length(pargs$col) < ncol(ps_subset))) {
+		warning("Not enough colors supplied. Colors will be recycled when drawing lines.")
+	}
+	if((length(pargs$lty) !=1) & (length(pargs$lty) < ncol(ps_subset))) {
+		warning("Not enough line types supplied. Line types will be recycled when drawing lines.")
+	}
+
 	x_axs <- rep(ref_group_d, ncol(ps_subset))
 
 	Map(lines, 
@@ -150,8 +159,7 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 		text(0.8, 0.2, cex = 2, 
 			paste0("AUC = ", round(auc(formula, data, ref_group, FALSE), 2), 
 				   "\n", 
-				   "V = ", round(v(formula, data, ref_group, FALSE), 2)))
-			
+				   "V = ", round(v(formula, data, ref_group, FALSE), 2)))	
 	}
 
 	if(shade == TRUE) {
@@ -201,5 +209,5 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 			labels = colnames(ps_subset), 
 			las = 2)
 	}
-if(return == TRUE) pargs
+if(return == TRUE) c(as.list(match.call()), pargs)
 }
