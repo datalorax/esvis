@@ -60,11 +60,11 @@ Currently, the `pp_plot` function is the most fully developed visualization.
 pp_plot(mean ~ subject, seda)
 ```
 
-[pp_plot1](https://dl.dropboxusercontent.com/u/33227330/esvis_figs/pp_plot1-1.png)
+![pp_plot1](https://dl.dropboxusercontent.com/u/33227330/esvis_figs/pp_plot1-1.png)
 When comparing more than one group, the reference group (which can be changed) is plotted along the x-axis.
 
 
 ```r
 pp_plot(mean ~ grade, seda)
 ```
-[pp_plot2](https://dl.dropboxusercontent.com/u/33227330/esvis_figs/pp_plot2-1.png)
+![pp_plot2](https://dl.dropboxusercontent.com/u/33227330/esvis_figs/pp_plot2-1.png)
