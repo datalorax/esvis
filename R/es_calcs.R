@@ -148,6 +148,7 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 	
 	if(diff == TRUE) {
 		diff_pac <- function(v) pacs[[ v[1] ]] - pacs[[ v[2] ]]
+		
 		if(tidy == TRUE) {
 			td <- tidy_out(names(pacs), diff_pac)
 
@@ -155,14 +156,6 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 				td <- td[td$ref_group == ref_group, ]
 			}
 		}
-		if(tidy == FALSE) {
-			vec <- create_vec(names(pacs), diff_pac)
-
-			if(!is.null(ref_group)) {
-				td <- td[td$ref_group == ref_group, ]
-			}
-		}
-
 
 		if(tidy == FALSE) {
 			vec <- create_vec(names(pacs), diff_pac)
