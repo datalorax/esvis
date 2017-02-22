@@ -10,6 +10,8 @@ test_that("Transformed percentage above  cut computes and outputs correctly", {
 	expect_equal(nrow(tpac(mean ~ grade, seda, 225, 3)), 5)
 
 	expect_output(str(tpac(score ~ group, tmp, 75)), "data.frame")
+	expect_output(str(tpac(score ~ group, tmp, 75, tidy = FALSE)), "Named num")
+	expect_output(str(tpac(score ~ group, tmp, 75, diff = FALSE)), "Named num")
 
 	expect_warning(tpac(mean ~ grade, seda, 10))
 	expect_warning(tpac(mean ~ constant, seda, 225))
