@@ -20,6 +20,10 @@ test_that("`pp_plot` produces expected output", {
 					return = TRUE)$col), 
 				5)
 	
+	expect_equal(length(pp_plot(mean ~ stateabb, seda, 
+					return = TRUE)$col), 
+				50)
+
 	expect_equal(length(pp_plot(mean ~ grade, seda, 
 					col = "blue", 
 					return = TRUE)$col), 
