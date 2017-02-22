@@ -164,14 +164,28 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 
 	if(legend == TRUE) {
 		par(mar = c(5.1, 0, 4.1, 0))
-		plot(seq(0, 1, length = ncol(ps_subset) * 1.75), 
-			 seq(1, ncol(ps_subset) * 1.75, length = ncol(ps_subset) * 1.75),
-			type = "n",
-			bty = "n", 
-			xaxt = "n",
-			xlab = "", 
-			yaxt = "n",
-			ylab = "")
+		
+		if(ncol(ps_subset) < 8) {
+			plot(seq(0, 1, length = 12), 
+				 1:12,
+				type = "n",
+				bty = "n", 
+				xaxt = "n",
+				xlab = "", 
+				yaxt = "n",
+				ylab = "")
+		}
+		else {
+			plot(seq(0, 1, length = ncol(ps_subset) * 1.5), 
+				 seq(1, ncol(ps_subset) * 1.5, 
+				 	length = ncol(ps_subset) * 1.5),
+				type = "n",
+				bty = "n", 
+				xaxt = "n",
+				xlab = "", 
+				yaxt = "n",
+				ylab = "")
+		}
 
 		axes <- cbind(c(0, 1), rep(1:ncol(ps_subset), each = 2))	
 		
