@@ -5,7 +5,7 @@
 \title{Empirical Cumulative Distribution Plot}
 \usage{
 ecdf_plot(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL,
-  text = TRUE, colors = NULL, ...)
+  text = TRUE, legend = TRUE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -26,10 +26,14 @@ line. Defaults to gray70.}
 \item{text}{Logical. If reference groups are compared, should the difference
 between the curves be annotated to the plot along the y-axis?}
 
-\item{colors}{Optional vector indicating the colors of the CDF step function
-lines.}
+\item{legend}{Logical. Should the legend be plotted? Defaults to 
+\code{TRUE}.}
 
-\item{...}{Additional arguments passed to \link[graphics]{plot}.}
+\item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
+it is best to use the full argument rather than partial matching, given the
+method used to call the plot. While some partial matching is supported 
+(e.g., \code{m} for \code{main}, it is generally safest to supply the full
+argument).}
 }
 \description{
 This function dresses up the \link[stats]{plot.ecdf} function and provides
