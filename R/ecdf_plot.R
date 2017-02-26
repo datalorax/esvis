@@ -23,6 +23,8 @@
 #' between the curves be annotated to the plot along the y-axis?
 #' @param legend Logical. Should the legend be plotted? Defaults to 
 #' \code{TRUE}.
+#' @param return Logical. Should the arguments passed to \link[graphics]{plot}
+#' returned (in quoted form)? Defaults to \code{FALSE}.
 #' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
 #' it is best to use the full argument rather than partial matching, given the
 #' method used to call the plot. While some partial matching is supported 
@@ -32,7 +34,7 @@
 #' @export
 
 
-ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL, text = TRUE, legend = TRUE, ...) {
+ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL, text = TRUE, legend = TRUE, return = FALSE, ...) {
 	splt <- parse_form(formula, data)
 	ecdfs <- cdfs(formula, data)
 
@@ -118,4 +120,45 @@ ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = 
 		}
 	}
 
+
+	if(legend == TRUE) {
+		par(mar = c(5.1, 0, 4.1, 0))
+		
+		if(length(splt) < 8) {
+			plot(seq(0, 1, length = 12), 
+				 1:12,
+				type = "n",
+				bty = "n", 
+				xaxt = "n",
+				xlab = "", 
+				yaxt = "n",
+				ylab = "")
+		}
+		else {
+			plot(seq(0, 1, length = length(splt) * 1.5), 
+				 seq(1, length(splt) * 1.5, 
+				 	length = length(splt) * 1.5),
+				type = "n",
+				bty = "n", 
+				xaxt = "n",
+				xlab = "", 
+				yaxt = "n",
+				ylab = "")
+		}
+
+		axes <- cbind(c(0, 1), rep(seq_along(splt), each = 2))	
+		
+		Map(lines, 
+			split(axes[ ,1], axes[ ,2]), 
+			split(axes[ ,2], axes[ ,2]),
+			col = pargs$col,
+			lwd = pargs$lwd,
+			lty = pargs$lty)
+		axis(2, 
+			lwd = 0, 
+			at = seq_along(splt), 
+			labels = names(splt), 
+			las = 2)
+	}
+if(return == TRUE) c(as.list(match.call()), pargs)
 }

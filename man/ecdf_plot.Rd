@@ -5,7 +5,7 @@
 \title{Empirical Cumulative Distribution Plot}
 \usage{
 ecdf_plot(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL,
-  text = TRUE, legend = TRUE, ...)
+  text = TRUE, legend = TRUE, return = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -28,6 +28,9 @@ between the curves be annotated to the plot along the y-axis?}
 
 \item{legend}{Logical. Should the legend be plotted? Defaults to 
 \code{TRUE}.}
+
+\item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
+returned (in quoted form)? Defaults to \code{FALSE}.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the
