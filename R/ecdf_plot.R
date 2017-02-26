@@ -69,11 +69,11 @@ ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = 
 		pargs$ylab <- "f(x)"
 	}
 	if(is.null(pargs$main)) {
-		
+
 		# check for partial matching
 		if(length(grep("m", names(pargs))) > 0) {
-			pargs$main <- pargs[[grep("m", names(pargs))]]
-			pargs[grep("m", names(pargs))[1]] <- NULL
+			pargs$main <- pargs[[grep("^m", names(pargs))]]
+			pargs[grep("^m", names(pargs))[1]] <- NULL
 		}
 		else { 
 			pargs$main <- paste(as.character(formula)[c(2, 1, 3)],
