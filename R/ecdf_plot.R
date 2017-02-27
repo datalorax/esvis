@@ -21,6 +21,9 @@
 #' line. Defaults to gray70.
 #' @param text Logical. If reference groups are compared, should the difference
 #' between the curves be annotated to the plot along the y-axis?
+#' @param es If text annotations should be made, which effect size should be
+#' plotted? Options include \code{\link{pac}} or \code{\link{tpac}} and 
+#' defaults to the latter.
 #' @param legend Logical. Should the legend be plotted? Defaults to 
 #' \code{TRUE}.
 #' @param return Logical. Should the arguments passed to \link[graphics]{plot}
@@ -34,7 +37,7 @@
 #' @export
 
 
-ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL, text = TRUE, legend = TRUE, return = FALSE, ...) {
+ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL, text = TRUE, es = "tpac", legend = TRUE, return = FALSE, ...) {
 	splt <- parse_form(formula, data)
 	ecdfs <- cdfs(formula, data)
 
@@ -102,8 +105,10 @@ ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = 
 		if(is.null(ref_groups)) {
 			abline(v = v_ref, col = ref_col, lty = 2, lwd = 2)
 		}
+		
 		if(!is.null(ref_groups)) {
-			y_refs <- sapply(ecdfs, function(x) x(200))
+			tpacs <- tpac(formula, data, v_ref)
+			y_refs <- sapply(ecdfs, function(x) x(v_ref))
 
 			segments(x0 = v_ref, x1 = v_ref,
 					 y0 = y_refs[ref_groups[1]], y1 = y_refs[ref_groups[2]],
@@ -120,45 +125,12 @@ ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = 
 		}
 	}
 
-
 	if(legend == TRUE) {
-		par(mar = c(5.1, 0, 4.1, 0))
-		
-		if(length(splt) < 8) {
-			plot(seq(0, 1, length = 12), 
-				 1:12,
-				type = "n",
-				bty = "n", 
-				xaxt = "n",
-				xlab = "", 
-				yaxt = "n",
-				ylab = "")
-		}
-		else {
-			plot(seq(0, 1, length = length(splt) * 1.5), 
-				 seq(1, length(splt) * 1.5, 
-				 	length = length(splt) * 1.5),
-				type = "n",
-				bty = "n", 
-				xaxt = "n",
-				xlab = "", 
-				yaxt = "n",
-				ylab = "")
-		}
-
-		axes <- cbind(c(0, 1), rep(seq_along(splt), each = 2))	
-		
-		Map(lines, 
-			split(axes[ ,1], axes[ ,2]), 
-			split(axes[ ,2], axes[ ,2]),
+		create_legend(length(splt), names(splt),
 			col = pargs$col,
 			lwd = pargs$lwd,
 			lty = pargs$lty)
-		axis(2, 
-			lwd = 0, 
-			at = seq_along(splt), 
-			labels = names(splt), 
-			las = 2)
 	}
+
 if(return == TRUE) c(as.list(match.call()), pargs)
 }

@@ -45,7 +45,6 @@ create_vec <- function(levs, fun) {
 vec
 }
 
-
 tidy_out <- function(levs, fun) {
 	combos_1 <- t(utils::combn(levs, 2))
 	combos_2 <- t(utils::combn(rev(levs), 2))
@@ -53,10 +52,28 @@ tidy_out <- function(levs, fun) {
 	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
 	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
 
-	df <- as.data.frame(rbind(combos_1, combos_2))
-	names(df) <- c("ref_group", "foc_group")
-	df$estimate <- c(diff_1, diff_2)
-df
+	if(is.null(dim(diff_1))) {
+		td <- as.data.frame(rbind(combos_1, combos_2))
+		names(td) <- c("ref_group", "foc_group")
+		td$estimate <- c(diff_1, diff_2)
+	}
+	else{
+		g1 <- as.data.frame(split(rep(combos_1, nrow(diff_1)), rep(1:2, each = nrow(combos_1))))
+		g2 <- as.data.frame(split(rep(combos_2, nrow(diff_2)), rep(1:2, each = nrow(combos_2))))
+		
+		td <- as.data.frame(rbind(g1, g2))
+		names(td) <- c("ref_group", "foc_group")
+		
+		if(is.null(rownames(diff_1))) warning("Cut score not specified as row names")
+		
+		td$cut <- rep(rep(rownames(diff_1), each = nrow(combos_1)), 2)
+
+		colnames(diff_1) <- apply(combos_1, 1, paste, collapse = "-")
+		colnames(diff_2) <- apply(combos_2, 1, paste, collapse = "-")
+
+		td$estimate <- c(t(diff_1), t(diff_2))
+	}
+td
 }
 
 
@@ -127,4 +144,53 @@ ps
 col_hue <- function(n) {
   hues = seq(15, 375, length = n + 1)
   grDevices::hcl(h = hues, c = 100, l = 65)[1:n]
+}
+
+#' Create a legend for a plot
+#' 
+#' This is an alternative legend for plots which uses the actual 
+#' plotting environment to create the legend, rather than overlaying it. I 
+#' prefer this legend because it scales better than the base legend. It is
+#' currently only implemented to support lines.
+#' 
+#' @param n Number of lines to produce on the legend.
+#' @param leg_labels Labels for the lines in the legend.
+#' @param ... Additional arguments passed to \link[graphics]{lines}.
+#' 
+
+create_legend <- function(n, leg_labels, ...) {
+	par(mar = c(5.1, 0, 4.1, 0))
+	if(n < 8) {
+		plot(seq(0, 1, length = 12), 
+			 1:12,
+			type = "n",
+			bty = "n", 
+			xaxt = "n",
+			xlab = "", 
+			yaxt = "n",
+			ylab = "")
+	}
+	else {
+		plot(seq(0, 1, length = n * 1.5), 
+			 seq(1, n * 1.5, 
+			 	length = n * 1.5),
+			type = "n",
+			bty = "n", 
+			xaxt = "n",
+			xlab = "", 
+			yaxt = "n",
+			ylab = "")
+	}
+
+	axes <- cbind(c(0, 1), rep(1:n, each = 2))	
+	
+	Map(lines, 
+		split(axes[ ,1], axes[ ,2]), 
+		split(axes[ ,2], axes[ ,2]),
+		...)
+	axis(2, 
+		lwd = 0, 
+		at = 1:n, 
+		labels = leg_labels, 
+		las = 2)
 }

@@ -127,43 +127,71 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 
 	ecdfs <- cdfs(formula, data)
 	pacs <- sapply(ecdfs, function(f) 1 - f(cut))
-	
+
 	if(diff == FALSE) {
-		if(tidy == TRUE) {
-			td <- data.frame(group = names(pacs), 
-							  estimate = pacs)
-			rownames(td) <- NULL
-			if(!is.null(ref_group)) {
-				td <- td[td$group == ref_group, ]
+		if(is.null(dim(pacs))) {
+			if(tidy == TRUE) {
+				td <- data.frame(group = names(pacs), 
+								 estimate = pacs)
+				rownames(td) <- NULL
 			}
-			return(td)
+			if(tidy == FALSE) {
+				if(!is.null(ref_group)) {
+					pacs <- pacs[as.character(ref_group)]
+				}
+				return(pacs)
+			}
 		}
-		if(tidy == FALSE) {
-			if(!is.null(ref_group)) {
-				pacs <- pacs[as.character(ref_group)]
+		else {
+			if(tidy == TRUE) {
+				td <- data.frame(group = rep(colnames(pacs), 
+												each = nrow(pacs)),
+								cut = rep(cut, ncol(pacs)))
+				dim(pacs) <- NULL
+				td$estimate <- pacs
 			}
-		return(pacs)
+			if(tidy == FALSE) {
+				rownames(pacs) <- cut
+			return(pacs)
+			}	
 		}
 	}
-	
 	if(diff == TRUE) {
-		diff_pac <- function(v) pacs[[ v[1] ]] - pacs[[ v[2] ]]
-		
-		if(tidy == TRUE) {
-			td <- tidy_out(names(pacs), diff_pac)
+		if(is.null(dim(pacs))) {
+			diff_pac <- function(v) pacs[[ v[1] ]] - pacs[[ v[2] ]]	
+			if(tidy == TRUE) {
+				td <- tidy_out(names(pacs), diff_pac)
+			}
 
-			if(!is.null(ref_group)) {
-				td <- td[td$ref_group == ref_group, ]
+			if(tidy == FALSE) {
+				vec <- create_vec(names(pacs), diff_pac)
+				if(!is.null(ref_group)) {
+					vec <- vec[grep(paste0("^", ref_group), names(vec))]
+				}
+				return(vec)
 			}
 		}
+		else {
+			diff_pac <- function(v) pacs[ ,v[1]] - pacs[ ,v[2]]
+			rownames(pacs) <- cut
+			td <- tidy_out(colnames(pacs), diff_pac)
+			
+			if(tidy == FALSE) {
+				splt_td <- split(td$estimate, td$cut)
+				
+				nms <- subset(td, cut == cut[1], select = c(1, 2))
+				nms <- apply(nms, 1, paste, collapse = "-")
 
-		if(tidy == FALSE) {
-			vec <- create_vec(names(pacs), diff_pac)
-			if(!is.null(ref_group)) {
-				vec <- vec[grep(paste0("^", ref_group), names(vec))]
-			}
-			return(vec)
+				splt_td <- lapply(splt_td, function(x) {
+					names(x) <- nms
+					return(x)
+				})
+			return(splt_td)
+			}			
 		}
+	}
+	if(!is.null(ref_group)) {
+		td <- td[td$ref_group == ref_group, ]
 	}
 td
 }

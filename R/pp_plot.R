@@ -171,43 +171,10 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 	}
 
 	if(legend == TRUE) {
-		par(mar = c(5.1, 0, 4.1, 0))
-		
-		if(ncol(ps_subset) < 8) {
-			plot(seq(0, 1, length = 12), 
-				 1:12,
-				type = "n",
-				bty = "n", 
-				xaxt = "n",
-				xlab = "", 
-				yaxt = "n",
-				ylab = "")
-		}
-		else {
-			plot(seq(0, 1, length = ncol(ps_subset) * 1.5), 
-				 seq(1, ncol(ps_subset) * 1.5, 
-				 	length = ncol(ps_subset) * 1.5),
-				type = "n",
-				bty = "n", 
-				xaxt = "n",
-				xlab = "", 
-				yaxt = "n",
-				ylab = "")
-		}
-
-		axes <- cbind(c(0, 1), rep(1:ncol(ps_subset), each = 2))	
-		
-		Map(lines, 
-			split(axes[ ,1], axes[ ,2]), 
-			split(axes[ ,2], axes[ ,2]),
-			col = pargs$col,
-			lwd = pargs$lwd,
+		create_legend(ncol(ps_subset), colnames(ps_subset), 
+			col = pargs$col, 
+			lwd = pargs$lwd, 
 			lty = pargs$lty)
-		axis(2, 
-			lwd = 0, 
-			at = 1:ncol(ps_subset), 
-			labels = colnames(ps_subset), 
-			las = 2)
 	}
 if(return == TRUE) c(as.list(match.call()), pargs)
 }

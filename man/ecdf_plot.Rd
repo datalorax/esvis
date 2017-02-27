@@ -5,7 +5,7 @@
 \title{Empirical Cumulative Distribution Plot}
 \usage{
 ecdf_plot(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL,
-  text = TRUE, legend = TRUE, return = FALSE, ...)
+  text = TRUE, es = "tpac", legend = TRUE, return = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -25,6 +25,10 @@ line. Defaults to gray70.}
 
 \item{text}{Logical. If reference groups are compared, should the difference
 between the curves be annotated to the plot along the y-axis?}
+
+\item{es}{If text annotations should be made, which effect size should be
+plotted? Options include \code{\link{pac}} or \code{\link{tpac}} and 
+defaults to the latter.}
 
 \item{legend}{Logical. Should the legend be plotted? Defaults to 
 \code{TRUE}.}
