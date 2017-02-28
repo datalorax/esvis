@@ -7,13 +7,31 @@
 #' according to their mean?
 #' @return A list of data split by the grouping factor.
 parse_form <- function(formula, data, order = TRUE) {
-	out <- data[[ all.vars(formula)[1] ]]
-	group <- data[[ all.vars(formula)[2] ]]	
+	vars <- all.vars(formula)
 
-	splt <- split(out, group)
+	if(length(vars) == 2) {
+		splt <- split(data[[ vars[1] ]], data[[ vars[2] ]]	)
+	}
+	if(length(vars) == 3) {
+		splt <- split(data, data[[ vars[2] ]]	)
+		splt <- lapply(splt, function(x) split(x, x[[ vars[3] ]]))
+		splt <- lapply(splt, function(x) lapply(x, "[[", vars[1]))
+	}
+	if(length(vars) > 3) {
+		stop("Only two grouping factors supported. Make sure your data are tidy.")
+	}
+
 	if(order == TRUE) {
-		means <- sapply(splt, mean, na.rm = TRUE)
-		splt <- splt[order(means, decreasing = TRUE)]
+		if(length(vars) == 2) {
+			means <- sapply(splt, mean, na.rm = TRUE)
+			splt <- splt[order(means, decreasing = TRUE)]
+		}
+		if(length(vars) == 3) {
+			ordered <- lapply(splt, function(x) {
+				order(sapply(x, mean, na.rm = TRUE), decreasing = TRUE)
+			})
+			splt <- Map(function(x, y) x[y], splt, ordered)
+		}
 	}
 splt
 }
@@ -91,7 +109,13 @@ td
 
 cdfs <- function(formula, data) {
 	splt <- parse_form(formula, data)
-lapply(splt, stats::ecdf)
+	
+	if(length(all.vars(formula)) == 2) {
+		return(lapply(splt, stats::ecdf))
+	}
+	else {
+		lapply(splt, function(x) lapply(x, stats::ecdf))
+	}		
 }
 
 #' Compute probabilities from the empirical CDFs of a grouping variable for
@@ -122,15 +146,22 @@ probs <- function(formula, data) {
 	ecdfs <- cdfs(formula, data)
 	out <- data[[ all.vars(formula)[1] ]]
 	
-	ps <- sapply(ecdfs, function(x) {
-			x(seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
-				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
-				  .1))
+	prob_vals <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
+					  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
+					  .1)
+
+	if(length(all.vars(formula)) == 2) {
+		ps <- sapply(ecdfs, function(x) x(prob_vals) )
+		colnames(ps) <- names(ecdfs)
+		rownames(ps) <- prob_vals
+	}
+	else {
+		ps <- lapply(ecdfs, function(x) sapply(x, function(x) x(prob_vals) ))
+		ps <- lapply(ps, function(x) {
+				rownames(x) <- prob_vals
+			x
 		})
-	colnames(ps) <- names(ecdfs)
-	rownames(ps) <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
-				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
-				  .1)
+	}
 ps
 }
 
