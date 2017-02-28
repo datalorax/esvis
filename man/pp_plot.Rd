@@ -4,7 +4,8 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(formula, data, ref_group = NULL, refline = TRUE, text = NULL,
+pp_plot(formula, data, ref_group = NULL, refline = TRUE,
+  refline_col = "gray", refline_lty = 2, refline_lwd = 1, text = NULL,
   shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
   255), legend = NULL, return = FALSE, ...)
 }
@@ -22,6 +23,12 @@ scoring group.}
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be
    plotted?}
+
+\item{refline_col}{Color of the reference line.}
+
+\item{refline_lty}{Line type of the reference line.}
+
+\item{refline_lwd}{Line width of the reference line.}
 
 \item{text}{Logical. Should the \code{link{auc}} and \code{link{v}}
 statistics be displayed on the plot? Defaults to \code{TRUE} when there

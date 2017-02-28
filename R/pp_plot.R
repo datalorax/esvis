@@ -15,6 +15,9 @@
 #' @param refline Logical. Defaults to \code{TRUE}. Should a diagonal
 #'    reference line, representing the point of equal probabilities, be
 #' 	  plotted?
+#' @param refline_col Color of the reference line.
+#' @param refline_lty Line type of the reference line.
+#' @param refline_lwd Line width of the reference line.
 #' @param text Logical. Should the \code{link{auc}} and \code{link{v}}
 #'    statistics be displayed on the plot? Defaults to \code{TRUE} when there
 #' 	  are two groups. Cannot currently be displayed for more than two groups. 
@@ -45,7 +48,7 @@
 #' 
 #'  pp_plot(score ~ frl, d)
 
-pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, 
+pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col = "gray", refline_lty = 2, refline_lwd = 1,
 	text = NULL, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
  	legend = NULL, return = FALSE, ...) {
@@ -153,8 +156,9 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE,
 		lwd = pargs$lwd,
 		lty = pargs$lty)
 
-	if(refline == TRUE)	abline(0, 1, col = "gray", lty = 2)
-
+	if(refline == TRUE) {
+		abline(0, 1, col = refline_col, lty = refline_lty, lwd = refline_lwd)
+	}
 	if(text == TRUE) {
 		text(0.8, 0.2, cex = 2, 
 			paste0("AUC = ", round(auc(formula, data, ref_group, FALSE), 2), 
