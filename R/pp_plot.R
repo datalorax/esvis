@@ -132,6 +132,10 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 	
 	do.call("plot", pargs)
 	
+	if(refline == TRUE) {
+		abline(0, 1, col = refline_col, lty = refline_lty, lwd = refline_lwd)
+	}
+	
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
 	
@@ -156,9 +160,6 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 		lwd = pargs$lwd,
 		lty = pargs$lty)
 
-	if(refline == TRUE) {
-		abline(0, 1, col = refline_col, lty = refline_lty, lwd = refline_lwd)
-	}
 	if(text == TRUE) {
 		text(0.8, 0.2, cex = 2, 
 			paste0("AUC = ", round(auc(formula, data, ref_group, FALSE), 2), 
