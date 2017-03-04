@@ -7,7 +7,8 @@
 pp_plot(formula, data, ref_group = NULL, refline = TRUE,
   refline_col = "gray", refline_lty = 2, refline_lwd = 1, text = NULL,
   shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
-  255), legend = NULL, return = FALSE, ...)
+  255), legend = NULL, return = FALSE, plot = TRUE, par_reset = TRUE,
+  ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -48,6 +49,15 @@ the number of groups == 2.}
 
 \item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
 returned (in quoted form)? Defaults to \code{FALSE}.}
+
+\item{plot}{Logical. Should the plot be produced? Defaults to \code{TRUE}. 
+Sometimes it is useful to only get the output from the plot, which is why
+this functionality exists (likely to be implemented in a panel plot).}
+
+\item{par_reset}{Logical. Should the \link[graphics]{par} parameters be 
+reset after producing the plot? Defaults to \code{TRUE}. Set to 
+\code{FALSE} when using the function in multi-panel plots (e.g., when
+\code{mfrow} is used.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the

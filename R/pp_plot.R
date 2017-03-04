@@ -32,6 +32,13 @@
 #'    the number of groups == 2.
 #' @param return Logical. Should the arguments passed to \link[graphics]{plot}
 #' returned (in quoted form)? Defaults to \code{FALSE}.
+#' @param plot Logical. Should the plot be produced? Defaults to \code{TRUE}. 
+#' Sometimes it is useful to only get the output from the plot, which is why
+#' this functionality exists (likely to be implemented in a panel plot).
+#' @param par_reset Logical. Should the \link[graphics]{par} parameters be 
+#' reset after producing the plot? Defaults to \code{TRUE}. Set to 
+#' \code{FALSE} when using the function in multi-panel plots (e.g., when
+#' \code{mfrow} is used. 
 #' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
 #' it is best to use the full argument rather than partial matching, given the
 #' method used to call the plot. While some partial matching is supported 
@@ -51,11 +58,12 @@
 pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col = "gray", refline_lty = 2, refline_lwd = 1,
 	text = NULL, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
- 	legend = NULL, return = FALSE, ...) {
+ 	legend = NULL, return = FALSE, plot = TRUE, par_reset = TRUE, ...) {
 
-	op <- par()
-	op <- op[-grep(c("cin|cra|csi|cxy|din|page"), names(op))]
-	on.exit(par(op))
+	op <- par(no.readonly = TRUE)
+	if(par_reset == TRUE) {
+		on.exit(par(op))
+	}
 
 	ps <- probs(formula, data)
 
@@ -83,10 +91,6 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 		if(is.null(legend)) legend <- FALSE
 		if(is.null(text)) text <- TRUE
 		if(is.null(shade)) shade <- TRUE
-	}
-
-	if(legend == TRUE) {
-		layout(t(c(1, 2)), widths = c(0.9, 0.1))
 	}
 
 	sq <- 1:ncol(ps)
@@ -130,12 +134,20 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 	}
 	if(is.null(pargs$bty)) pargs$bty <- "n"
 	
-	do.call("plot", pargs)
+	if(plot == TRUE) {
+		if(legend == TRUE) {
+			layout(t(c(1, 2)), widths = c(0.9, 0.1))
+		}
+
+		do.call("plot", pargs)
 	
-	if(refline == TRUE) {
-		abline(0, 1, col = refline_col, lty = refline_lty, lwd = refline_lwd)
+		if(refline == TRUE) {
+			abline(0, 1, 
+				col = refline_col, 
+				lty = refline_lty, 
+				lwd = refline_lwd)
+		}
 	}
-	
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
 	
@@ -153,33 +165,37 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 
 	x_axs <- rep(ref_group_d, ncol(ps_subset))
 
-	Map(lines, 
-		x = split(x_axs, rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
-		y = split(ps_subset, rep(1:ncol(ps_subset), each = nrow(ps_subset))),
-	    col = pargs$col, 
-		lwd = pargs$lwd,
-		lty = pargs$lty)
-
-	if(text == TRUE) {
-		text(0.8, 0.2, cex = 2, 
-			paste0("AUC = ", round(auc(formula, data, ref_group, FALSE), 2), 
-				   "\n", 
-				   "V = ", round(v(formula, data, ref_group, FALSE), 2)))	
-	}
-
-	if(shade == TRUE) {
-		xlims <- seq(0, 1, length = nrow(ps))
-		polygon(c(xlims, rev(ps[ ,1])), 
-				c(rep(-1, length(xlims)), rev(ps[ ,2])),
-			col = shade_rgb,
-			border = NA)
-	}
-
-	if(legend == TRUE) {
-		create_legend(ncol(ps_subset), colnames(ps_subset), 
-			col = pargs$col, 
-			lwd = pargs$lwd, 
+	if(plot == TRUE) {
+		Map(lines, 
+			x = split(x_axs, rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
+			y = split(ps_subset, rep(1:ncol(ps_subset), each = nrow(ps_subset))),
+		    col = pargs$col, 
+			lwd = pargs$lwd,
 			lty = pargs$lty)
+
+		if(text == TRUE) {
+			text(0.8, 0.2, cex = 2, 
+				paste0("AUC = ", 
+							round(auc(formula, data, ref_group, FALSE), 2), 
+					   "\n", 
+					   "V = ", 
+					   		round(v(formula, data, ref_group, FALSE), 2)))	
+		}
+
+		if(shade == TRUE) {
+			xlims <- seq(0, 1, length = nrow(ps))
+			polygon(c(xlims, rev(ps[ ,1])), 
+					c(rep(-1, length(xlims)), rev(ps[ ,2])),
+				col = shade_rgb,
+				border = NA)
+		}
+
+		if(legend == TRUE) {
+			create_legend(ncol(ps_subset), colnames(ps_subset), 
+				col = pargs$col, 
+				lwd = pargs$lwd, 
+				lty = pargs$lty)
+		}
 	}
 if(return == TRUE) c(as.list(match.call()), pargs)
 }

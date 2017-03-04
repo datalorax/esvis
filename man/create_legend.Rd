@@ -4,12 +4,18 @@
 \alias{create_legend}
 \title{Create a legend for a plot}
 \usage{
-create_legend(n, leg_labels, ...)
+create_legend(n, leg_labels, left_mar = 0, height = NULL, ...)
 }
 \arguments{
 \item{n}{Number of lines to produce on the legend.}
 
 \item{leg_labels}{Labels for the lines in the legend.}
+
+\item{left_mar}{Left margin argument. Defaults to 0. Larger numbers push the
+legend more to the right.}
+
+\item{height}{The height of the legend. Counter-intuitively, larger numbers
+result in a smaller legend (more squished to the bottom).}
 
 \item{...}{Additional arguments passed to \link[graphics]{lines}.}
 }
