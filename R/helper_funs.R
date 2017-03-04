@@ -7,31 +7,13 @@
 #' according to their mean?
 #' @return A list of data split by the grouping factor.
 parse_form <- function(formula, data, order = TRUE) {
-	vars <- all.vars(formula)
+	out <- data[[ all.vars(formula)[1] ]]
+	group <- data[[ all.vars(formula)[2] ]]	
 
-	if(length(vars) == 2) {
-		splt <- split(data[[ vars[1] ]], data[[ vars[2] ]]	)
-	}
-	if(length(vars) == 3) {
-		splt <- split(data, data[[ vars[2] ]]	)
-		splt <- lapply(splt, function(x) split(x, x[[ vars[3] ]]))
-		splt <- lapply(splt, function(x) lapply(x, "[[", vars[1]))
-	}
-	if(length(vars) > 3) {
-		stop("Only two grouping factors supported. Make sure your data are tidy.")
-	}
-
+	splt <- split(out, group)
 	if(order == TRUE) {
-		if(length(vars) == 2) {
-			means <- sapply(splt, mean, na.rm = TRUE)
-			splt <- splt[order(means, decreasing = TRUE)]
-		}
-		if(length(vars) == 3) {
-			ordered <- lapply(splt, function(x) {
-				order(sapply(x, mean, na.rm = TRUE), decreasing = TRUE)
-			})
-			splt <- Map(function(x, y) x[y], splt, ordered)
-		}
+		means <- sapply(splt, mean, na.rm = TRUE)
+		splt <- splt[order(means, decreasing = TRUE)]
 	}
 splt
 }
@@ -70,7 +52,7 @@ tidy_out <- function(levs, fun) {
 	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
 	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
 
-	if(is.null(dim(diff_1))) {
+	if(length(dim(diff_1)) == 0) {
 		td <- as.data.frame(rbind(combos_1, combos_2))
 		names(td) <- c("ref_group", "foc_group")
 		td$estimate <- c(diff_1, diff_2)
@@ -109,13 +91,7 @@ td
 
 cdfs <- function(formula, data) {
 	splt <- parse_form(formula, data)
-	
-	if(length(all.vars(formula)) == 2) {
-		return(lapply(splt, stats::ecdf))
-	}
-	else {
-		lapply(splt, function(x) lapply(x, stats::ecdf))
-	}		
+lapply(splt, stats::ecdf)
 }
 
 #' Compute probabilities from the empirical CDFs of a grouping variable for
@@ -146,22 +122,15 @@ probs <- function(formula, data) {
 	ecdfs <- cdfs(formula, data)
 	out <- data[[ all.vars(formula)[1] ]]
 	
-	prob_vals <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
-					  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
-					  .1)
-
-	if(length(all.vars(formula)) == 2) {
-		ps <- sapply(ecdfs, function(x) x(prob_vals) )
-		colnames(ps) <- names(ecdfs)
-		rownames(ps) <- prob_vals
-	}
-	else {
-		ps <- lapply(ecdfs, function(x) sapply(x, function(x) x(prob_vals) ))
-		ps <- lapply(ps, function(x) {
-				rownames(x) <- prob_vals
-			x
+	ps <- sapply(ecdfs, function(x) {
+			x(seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
+				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
+				  .1))
 		})
-	}
+	colnames(ps) <- names(ecdfs)
+	rownames(ps) <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
+				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
+				  .1)
 ps
 }
 
@@ -177,6 +146,7 @@ col_hue <- function(n) {
   grDevices::hcl(h = hues, c = 100, l = 65)[1:n]
 }
 
+
 #' Create a legend for a plot
 #' 
 #' This is an alternative legend for plots which uses the actual 
@@ -186,32 +156,33 @@ col_hue <- function(n) {
 #' 
 #' @param n Number of lines to produce on the legend.
 #' @param leg_labels Labels for the lines in the legend.
+#' @param left_mar Left margin argument. Defaults to 0. Larger numbers push the
+#' legend more to the right.
+#' @param height The height of the legend. Counter-intuitively, larger numbers
+#' result in a smaller legend (more squished to the bottom). 
 #' @param ... Additional arguments passed to \link[graphics]{lines}.
 #' 
 
-create_legend <- function(n, leg_labels, ...) {
-	par(mar = c(5.1, 0, 4.1, 0))
-	if(n < 8) {
-		plot(seq(0, 1, length = 12), 
-			 1:12,
-			type = "n",
-			bty = "n", 
-			xaxt = "n",
-			xlab = "", 
-			yaxt = "n",
-			ylab = "")
+create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
+	par(mar = c(5.1, left_mar, 4.1, 0))
+	
+	if(is.null(height)) {
+		if(n < 8) {
+			height <-  12
+		}
+		else {
+			height <- n * 1.5
+		}
 	}
-	else {
-		plot(seq(0, 1, length = n * 1.5), 
-			 seq(1, n * 1.5, 
-			 	length = n * 1.5),
-			type = "n",
-			bty = "n", 
-			xaxt = "n",
-			xlab = "", 
-			yaxt = "n",
-			ylab = "")
-	}
+
+	plot(seq(0, 1, length = height), 
+		 1:height,
+		type = "n",
+		bty = "n", 
+		xaxt = "n",
+		xlab = "", 
+		yaxt = "n",
+		ylab = "")
 
 	axes <- cbind(c(0, 1), rep(1:n, each = 2))	
 	
