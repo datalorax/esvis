@@ -6,9 +6,8 @@
 \usage{
 pp_plot(formula, data, ref_group = NULL, refline = TRUE,
   refline_col = "gray", refline_lty = 2, refline_lwd = 1, text = NULL,
-  shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
-  255), legend = NULL, return = FALSE, plot = TRUE, par_reset = TRUE,
-  ...)
+  text_size = 2, shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30,
+  maxColorValue = 255), legend = NULL, plot = TRUE, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -35,6 +34,8 @@ reference line, representing the point of equal probabilities, be
 statistics be displayed on the plot? Defaults to \code{TRUE} when there
    are two groups. Cannot currently be displayed for more than two groups.}
 
+\item{text_size}{The size of the text to be displayed. Defaults to 2.}
+
 \item{shade}{Logical. Should the area under the curve be shaded? Defaults
 to \code{TRUE} if there are only two group. Currently it cannot be 
 produced for more than two groups.}
@@ -43,21 +44,26 @@ produced for more than two groups.}
 Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
 light blue color.}
 
-\item{legend}{Logical. Should the legend be plotted? Defaults to \code{TRUE}
-when the number of groups is greater than 2. Legend not available when
-the number of groups == 2.}
-
-\item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
-returned (in quoted form)? Defaults to \code{FALSE}.}
+\item{legend}{The type of legend to be displayed, with possible values 
+\code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
+when there are more than two groups and \code{"none"} when only comparing
+two groups. If the option \code{"side"} is used the plot is split into two
+plots, via \link[graphics]{layout}, with the legend displayed in the second 
+plot. This scales better than the base legend (i.e., manually manipulating
+the size of the plot after it is rendered), but is not compatible with 
+multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
+When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
+latter of which produces the legend with the base \link[graphics]{legend}
+function.}
 
 \item{plot}{Logical. Should the plot be produced? Defaults to \code{TRUE}. 
 Sometimes it is useful to only get the output from the plot, which is why
 this functionality exists (likely to be implemented in a panel plot).}
 
-\item{par_reset}{Logical. Should the \link[graphics]{par} parameters be 
-reset after producing the plot? Defaults to \code{TRUE}. Set to 
-\code{FALSE} when using the function in multi-panel plots (e.g., when
-\code{mfrow} is used.}
+\item{theme}{Visual properties of the plot. There are currently only two
+themes implemented - a standard plot and a dark theme. If \code{NULL} 
+(default), the theme will be produced with a standard white background. If
+\code{"dark"}, a dark gray background will be used with white text and axes.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the
@@ -65,11 +71,16 @@ method used to call the plot. While some partial matching is supported
 (e.g., \code{m} for \code{main}, it is generally safest to supply the full
 argument).}
 }
+\value{
+The arguments supplied to the plot are silently returned for testing 
+purposes.
+}
 \description{
 The paired probability plot maps the probability of obtaining a specific
    score for each of two groups. The area under the curve 
-   (\code{\link{auc}}) corresponds to the probability that the x-axis group
-	   will score higher than the y-axis group.
+   (\code{\link{auc}}) corresponds to the probability that a randomly
+   selected observation from the x-axis group will have a higher score than
+   a randomly selected observation from the y-axis group.
 }
 \examples{
 free_reduced <- rnorm(800, 80, 20)

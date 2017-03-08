@@ -164,11 +164,12 @@ col_hue <- function(n) {
 #' 
 
 create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
-	par(mar = c(5.1, left_mar, 4.1, 0))
+	op <- par(mar = c(5.1, left_mar, 4.1, 0))
+	on.exit(par(op))
 	
 	if(is.null(height)) {
-		if(n < 8) {
-			height <-  12
+		if(n < 15) {
+			height <-  20
 		}
 		else {
 			height <- n * 1.5
@@ -195,4 +196,13 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 		at = 1:n, 
 		labels = leg_labels, 
 		las = 2)
+}
+
+
+create_base_legend <- function(labels, position = "bottomright", ...) {
+
+	legend(position, 
+			legend = labels, 
+			box.lwd = 0,
+			...)
 }

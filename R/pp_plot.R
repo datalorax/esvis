@@ -2,8 +2,9 @@
 #' 
 #' The paired probability plot maps the probability of obtaining a specific
 #'    score for each of two groups. The area under the curve 
-#'    (\code{\link{auc}}) corresponds to the probability that the x-axis group
-#' 	   will score higher than the y-axis group.
+#'    (\code{\link{auc}}) corresponds to the probability that a randomly
+#'    selected observation from the x-axis group will have a higher score than
+#'    a randomly selected observation from the y-axis group.
 #' 
 #' @param formula  A formula of the type \code{out ~ group} where \code{out} is
 #'   the outcome variable and \code{group} is the grouping variable. Note the
@@ -20,30 +21,40 @@
 #' @param refline_lwd Line width of the reference line.
 #' @param text Logical. Should the \code{link{auc}} and \code{link{v}}
 #'    statistics be displayed on the plot? Defaults to \code{TRUE} when there
-#' 	  are two groups. Cannot currently be displayed for more than two groups. 
+#' 	  are two groups. Cannot currently be displayed for more than two groups.
+#' @param text_size The size of the text to be displayed. Defaults to 2. 
 #' @param shade Logical. Should the area under the curve be shaded? Defaults
 #'    to \code{TRUE} if there are only two group. Currently it cannot be 
 #'    produced for more than two groups.
 #' @param shade_rgb The color of the shading via \link[grDevices]{rgb}. 
 #'    Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
 #'    light blue color.
-#' @param legend Logical. Should the legend be plotted? Defaults to \code{TRUE}
-#'    when the number of groups is greater than 2. Legend not available when
-#'    the number of groups == 2.
-#' @param return Logical. Should the arguments passed to \link[graphics]{plot}
-#' returned (in quoted form)? Defaults to \code{FALSE}.
+#' @param legend The type of legend to be displayed, with possible values 
+#' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
+#' when there are more than two groups and \code{"none"} when only comparing
+#' two groups. If the option \code{"side"} is used the plot is split into two
+#' plots, via \link[graphics]{layout}, with the legend displayed in the second 
+#' plot. This scales better than the base legend (i.e., manually manipulating
+#' the size of the plot after it is rendered), but is not compatible with 
+#' multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
+#' When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
+#' latter of which produces the legend with the base \link[graphics]{legend}
+#' function.
 #' @param plot Logical. Should the plot be produced? Defaults to \code{TRUE}. 
 #' Sometimes it is useful to only get the output from the plot, which is why
-#' this functionality exists (likely to be implemented in a panel plot).
-#' @param par_reset Logical. Should the \link[graphics]{par} parameters be 
-#' reset after producing the plot? Defaults to \code{TRUE}. Set to 
-#' \code{FALSE} when using the function in multi-panel plots (e.g., when
-#' \code{mfrow} is used. 
+#' this functionality exists (likely to be implemented in a panel plot). 
+#' @param theme Visual properties of the plot. There are currently only two
+#' themes implemented - a standard plot and a dark theme. If \code{NULL} 
+#' (default), the theme will be produced with a standard white background. If
+#' \code{"dark"}, a dark gray background will be used with white text and axes.
 #' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
 #' it is best to use the full argument rather than partial matching, given the
 #' method used to call the plot. While some partial matching is supported 
 #' (e.g., \code{m} for \code{main}, it is generally safest to supply the full
 #' argument).
+#' @return
+#' The arguments supplied to the plot are silently returned for testing 
+#' purposes.
 #' @import graphics grDevices
 #' @export
 #' @examples
@@ -56,14 +67,9 @@
 #'  pp_plot(score ~ frl, d)
 
 pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col = "gray", refline_lty = 2, refline_lwd = 1,
-	text = NULL, shade = NULL, 
+	text = NULL, text_size = 2, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
- 	legend = NULL, return = FALSE, plot = TRUE, par_reset = TRUE, ...) {
-
-	op <- par(no.readonly = TRUE)
-	if(par_reset == TRUE) {
-		on.exit(par(op))
-	}
+ 	legend = NULL, plot = TRUE, theme = NULL, ...) {
 
 	ps <- probs(formula, data)
 
@@ -79,18 +85,38 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 		}
 		
 	}
+	if(ncol(ps) == 2 & all(par()$mfrow == c(1, 2))) {
+		warning("Two-panel plot detected without a legend. Call `dev.off()` and then rerun the plot to avoid wasted space, if only trying to plot a single curve. Ignore otherwise.")
+	}
 
 	if(is.null(ref_group)) ref_group <- colnames(ps)[1]
 	
 	if(ncol(ps) > 2) {
 		shade <- FALSE
 		text <- FALSE
-		if(is.null(legend)) legend <-  TRUE
+		if(is.null(legend)) legend <- "side"
 	}
 	if(ncol(ps) == 2) {
-		if(is.null(legend)) legend <- FALSE
+		if(is.null(legend)) legend <- "none"
 		if(is.null(text)) text <- TRUE
 		if(is.null(shade)) shade <- TRUE
+	}
+
+	if(!is.null(theme)) {
+		if(theme == "dark") {
+			op <- par(bg = "gray21", 
+					  col.axis = "white", 
+					  col.lab = "white",
+					  col.main = "white")
+		}
+	}
+	else {
+		op <- par(bg = "transparent")	
+	}
+	on.exit(par(op))
+
+	if(any(par()$mfrow > 2) & any(par()$mfrow != c(1,2)) & legend == "side") {
+		message("Multi-panel settings detected with `legend == 'side'`. Change legend option if trying to produce a multi-panel plot.")
 	}
 
 	sq <- 1:ncol(ps)
@@ -100,7 +126,7 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 				  y = quote(ps[ ,2]),
 				  type = "n",
 				  ...)
-	
+
 	if(is.null(pargs$xlab)) {
 		if(ncol(ps) == 2) pargs$xlab <- paste0("p(",colnames(ps)[1],")")
 		if(ncol(ps) > 2) pargs$xlab <- paste0("p(", ref_group, ")")
@@ -135,12 +161,19 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 	if(is.null(pargs$bty)) pargs$bty <- "n"
 	
 	if(plot == TRUE) {
-		if(legend == TRUE) {
+		if(legend == "side") {
 			layout(t(c(1, 2)), widths = c(0.9, 0.1))
 		}
 
 		do.call("plot", pargs)
-	
+		if(!is.null(theme)) {
+			if(theme == "dark") {
+				if(is.null(pargs$xaxt))	axis(1, col = "white")
+				if(is.null(pargs$yaxt)) axis(2, col = "white")
+				if(refline_col == "gray") refline_col = "white"
+				if(refline_lwd == 1) refline_lwd = 2
+			}
+		}
 		if(refline == TRUE) {
 			abline(0, 1, 
 				col = refline_col, 
@@ -174,12 +207,24 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 			lty = pargs$lty)
 
 		if(text == TRUE) {
-			text(0.8, 0.2, cex = 2, 
-				paste0("AUC = ", 
-							round(auc(formula, data, ref_group, FALSE), 2), 
-					   "\n", 
-					   "V = ", 
-					   		round(v(formula, data, ref_group, FALSE), 2)))	
+			if(!is.null(theme)) {
+				if(theme == "dark") {
+					text(0.8, 0.2, cex = text_size, col = "white",
+					paste0("AUC = ", 
+								round(auc(formula, data, ref_group, FALSE), 2), 
+						   "\n", 
+						   "V = ", 
+						   		round(v(formula, data, ref_group, FALSE), 2)))
+				}	
+			}
+			else {
+				text(0.8, 0.2, cex = text_size, 
+					paste0("AUC = ", 
+								round(auc(formula, data, ref_group, FALSE), 2), 
+						   "\n", 
+						   "V = ", 
+						   		round(v(formula, data, ref_group, FALSE), 2)))
+			}
 		}
 
 		if(shade == TRUE) {
@@ -190,12 +235,29 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 				border = NA)
 		}
 
-		if(legend == TRUE) {
+		if(legend == "side") {
 			create_legend(ncol(ps_subset), colnames(ps_subset), 
 				col = pargs$col, 
 				lwd = pargs$lwd, 
 				lty = pargs$lty)
 		}
+		if(legend == "base") {
+			if(is.null(theme)) {
+				create_base_legend(colnames(ps_subset), 
+					col = pargs$col, 
+					lwd = pargs$lwd, 
+					lty = pargs$lty)
+			}
+			if(!is.null(theme)) {
+				if(theme == "dark") {
+					create_base_legend(colnames(ps_subset), 
+						col = pargs$col, 
+						lwd = pargs$lwd, 
+						lty = pargs$lty,
+						text.col = "white")
+				}
+			}
+		}
 	}
-if(return == TRUE) c(as.list(match.call()), pargs)
+invisible(c(as.list(match.call()), pargs, op))
 }

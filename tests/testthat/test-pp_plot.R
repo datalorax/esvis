@@ -1,80 +1,65 @@
 
 test_that("`pp_plot` produces expected output", {
-	expect_equal(pp_plot(mean ~ grade, seda, 
-					return = TRUE)$type, 
+	expect_equal(pp_plot(mean ~ grade, seda)$type, 
 				"n")
 	
-	expect_equal(pp_plot(mean ~ grade, seda, 
-					return = TRUE)$xlab, 
+	expect_equal(pp_plot(mean ~ grade, seda)$xlab, 
 				"p(8)")
 	
-	expect_equal(pp_plot(mean ~ grade, seda, 
-					return = TRUE)$ylab, 
+	expect_equal(pp_plot(mean ~ grade, seda)$ylab, 
 				"p(Focal Group)")
 	
-	expect_equal(pp_plot(mean ~ subject, seda, 
-					return = TRUE)$ylab, 
+	par(mfrow = c(1, 1))
+	expect_equal(pp_plot(mean ~ subject, seda)$ylab, 
 				"p(ela)")
 
-	expect_equal(length(pp_plot(mean ~ grade, seda, 
-					return = TRUE)$col), 
+	expect_equal(length(pp_plot(mean ~ grade, seda)$col), 
 				5)
 	
-	expect_equal(length(pp_plot(mean ~ stateabb, seda, 
-					return = TRUE)$col), 
+	expect_equal(length(pp_plot(mean ~ stateabb, seda)$col), 
 				50)
 
 	expect_equal(length(pp_plot(mean ~ grade, seda, 
-					col = "blue", 
-					return = TRUE)$col), 
+					col = "blue")$col), 
 				1)
 
-	expect_equal(length(pp_plot(mean ~ subject, seda, 
-					return = TRUE)$col), 
+	par(mfrow = c(1, 1))
+	expect_equal(length(pp_plot(mean ~ subject, seda)$col), 
 				1)
 
 	expect_equal(pp_plot(mean ~ grade, seda, 
-					3,
-					return = TRUE)$ref_group, 
+					3)$ref_group, 
 				3)
 
 	expect_equal(pp_plot(mean ~ grade, seda, 
-					3,
-					return = TRUE)$xlab, 
+					3)$xlab, 
 				"p(3)")
 })
 
 test_that("Partial matching for `pp_plot` works", {
 	expect_equal(pp_plot(mean ~ grade,  seda, 
-					m = "new title", 
-					return = TRUE)$main,
+					m = "new title")$main,
 				"new title")
 	
 	expect_equal(pp_plot(mean ~ grade,  seda, 
-					xla = "new title", 
-					return = TRUE)$xlab,
+					xla = "new title")$xlab,
 				"new title")
 
 	expect_equal(pp_plot(mean ~ grade,  seda, 
-					yla = "new title", 
-					return = TRUE)$ylab,
+					yla = "new title")$ylab,
 				"new title")
 })
 
 test_that("`pp_plot` throws warnings when it should", {
 	expect_warning(pp_plot(mean ~ grade, seda,
-					shade = TRUE,
-					return = TRUE))
+					shade = TRUE))
 
 	expect_warning(pp_plot(mean ~ grade, seda,
-					text = TRUE,
-					return = TRUE))
+					text = TRUE))
 
 	expect_warning(pp_plot(mean ~ grade, seda,
-					lty = 1:2,
-					return = TRUE))
+					lty = 1:2))
 
 	expect_warning(pp_plot(mean ~ grade, seda,
-					col = 1:2,
-					return = TRUE))
+					col = 1:2))
 })
