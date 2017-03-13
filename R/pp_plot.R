@@ -122,54 +122,29 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 	sq <- 1:ncol(ps)
 	ref_group_d <- ps[ ,sq[colnames(ps) == as.character(ref_group)] ]
 
-	pargs <- list(x = quote(ref_group_d), 
-				  y = quote(ps[ ,2]),
-				  type = "n",
-				  ...)
-
-	if(is.null(pargs$xlab)) {
-		if(ncol(ps) == 2) pargs$xlab <- paste0("p(",colnames(ps)[1],")")
-		if(ncol(ps) > 2) pargs$xlab <- paste0("p(", ref_group, ")")
-
-		# check for partial matching
-		if(!is.null(pargs$xla)) {
-			pargs$xlab <- pargs$xla
-			pargs$xla <- NULL
-		}
-	}
-	if(is.null(pargs$ylab)) {
-		if(ncol(ps) == 2) pargs$ylab <- paste0("p(",colnames(ps)[2],")")
-		if(ncol(ps) > 2) pargs$ylab <- "p(Focal Group)"
-
-		if(!is.null(pargs$yla)) {
-			pargs$ylab <- pargs$yla
-			pargs$yla <- NULL
-		}
-	}
-	if(is.null(pargs$main)) {
-		
-		# check for partial matching
-		if(length(grep("m", names(pargs))) > 0) {
-			pargs$main <- pargs[[grep("m", names(pargs))]]
-			pargs[grep("m", names(pargs))[1]] <- NULL
-		}
-		else { 
-			pargs$main <- paste(as.character(formula)[c(2, 1, 3)],
-							collapse = " ")
-		}
-	}
-	if(is.null(pargs$bty)) pargs$bty <- "n"
-	
 	if(plot == TRUE) {
 		if(legend == "side") {
 			layout(t(c(1, 2)), widths = c(0.9, 0.1))
 		}
-
-		do.call("plot", pargs)
+		if(ncol(ps) == 2) {
+			p <- empty_plot(ref_group_d, ps[ ,2], 
+				paste0("p(",colnames(ps)[1],")"),
+				paste0("p(",colnames(ps)[2],")"),
+				paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
+				...)
+		}
+		if(ncol(ps) > 2) {
+			p <- empty_plot(ref_group_d, ps[ ,2], 
+				paste0("p(", ref_group, ")"),
+				"p(Focal Group)",
+				paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
+				...)
+		}
+		
 		if(!is.null(theme)) {
 			if(theme == "dark") {
-				if(is.null(pargs$xaxt))	axis(1, col = "white")
-				if(is.null(pargs$yaxt)) axis(2, col = "white")
+				if(is.null(p$xaxt))	axis(1, col = "white")
+				if(is.null(p$yaxt)) axis(2, col = "white")
 				if(refline_col == "gray") refline_col = "white"
 				if(refline_lwd == 1) refline_lwd = 2
 			}
@@ -185,14 +160,14 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 					drop = FALSE]
 	
 	
-	if(is.null(pargs$lwd)) pargs$lwd <- 2
-	if(is.null(pargs$lty)) pargs$lty <- 1
-	if(is.null(pargs$col)) pargs$col <- col_hue(ncol(ps_subset))
+	if(is.null(p$lwd)) p$lwd <- 2
+	if(is.null(p$lty)) p$lty <- 1
+	if(is.null(p$col)) p$col <- col_hue(ncol(ps_subset))
 
-	if((length(pargs$col) !=1) & (length(pargs$col) < ncol(ps_subset))) {
+	if((length(p$col) !=1) & (length(p$col) < ncol(ps_subset))) {
 		warning("Not enough colors supplied. Colors will be recycled when drawing lines.")
 	}
-	if((length(pargs$lty) !=1) & (length(pargs$lty) < ncol(ps_subset))) {
+	if((length(p$lty) !=1) & (length(p$lty) < ncol(ps_subset))) {
 		warning("Not enough line types supplied. Line types will be recycled when drawing lines.")
 	}
 
@@ -202,9 +177,9 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 		Map(lines, 
 			x = split(x_axs, rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
 			y = split(ps_subset, rep(1:ncol(ps_subset), each = nrow(ps_subset))),
-		    col = pargs$col, 
-			lwd = pargs$lwd,
-			lty = pargs$lty)
+		    col = p$col, 
+			lwd = p$lwd,
+			lty = p$lty)
 
 		if(text == TRUE) {
 			if(!is.null(theme)) {
@@ -237,27 +212,27 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 
 		if(legend == "side") {
 			create_legend(ncol(ps_subset), colnames(ps_subset), 
-				col = pargs$col, 
-				lwd = pargs$lwd, 
-				lty = pargs$lty)
+				col = p$col, 
+				lwd = p$lwd, 
+				lty = p$lty)
 		}
 		if(legend == "base") {
 			if(is.null(theme)) {
 				create_base_legend(colnames(ps_subset), 
-					col = pargs$col, 
-					lwd = pargs$lwd, 
-					lty = pargs$lty)
+					col = p$col, 
+					lwd = p$lwd, 
+					lty = p$lty)
 			}
 			if(!is.null(theme)) {
 				if(theme == "dark") {
 					create_base_legend(colnames(ps_subset), 
-						col = pargs$col, 
-						lwd = pargs$lwd, 
-						lty = pargs$lty,
+						col = p$col, 
+						lwd = p$lwd, 
+						lty = p$lty,
 						text.col = "white")
 				}
 			}
 		}
 	}
-invisible(c(as.list(match.call()), pargs, op))
+invisible(c(as.list(match.call()), p, op))
 }

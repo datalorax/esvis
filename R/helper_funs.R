@@ -198,6 +198,17 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 		las = 2)
 }
 
+#' Create a base legend for a plot
+#' 
+#' This function creates a legend using the base \link[graphics]{legend}
+#' function, but with more abbreviated syntax.
+#' 
+#' @param labels Labels for the legend (line labels).
+#' @param position Where the legend should be positioned. Defaults to
+#'  \code{"bottomright"}.
+#' @param ... Additional arguments passed to \link[graphics]{legend} 
+#' (typically colors, line width, etc).
+#' 
 
 create_base_legend <- function(labels, position = "bottomright", ...) {
 
@@ -205,4 +216,69 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 			legend = labels, 
 			box.lwd = 0,
 			...)
+}
+
+#' Create an empty plot
+#' 
+#' This function creates an empty plot for further plotting (e.g., via 
+#' \link[graphics]{lines}). What makes the function unique is that it allows
+#' for specification of default \code{xlab}, \code{ylab}, and \code{main}
+#' arguments, while allowing the user to override those arguments. Only really
+#' useful when used within other functions (e.g., \link{pp_plot}).
+#' 
+#' @param x The x variable to be plotted.
+#' @param y The y variable to be plotted.
+#' @param default_xlab The default x-label, which can be overridden by the 
+#' user.
+#' @param default_ylab The default y-label, which can be overridden by the 
+#' user.
+#' @param default_main The default main title, which can be overridden by the 
+#' user.
+#' @param default_bty The default background type, which can be overridden by 
+#' the user. Defaults to \code{"n"}.
+#' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
+#' \code{xlim}, \code{ylim}, \code{cex}, etc.)
+
+empty_plot <- function(x, y, default_xlab, default_ylab, 
+	default_main, default_bty = "n", ...) {
+
+	pargs <- list(x = quote(x), 
+				  y = quote(y),
+				  type = "n",
+				  ...)
+
+	if(is.null(pargs$xlab)) {
+		pargs$xlab <- default_xlab
+		
+		# check for partial matching
+		if(!is.null(pargs$xla)) {
+			pargs$xlab <- pargs$xla
+			pargs$xla <- NULL
+		}
+	}
+	if(is.null(pargs$ylab)) {
+		pargs$ylab <- default_ylab
+		
+		# check for partial matching
+		if(!is.null(pargs$yla)) {
+			pargs$ylab <- pargs$yla
+			pargs$yla <- NULL
+		}
+	}
+	
+	if(is.null(pargs$main)) {
+		
+		# check for partial matching
+		if(length(grep("^m", names(pargs))) > 0) {
+			pargs$main <- pargs[[grep("^m", names(pargs))]]
+			pargs[grep("^m", names(pargs))[1]] <- NULL
+		}
+		else { 
+			pargs$main <- default_main
+		}
+	}
+	if(is.null(pargs$bty)) pargs$bty <- default_bty
+
+	do.call("plot", pargs)
+invisible(pargs)
 }
