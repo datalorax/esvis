@@ -66,7 +66,8 @@ tidy_out <- function(levs, fun) {
 		
 		if(is.null(rownames(diff_1))) warning("Cut score not specified as row names")
 		
-		td$cut <- rep(rep(rownames(diff_1), each = nrow(combos_1)), 2)
+		td$cut <- c(rep(rownames(diff_1), each = nrow(combos_1)), 
+					rep(rownames(diff_2), each = nrow(combos_2)))
 
 		colnames(diff_1) <- apply(combos_1, 1, paste, collapse = "-")
 		colnames(diff_2) <- apply(combos_2, 1, paste, collapse = "-")
