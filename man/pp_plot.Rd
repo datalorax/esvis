@@ -5,7 +5,7 @@
 \title{Produces the paired probability plot for two groups}
 \usage{
 pp_plot(formula, data, ref_group = NULL, refline = TRUE,
-  refline_col = "gray", refline_lty = 2, refline_lwd = 1, text = NULL,
+  refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
   text_size = 2, shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30,
   maxColorValue = 255), legend = NULL, plot = TRUE, theme = NULL, ...)
 }
