@@ -2,7 +2,7 @@
 % Please edit documentation in R/ptile_plot.R
 \name{ptile_es}
 \alias{ptile_es}
-\title{Computer effect sizes by percentile bins}
+\title{Compute effect sizes by percentile bins}
 \usage{
 ptile_es(formula, data, ref_group = NULL, ptiles = seq(0, 1, 0.33))
 }

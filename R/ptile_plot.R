@@ -13,7 +13,7 @@ tidy_out(names(splt), pooled)
 
 ptile_mean_diffs <- function(formula, data, ptiles = seq(0, 1, .33)) {
 	splt <- parse_form(formula, data)
-	ptile_l <- lapply(splt, function(x) split(x, cut(x, quantile(x, ptiles))))
+	ptile_l <- lapply(splt, function(x) split(x, cut(x, quantile(x, ptiles, na.rm = TRUE))))
 
 	mean_diffs <- function(v) {
 		Map(function(x, y) mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE),
@@ -34,7 +34,7 @@ ptile_mean_diffs <- function(formula, data, ptiles = seq(0, 1, .33)) {
 td[ ,c(1:3, 5, 4)]
 }
 
-#' Computer effect sizes by percentile bins
+#' Compute effect sizes by percentile bins
 #' 
 #' Returns a data frame with the estimated effect size by the provided 
 #' percentiles. Currently, the effect size is equivalent to Cohen's d, but 
@@ -156,7 +156,7 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 	on.exit(par(op))
 
 	d <- ptile_es(formula, data, ref_group, ptiles) 
-	
+
 	if(length(unique(d$foc_group)) > 1) {
 		if(is.null(legend)) legend <- "side"
 	}
@@ -166,7 +166,9 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 
 
 	if(legend == "side") {
-		layout(t(c(1, 2)), widths = c(0.9, 0.1))
+		max_char <- max(nchar(as.character(d$foc_group)))
+		wdth <- 0.9 - (max_char * 0.01)
+		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))
 	}
 
 	p <- with(d, empty_plot(midpoint, es,
@@ -246,7 +248,8 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 			create_legend(length(xaxes), names(xaxes), 
 				col = p$col, 
 				lwd = p$lwd, 
-				lty = p$lty)
+				lty = p$lty,
+				left_mar = max_char * .35)
 	}
 	if(legend == "base") {
 		if(is.null(theme)) {
