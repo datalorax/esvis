@@ -8,9 +8,9 @@ init:
         Import-Module '..\appveyor-tool.ps1'
 
 install:
-  ps: Bootstrap
   - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
-
+  ps: Bootstrap
+  
 # Adapt as necessary starting from here
 
 build_script:
