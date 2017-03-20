@@ -4,8 +4,8 @@
 \alias{empty_plot}
 \title{Create an empty plot}
 \usage{
-empty_plot(x, y, default_xlab, default_ylab, default_main, default_bty = "n",
-  default_xlim = NULL, default_ylim = NULL, ...)
+empty_plot(x, y, default_xlab, default_ylab, default_main,
+  default_xlim = NULL, default_ylim = NULL, default_bty = "n", ...)
 }
 \arguments{
 \item{x}{The x variable to be plotted.}
@@ -20,6 +20,14 @@ user.}
 
 \item{default_main}{The default main title, which can be overridden by the 
 user.}
+
+\item{default_xlim}{The default x-axis limits, which can be overridden by 
+the user. Defaults to \code{NULL}, in which case the limits are found by
+the default plotting arguments.}
+
+\item{default_ylim}{The default y-axis limits, which can be overridden by 
+the user. Defaults to \code{NULL}, in which case the limits are found by
+the default plotting arguments.}
 
 \item{default_bty}{The default background type, which can be overridden by 
 the user. Defaults to \code{"n"}.}

@@ -237,11 +237,17 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' user.
 #' @param default_bty The default background type, which can be overridden by 
 #' the user. Defaults to \code{"n"}.
+#' @param default_xlim The default x-axis limits, which can be overridden by 
+#' the user. Defaults to \code{NULL}, in which case the limits are found by
+#' the default plotting arguments.
+#' @param default_ylim The default y-axis limits, which can be overridden by 
+#' the user. Defaults to \code{NULL}, in which case the limits are found by
+#' the default plotting arguments.
 #' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
 
 empty_plot <- function(x, y, default_xlab, default_ylab, 
-	default_main, default_bty = "n", default_xlim = NULL, default_ylim = NULL,
+	default_main, default_xlim = NULL, default_ylim = NULL, default_bty = "n",
 	...) {
 
 	pargs <- list(x = quote(x), 
