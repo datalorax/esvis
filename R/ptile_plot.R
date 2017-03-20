@@ -170,11 +170,18 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 		wdth <- 0.9 - (max_char * 0.01)
 		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))
 	}
+	min_est <- min(d$es, na.rm = TRUE)
+	max_est <- max(d$es, na.rm = TRUE)
+
+	default_ylim_low <- ifelse(min_est < 0, 0.05*min_est + min_est, -0.1)
+	default_ylim_high <- ifelse(max_est < 0, 0.1, 0.05*max_est + max_est)
 
 	p <- with(d, empty_plot(midpoint, es,
 					"Percentiles",
 					"Effect Size",
 					paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
+					xlim = c(0, 1),
+					ylim = c(default_ylim_low, default_ylim_high), 
 					...))
 
     if(!is.null(theme)) {

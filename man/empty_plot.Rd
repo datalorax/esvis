@@ -5,7 +5,7 @@
 \title{Create an empty plot}
 \usage{
 empty_plot(x, y, default_xlab, default_ylab, default_main, default_bty = "n",
-  ...)
+  default_xlim = NULL, default_ylim = NULL, ...)
 }
 \arguments{
 \item{x}{The x variable to be plotted.}

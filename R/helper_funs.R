@@ -241,7 +241,8 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
 
 empty_plot <- function(x, y, default_xlab, default_ylab, 
-	default_main, default_bty = "n", ...) {
+	default_main, default_bty = "n", default_xlim = NULL, default_ylim = NULL,
+	...) {
 
 	pargs <- list(x = quote(x), 
 				  y = quote(y),
@@ -266,7 +267,22 @@ empty_plot <- function(x, y, default_xlab, default_ylab,
 			pargs$yla <- NULL
 		}
 	}
-	
+	if(is.null(pargs$xlim)) {
+		pargs$xlim <- default_xlim
+		
+		if(!is.null(pargs$xli)) {
+			pargs$xlim <- pargs$xli
+			pargs$xli <- NULL
+		}
+	}
+	if(is.null(pargs$ylim)) {
+		pargs$ylim <- default_ylim
+		
+		if(!is.null(pargs$yli)) {
+			pargs$ylim <- pargs$yli
+			pargs$yli <- NULL
+		}
+	}
 	if(is.null(pargs$main)) {
 		
 		# check for partial matching
