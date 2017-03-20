@@ -9,7 +9,7 @@ init:
 
 install:
   - ps: Bootstrap
-  - cinst: Curl
+  - ps: Curl
 
 # Adapt as necessary starting from here
 
