@@ -142,6 +142,8 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 	lines = TRUE, points = TRUE, legend = NULL, theme = NULL, 
 	 ...) {
 
+	args <- as.list(match.call())
+	
 	if(!is.null(theme)) {
 		if(theme == "dark") {
 			op <- par(bg = "gray21", 
@@ -181,13 +183,27 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 					"Effect Size",
 					paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
 					xlim = c(0, 1),
-					ylim = c(default_ylim_low, default_ylim_high), 
+					ylim = c(default_ylim_low, default_ylim_high),
+					yaxt = "n",
 					...))
+	
+	if(is.null(args$yaxt)) {
+		axis(2, at = seq(round(default_ylim_low - 2), 
+						 round(default_ylim_high + 2), 
+						 .2), 
+						 las = 2)
+	}
 
     if(!is.null(theme)) {
 		if(theme == "dark") {
 			if(is.null(p$xaxt))	axis(1, col = "white")
-			if(is.null(p$yaxt)) axis(2, col = "white")
+			if(is.null(args$yaxt))  {
+				axis(2, at = seq(round(default_ylim_low - 2), 
+						 round(default_ylim_high + 2), 
+						 .2), 
+						 las = 2,
+						 col = "white")
+			}
 			if(refline_col == "gray") refline_col = "white"
 			if(refline_lwd == 1) refline_lwd = 2
 		}
@@ -275,5 +291,5 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 				}
 			}
 		}
-invisible(p)
+invisible(list(as.list(args), p))
 }

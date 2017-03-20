@@ -230,24 +230,34 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' @param x The x variable to be plotted.
 #' @param y The y variable to be plotted.
 #' @param default_xlab The default x-label, which can be overridden by the 
-#' user.
+#' user. Defaults to \code{NULL}, in which case the label is defined by
+#' the default \link[graphics]{plot} function.
 #' @param default_ylab The default y-label, which can be overridden by the 
-#' user.
+#' user. Defaults to \code{NULL}, in which case the label is defined by
+#' the default \link[graphics]{plot} function.
 #' @param default_main The default main title, which can be overridden by the 
-#' user.
+#' user. Defaults to \code{NULL}, in which case the title is defined by
+#' the default \link[graphics]{plot} function.
 #' @param default_bty The default background type, which can be overridden by 
 #' the user. Defaults to \code{"n"}.
 #' @param default_xlim The default x-axis limits, which can be overridden by 
-#' the user. Defaults to \code{NULL}, in which case the limits are found by
-#' the default plotting arguments.
+#' the user. Defaults to \code{NULL}, in which case the limits are defined by
+#' the default \link[graphics]{plot} function.
 #' @param default_ylim The default y-axis limits, which can be overridden by 
-#' the user. Defaults to \code{NULL}, in which case the limits are found by
-#' the default plotting arguments.
+#' the user. Defaults to \code{NULL}, in which case the limits are defined by
+#' the default \link[graphics]{plot} function.
+#' @param default_xaxt The default x-axis type, which can be overridden by the 
+#' user. Defaults to \code{NULL}, in which case the type is defined by
+#' the default \link[graphics]{plot} function.
+#' @param default_yaxt The default y-axis type, which can be overridden by the 
+#' user. Defaults to \code{NULL}, in which case the type is defined by
+#' the default \link[graphics]{plot} function.
 #' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
 
-empty_plot <- function(x, y, default_xlab, default_ylab, 
-	default_main, default_xlim = NULL, default_ylim = NULL, default_bty = "n",
+empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL, 
+	default_main = NULL, default_xlim = NULL, default_ylim = NULL, 
+	default_xaxt = NULL, default_yaxt = NULL, default_bty = "n",
 	...) {
 
 	pargs <- list(x = quote(x), 
@@ -289,6 +299,10 @@ empty_plot <- function(x, y, default_xlab, default_ylab,
 			pargs$yli <- NULL
 		}
 	}
+	if(is.null(pargs$xaxt)) pargs$xaxt <- default_xaxt
+	if(is.null(pargs$yaxt)) pargs$yaxt <- default_yaxt
+		
+	
 	if(is.null(pargs$main)) {
 		
 		# check for partial matching
