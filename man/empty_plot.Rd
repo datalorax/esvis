@@ -4,8 +4,9 @@
 \alias{empty_plot}
 \title{Create an empty plot}
 \usage{
-empty_plot(x, y, default_xlab, default_ylab, default_main,
-  default_xlim = NULL, default_ylim = NULL, default_bty = "n", ...)
+empty_plot(x, y, default_xlab = NULL, default_ylab = NULL,
+  default_main = NULL, default_xlim = NULL, default_ylim = NULL,
+  default_xaxt = NULL, default_yaxt = NULL, default_bty = "n", ...)
 }
 \arguments{
 \item{x}{The x variable to be plotted.}
@@ -13,21 +14,32 @@ empty_plot(x, y, default_xlab, default_ylab, default_main,
 \item{y}{The y variable to be plotted.}
 
 \item{default_xlab}{The default x-label, which can be overridden by the 
-user.}
+user. Defaults to \code{NULL}, in which case the label is defined by
+the default \link[graphics]{plot} function.}
 
 \item{default_ylab}{The default y-label, which can be overridden by the 
-user.}
+user. Defaults to \code{NULL}, in which case the label is defined by
+the default \link[graphics]{plot} function.}
 
 \item{default_main}{The default main title, which can be overridden by the 
-user.}
+user. Defaults to \code{NULL}, in which case the title is defined by
+the default \link[graphics]{plot} function.}
 
 \item{default_xlim}{The default x-axis limits, which can be overridden by 
-the user. Defaults to \code{NULL}, in which case the limits are found by
-the default plotting arguments.}
+the user. Defaults to \code{NULL}, in which case the limits are defined by
+the default \link[graphics]{plot} function.}
 
 \item{default_ylim}{The default y-axis limits, which can be overridden by 
-the user. Defaults to \code{NULL}, in which case the limits are found by
-the default plotting arguments.}
+the user. Defaults to \code{NULL}, in which case the limits are defined by
+the default \link[graphics]{plot} function.}
+
+\item{default_xaxt}{The default x-axis type, which can be overridden by the 
+user. Defaults to \code{NULL}, in which case the type is defined by
+the default \link[graphics]{plot} function.}
+
+\item{default_yaxt}{The default y-axis type, which can be overridden by the 
+user. Defaults to \code{NULL}, in which case the type is defined by
+the default \link[graphics]{plot} function.}
 
 \item{default_bty}{The default background type, which can be overridden by 
 the user. Defaults to \code{"n"}.}
