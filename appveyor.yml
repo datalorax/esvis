@@ -9,7 +9,7 @@ init:
 
 install:
   - ps: Bootstrap
-  - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
+  - cinst: Curl
 
 # Adapt as necessary starting from here
 
