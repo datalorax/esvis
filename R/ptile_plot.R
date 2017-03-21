@@ -136,7 +136,7 @@ es[order(es$midpoint), ]
 #' @export
 
 ptile_plot <- function(formula, data, ref_group = NULL,
-	ptiles = seq(0, 1, .33), refline = TRUE, refline_col = "black", 
+	ptiles = seq(0, 1, .3333), refline = TRUE, refline_col = "black", 
 	refline_lty = 1, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)),
 	lines = TRUE, points = TRUE, legend = NULL, theme = NULL, 
@@ -153,7 +153,7 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 		}
 	}
 	else {
-		op <- par(bg = "transparent")	
+		op <- par(mar = c(5.1, 4.1, 4.1, 2.1))	
 	}
 	on.exit(par(op))
 
@@ -166,11 +166,14 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 		if(is.null(legend)) legend <- "none"
 	}
 
-
 	if(legend == "side") {
+		dev.off()
 		max_char <- max(nchar(as.character(d$foc_group)))
 		wdth <- 0.9 - (max_char * 0.01)
-		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))
+		invisible(
+			split.screen(rbind(c(0, wdth, 0, 1), c(wdth, 1, 0, 1)))
+			)
+		screen(1)
 	}
 	min_est <- min(d$es, na.rm = TRUE)
 	max_est <- max(d$es, na.rm = TRUE)
@@ -268,11 +271,27 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 	}
 
 	if(legend == "side") {
-			create_legend(length(xaxes), names(xaxes), 
-				col = p$col, 
-				lwd = p$lwd, 
-				lty = p$lty,
-				left_mar = max_char * .35)
+		screen(2)
+		create_legend(length(xaxes), names(xaxes), 
+			col = p$col, 
+			lwd = p$lwd, 
+			lty = p$lty,
+			left_mar = max_char * .35)
+		close.screen(2)
+
+		screen(1)
+		with(d, plot(midpoint, es,
+				type = "n",
+				xlab = "",
+				ylab = "",
+				main = "",
+				xlim = p$xlim,
+				ylim = p$ylim,
+				bty = "n",
+				yaxt = "n",
+				xaxt = "n",
+				...))
+		
 	}
 	if(legend == "base") {
 		if(is.null(theme)) {

@@ -4,7 +4,7 @@
 \alias{ptile_plot}
 \title{Percentile-matched effect size plot}
 \usage{
-ptile_plot(formula, data, ref_group = NULL, ptiles = seq(0, 1, 0.33),
+ptile_plot(formula, data, ref_group = NULL, ptiles = seq(0, 1, 0.3333),
   refline = TRUE, refline_col = "black", refline_lty = 1,
   refline_lwd = 2, rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1),
   rgb(0.2, 0.2, 0.2, 0)), lines = TRUE, points = TRUE, legend = NULL,
