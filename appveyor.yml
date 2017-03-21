@@ -9,7 +9,6 @@ init:
 
 install:
   - ps: Bootstrap
-  - set PATH=C:\Program Files\Git\mingw64\bin;%PATH%
 
 # Adapt as necessary starting from here
 
