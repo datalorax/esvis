@@ -4,7 +4,7 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(formula, data, ref_group = NULL, refline = TRUE,
+pp_plot(formula, data, ref_group = NULL, annotate = FALSE, refline = TRUE,
   refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
   text_size = 2, shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30,
   maxColorValue = 255), legend = NULL, plot = TRUE, theme = NULL, ...)
@@ -19,6 +19,15 @@ grouping variable must only include only two groups.}
 \item{ref_group}{Optional character vector (of length 1) naming the
 reference group to be plotted on the x-axis. Defaults to the highest
 scoring group.}
+
+\item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
+\code{legend == "side"} the plot is rendered such that additional
+annotations can be made on the plot using low level base plotting functions
+(e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
+\link[grDevices]{dev.off} must be called before a new plot is rendered 
+(otherwise the plot will be attempted to be rendered in the region 
+designated for the legend). Argument is ignored when \code{legend != 
+"side"}.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be

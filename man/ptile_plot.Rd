@@ -5,10 +5,10 @@
 \title{Percentile-matched effect size plot}
 \usage{
 ptile_plot(formula, data, ref_group = NULL, ptiles = seq(0, 1, 0.3333),
-  refline = TRUE, refline_col = "black", refline_lty = 1,
-  refline_lwd = 2, rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1),
-  rgb(0.2, 0.2, 0.2, 0)), lines = TRUE, points = TRUE, legend = NULL,
-  theme = NULL, ...)
+  annotate = FALSE, refline = TRUE, refline_col = "black",
+  refline_lty = 2, refline_lwd = 2, rects = TRUE,
+  rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2, 0)),
+  lines = TRUE, points = TRUE, legend = NULL, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -28,12 +28,21 @@ which splits the distribution into thirds (lower, middle, upper). Any
 sequence is valid, but it is recommended the bins be even. For example
 \code{seq(0, 1, .1)} would split the distributions into deciles.}
 
+\item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
+\code{legend == "side"} the plot is rendered such that additional
+annotations can be made on the plot using low level base plotting functions
+(e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
+\link[grDevices]{dev.off} must be called before a new plot is rendered 
+(otherwise the plot will be attempted to be rendered in the region 
+designated for the legend). Argument is ignored when \code{legend != 
+"side"}.}
+
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be plotted?}
 
 \item{refline_col}{Color of the reference line. Defaults to \code{"gray"}.}
 
-\item{refline_lty}{Line type of the reference line. Defaults to \code{1}.}
+\item{refline_lty}{Line type of the reference line. Defaults to \code{2}.}
 
 \item{refline_lwd}{Line width of the reference line. Defaults to \code{2}.}
 

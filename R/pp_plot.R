@@ -13,6 +13,14 @@
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
+#' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
+#' \code{legend == "side"} the plot is rendered such that additional
+#' annotations can be made on the plot using low level base plotting functions
+#' (e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
+#' \link[grDevices]{dev.off} must be called before a new plot is rendered 
+#' (i.e., close the current plotting window). Otherwise the plot will be
+#' attempted to be rendered in the region designated for the legend). Argument
+#' is ignored when \code{legend != "side"}.
 #' @param refline Logical. Defaults to \code{TRUE}. Should a diagonal
 #'    reference line, representing the point of equal probabilities, be
 #' 	  plotted?
@@ -66,7 +74,7 @@
 #' 
 #'  pp_plot(score ~ frl, d)
 
-pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
+pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
 	text = NULL, text_size = 2, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
  	legend = NULL, plot = TRUE, theme = NULL, ...) {
@@ -124,7 +132,7 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 
 	if(plot == TRUE) {
 		if(legend == "side") {
-			layout(t(c(1, 2)), widths = c(0.9, 0.1))
+			layout(t(c(1, 2)), widths = c(0.9, 0.1))	
 		}
 		if(ncol(ps) == 2) {
 			p <- empty_plot(ref_group_d, ps[ ,2], 
@@ -209,7 +217,6 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 				col = shade_rgb,
 				border = NA)
 		}
-
 		if(legend == "side") {
 			create_legend(ncol(ps_subset), colnames(ps_subset), 
 				col = p$col, 
@@ -234,5 +241,9 @@ pp_plot <- function(formula, data, ref_group = NULL, refline = TRUE, refline_col
 			}
 		}
 	}
+	if(annotate == TRUE) {
+		par(mfg = c(1, 1))
+		empty_plot(ref_group_d, ps[ ,2], "", "", xaxt = "n", yaxt = "n", ...)
+	} 
 invisible(c(as.list(match.call()), p, op))
 }
