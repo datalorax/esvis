@@ -33,9 +33,9 @@ sequence is valid, but it is recommended the bins be even. For example
 annotations can be made on the plot using low level base plotting functions
 (e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
 \link[grDevices]{dev.off} must be called before a new plot is rendered 
-(otherwise the plot will be attempted to be rendered in the region 
-designated for the legend). Argument is ignored when \code{legend != 
-"side"}.}
+(i.e., close the current plotting window). Otherwise the plot will be
+attempted to be rendered in the region designated for the legend). Argument
+is ignored when \code{legend != "side"}.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be plotted?}
