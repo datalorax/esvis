@@ -4,8 +4,8 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL,
-  text = TRUE, es = "tpac", legend = TRUE, return = FALSE, ...)
+ecdf_plot(formula, data, ref_cut = NULL, hor_ref = FALSE, rect_ref = TRUE,
+  legend = "side", theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -14,27 +14,31 @@ variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
 
-\item{v_ref}{Optional argument stating the location of the vertical 
-reference line(s) to compare groups at a specific location on the scale.}
+\item{ref_cut}{Optional numeric vector stating the location of reference 
+line(s) and/or rectangle(s).}
 
-\item{ref_groups}{Optional character vector indicating the reference groups
-(CDFs) to be compared at the location of \emph{v_ref}.}
+\item{hor_ref}{Logical, defaults to \code{FALSE}. Should horizontal
+reference lines be plotted at the location of \code{ref_cut}?}
 
-\item{ref_col}{Optional argument stating the color of the vertical reference
-line. Defaults to gray70.}
+\item{rect_ref}{Logical, defaults to \code{TRUE}. Should semi-transparent 
+rectangle(s) be plotted at the locations of \code{ref_cut}?}
 
-\item{text}{Logical. If reference groups are compared, should the difference
-between the curves be annotated to the plot along the y-axis?}
+\item{legend}{The type of legend to be displayed, with possible values 
+\code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
+when there are more than two groups and \code{"none"} when only comparing
+two groups. If the option \code{"side"} is used the plot is split into two
+plots, via \link[graphics]{layout}, with the legend displayed in the second 
+plot. This scales better than the base legend (i.e., manually manipulating
+the size of the plot after it is rendered), but is not compatible with 
+multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
+When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
+latter of which produces the legend with the base \link[graphics]{legend}
+function.}
 
-\item{es}{If text annotations should be made, which effect size should be
-plotted? Options include \code{\link{pac}} or \code{\link{tpac}} and 
-defaults to the latter.}
-
-\item{legend}{Logical. Should the legend be plotted? Defaults to 
-\code{TRUE}.}
-
-\item{return}{Logical. Should the arguments passed to \link[graphics]{plot}
-returned (in quoted form)? Defaults to \code{FALSE}.}
+\item{theme}{Visual properties of the plot. There are currently only two
+themes implemented - a standard plot and a dark theme. If \code{NULL} 
+(default), the theme will be produced with a standard white background. If
+\code{"dark"}, a dark gray background will be used with white text and axes.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the

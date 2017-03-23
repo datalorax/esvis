@@ -13,21 +13,27 @@
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param v_ref Optional argument stating the location of the vertical 
-#' reference line(s) to compare groups at a specific location on the scale.
-#' @param ref_groups Optional character vector indicating the reference groups
-#' (CDFs) to be compared at the location of \emph{v_ref}.
-#' @param ref_col Optional argument stating the color of the vertical reference
-#' line. Defaults to gray70.
-#' @param text Logical. If reference groups are compared, should the difference
-#' between the curves be annotated to the plot along the y-axis?
-#' @param es If text annotations should be made, which effect size should be
-#' plotted? Options include \code{\link{pac}} or \code{\link{tpac}} and 
-#' defaults to the latter.
-#' @param legend Logical. Should the legend be plotted? Defaults to 
-#' \code{TRUE}.
-#' @param return Logical. Should the arguments passed to \link[graphics]{plot}
-#' returned (in quoted form)? Defaults to \code{FALSE}.
+#' @param ref_cut Optional numeric vector stating the location of reference 
+#' line(s) and/or rectangle(s).
+#' @param hor_ref Logical, defaults to \code{FALSE}. Should horizontal
+#'  reference lines be plotted at the location of \code{ref_cut}? 
+#' @param rect_ref Logical, defaults to \code{TRUE}. Should semi-transparent 
+#' rectangle(s) be plotted at the locations of \code{ref_cut}? 
+#' @param legend The type of legend to be displayed, with possible values 
+#' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
+#' when there are more than two groups and \code{"none"} when only comparing
+#' two groups. If the option \code{"side"} is used the plot is split into two
+#' plots, via \link[graphics]{layout}, with the legend displayed in the second 
+#' plot. This scales better than the base legend (i.e., manually manipulating
+#' the size of the plot after it is rendered), but is not compatible with 
+#' multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
+#' When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
+#' latter of which produces the legend with the base \link[graphics]{legend}
+#' function.
+#' @param theme Visual properties of the plot. There are currently only two
+#' themes implemented - a standard plot and a dark theme. If \code{NULL} 
+#' (default), the theme will be produced with a standard white background. If
+#' \code{"dark"}, a dark gray background will be used with white text and axes.
 #' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
 #' it is best to use the full argument rather than partial matching, given the
 #' method used to call the plot. While some partial matching is supported 
@@ -36,101 +42,100 @@
 #' @import graphics 
 #' @export
 
-
-ecdf_plot <- function(formula, data, v_ref = NULL, ref_groups = NULL, ref_col = NULL, text = TRUE, es = "tpac", legend = TRUE, return = FALSE, ...) {
+ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 
+	rect_ref = TRUE, legend = "side", theme = NULL, ...) {
+	
 	splt <- parse_form(formula, data)
 	ecdfs <- cdfs(formula, data)
 
-	op <- par()
-	op <- op[-grep(c("cin|cra|csi|cxy|din|page"), names(op))]
+	if(!is.null(theme)) {
+		if(theme == "dark") {
+			op <- par(bg = "gray21", 
+					  col.axis = "white", 
+					  col.lab = "white",
+					  col.main = "white")
+		}
+	}
+	else {
+		op <- par(bg = "transparent")	
+	}
 	on.exit(par(op))
 
 	x_lim <- seq(min(sapply(splt, min, na.rm = TRUE)),
 				max(sapply(splt, max, na.rm = TRUE)), 
 				.1)
 
-	pargs <- list(x = x_lim, 
-				  y = seq(0, 1, length = length(x_lim)),
-				  type = "n",
-				  ...)
+	if(legend == "side") {
+		max_char <- max(nchar(names(splt)))
+		wdth <- 0.9 - (max_char * 0.01)
+		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))	
+	}
 
-	if(legend == TRUE) {
-		layout(t(c(1, 2)), widths = c(0.9, 0.1))
-	}
-	if(is.null(pargs$xlab)) {
-		if(!is.null(pargs$xla)) {
-			pargs$xlab <- pargs$xla
-			pargs$xla <- NULL
-		}
-		pargs$xlab <- "Scale"
-	}
-	if(is.null(pargs$ylab)) {
-		if(!is.null(pargs$yla)) {
-			pargs$ylab <- pargs$yla
-			pargs$yla <- NULL
-		}
-		pargs$ylab <- "f(x)"
-	}
-	if(is.null(pargs$main)) {
+	p <- empty_plot(x_lim, seq(0, 1, length = length(x_lim)), 
+					xlab = all.vars(formula)[1],
+					ylab = "Proportion",
+					main = paste(as.character(formula)[c(2, 1, 3)], 
+								collapse = " "),
+					...)
 
-		# check for partial matching
-		if(length(grep("m", names(pargs))) > 0) {
-			pargs$main <- pargs[[grep("^m", names(pargs))]]
-			pargs[grep("^m", names(pargs))[1]] <- NULL
-		}
-		else { 
-			pargs$main <- paste(as.character(formula)[c(2, 1, 3)],
-							collapse = " ")
-		}
-	}
-	if(is.null(pargs$bty)) pargs$bty <- "n"
-	
-	do.call("plot", pargs)
-
-	if(is.null(pargs$lwd)) pargs$lwd <- 2
-	if(is.null(pargs$lty)) pargs$lty <- 1
-	if(is.null(pargs$col)) pargs$col <- col_hue(length(splt))
+	if(is.null(p$lwd)) p$lwd <- 2
+	if(is.null(p$lty)) p$lty <- 1
+	if(is.null(p$col)) p$col <- col_hue(length(splt))
 
 	Map(lines, 
 		ecdfs,
-	    col = pargs$col, 
-		lwd = pargs$lwd,
-		lty = pargs$lty,
+	    col = p$col, 
+		lwd = p$lwd,
+		lty = p$lty,
 		col.01line = FALSE, 
 		verticals = TRUE, 
 		do.points = FALSE)
-	
-	if(!is.null(v_ref)) {
-		if(is.null(ref_col)) ref_col <- "gray70"
-		if(is.null(ref_groups)) {
-			abline(v = v_ref, col = ref_col, lty = 2, lwd = 2)
-		}
-		
-		if(!is.null(ref_groups)) {
-			tpacs <- tpac(formula, data, v_ref)
-			y_refs <- sapply(ecdfs, function(x) x(v_ref))
 
-			segments(x0 = v_ref, x1 = v_ref,
-					 y0 = y_refs[ref_groups[1]], y1 = y_refs[ref_groups[2]],
-					 col = ref_col,
-					 #lty = 2,
-					 lwd = 2)
-			if(text == TRUE) {
-				text(x = min(x_lim), 
-					 y = mean(y_refs[ref_groups[1]], y_refs[ref_groups[2]]),
-					 abs(round(abs(y_refs[ref_groups[1]]) - 
-					 		   abs(y_refs[ref_groups[2]]), 2)),
-					 col = ref_col)
+	if(!is.null(ref_cut)) {
+		if(hor_ref) {
+			x_ints <- split(rep(ref_cut, length(ref_cut)), 
+						rep(seq(1, length(ref_cut)), each = length(ref_cut)))
+
+			y_ints <- lapply(ecdfs, function(x) x(ref_cut))
+			Map(segments, 
+				x0 = 0, 
+				x1 = x_ints,
+				y0 = y_ints,
+				y1 = y_ints,
+				col = p$col,
+				lty = 3,
+				lwd = 1.5) 
+		}
+		if(rect_ref) {
+			rect(ref_cut, -1, 1000, 2, 
+				col = rgb(.2, .2, .2, .2), 
+				lwd = 0)
+		}
+	}
+
+	if(legend == "side") {
+		create_legend(length(splt), names(splt),
+			col = p$col,
+			lwd = p$lwd,
+			lty = p$lty,
+			left_mar = max_char * .35)
+	}
+	if(legend == "base") {
+		if(is.null(theme)) {
+			create_base_legend(names(splt), 
+				col = p$col, 
+				lwd = p$lwd, 
+				lty = p$lty)
+		}
+		if(!is.null(theme)) {
+			if(theme == "dark") {
+				create_base_legend(names(splt), 
+					col = p$col, 
+					lwd = p$lwd, 
+					lty = p$lty,
+					text.col = "white")
 			}
 		}
 	}
-
-	if(legend == TRUE) {
-		create_legend(length(splt), names(splt),
-			col = pargs$col,
-			lwd = pargs$lwd,
-			lty = pargs$lty)
-	}
-
-if(return == TRUE) c(as.list(match.call()), pargs)
+invisible(c(as.list(match.call()), p))
 }
