@@ -5,11 +5,10 @@ R Package for effect size visualizations.
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) 
 [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
 
-This package was designed primarily for visualizing achievement differences (achievement gaps) between student groups in educational data. However, it is generally designed to compare two or more distributions visually and could be used in any context where there is a need to compare distributions (e.g., treatment effects). A particular strength of the visualizations is the ability to evaluate overall differences between the distributions at all points on the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including the area under the curve (conceptually equivalent to the probability that a randomly selected individual in distribution a has a higher value than a randomly selected individual from distribution b), and the *V* statistic, which essentailly transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
+This package is designed to visually compare two or more distributions across the entirety of the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including Cohen's *d*, Hedges' *g*, percentage above a cut, transformed (normalized) percentage above a cut, the area under the curve (conceptually equivalent to the probability that a randomly selected individual from Distribution A has a higher value than a randomly selected individual from Distribution B), and the *V* statistic, which essentailly transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
 
 ## Installation
 Install with *devtools* with
-
 
 ```r
 # install devtools, if not already installed
@@ -19,13 +18,45 @@ Install with *devtools* with
 devtools::install_github("DJAnderson07/esvis")
 ```
 
-## Basic Usage
+## Plotting methods
 
-Compute effect sizes for all possible pairwise comparisons.
+There are three primary data visualizations: (a) binned effect size plots, (b)probability-probability plots, and (c) empirical cumulative distribution functions. All plots should be fully manipulable with calls to the base plotting functions.
+
+At present, the binned effect size plot can only be produced with Cohen's *d*, although future development will allow the user to select the type of effect size. The binned effect size plot splits the distribution into quantiles specified by the user (defaults to lower, middle, and upper thirds), calculates the mean difference between groups within each quantile bin, and produces an effect size for each bin by dividing by the overall pooled standard deviation (i.e., not by quantile). For example
 
 
 ```r
 library(esvis)
+binned_es_plot(math ~ condition, star)
+```
+
+![binnes_es_plot](https://github.com/DJAnderson07/figs/blob/master/binned_quantile-1.png)
+
+The quantiles can be changed with a call to `qtiles`. For example `binned_es_plot(math ~ condition, star, ref_group = "reg", qtiles = seq(0, 1, .2))` would produce the same plot but binned by quintiles. In this case, the reference group is pretty clearly regular-sized classrooms, so we could add `ref_group = "reg"` to change the reference group and perhaps help interpretability.
+
+A probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in math achievement by race. Notice the "other" category is jagged because the sample size is small (*n* = 27).
+
+
+```r
+pp_plot(math ~ race, star)
+```
+![pp_plot](https://github.com/DJAnderson07/figs/blob/master/pp_plot-1.png)
+
+
+Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features.
+
+
+```r
+ecdf_plot(reading ~ sex, star, ref_cut = c(425, 440, 467))
+```
+
+![ecdf_plot](https://github.com/DJAnderson07/figs/blob/master/ecdf-1.png)
+
+## Estimation Methods
+
+Compute effect sizes for all possible pairwise comparisons.
+
+```r 
 coh_d(mean ~ subject, seda)
 ```
 
@@ -39,7 +70,7 @@ Or specify a reference group
 
 
 ```r
-coh_d(mean ~ grade, seda, 8)
+coh_d(mean ~ grade, seda, ref_group = 8)
 ```
 
 ```
@@ -50,21 +81,3 @@ coh_d(mean ~ grade, seda, 8)
 ## 4         8         4 2.416754
 ## 5         8         3 3.004039
 ```
-
-Currently implemented effect size calculations include Cohen's *d*, Hedge's *g*, percent above the cut, transformed percent above the cut, area under the curve, and the *V* statistic, as outlined by [Ho & Reardon, 2012](http://journals.sagepub.com/doi/abs/10.3102/1076998611411918).
-
-Currently, the `pp_plot` function is the most fully developed visualization.
-
-
-```r
-pp_plot(mean ~ subject, seda)
-```
-
-![pp_plot1](https://raw.githubusercontent.com/DJAnderson07/figs/master/pp_plot1-1.png)
-When comparing more than one group, the reference group (which can be changed) is plotted along the x-axis.
-
-
-```r
-pp_plot(mean ~ grade, seda)
-```
-![pp_plot2](https://raw.githubusercontent.com/DJAnderson07/figs/master/pp_plot2-1.png)
