@@ -11,23 +11,23 @@ pooled_sd <- function(formula, data) {
 tidy_out(names(splt), pooled)
 }
 
-ptile_mean_diffs <- function(formula, data, ptiles = seq(0, 1, .33)) {
+ptile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
 	splt <- parse_form(formula, data)
-	ptile_l <- lapply(splt, function(x) split(x, cut(x, quantile(x, ptiles, na.rm = TRUE))))
+	ptile_l <- lapply(splt, function(x) split(x, cut(x, quantile(x, qtiles, na.rm = TRUE))))
 
 	mean_diffs <- function(v) {
-		Map(function(x, y) mean(x, na.rm = TRUE) - mean(y, na.rm = TRUE),
+		Map(function(x, y) mean(y, na.rm = TRUE) - mean(x, na.rm = TRUE),
 			ptile_l[[ v[1] ]], 
 			ptile_l[[ v[2] ]])
 	}
 	td <- tidy_out(names(ptile_l), mean_diffs)	
 	td$estimate <- unlist(td$estimate)
 
-	low_ptiles <- ptiles[-length(ptiles)]
-	high_ptiles <- ptiles[-1]
+	low_qtiles <- qtiles[-length(qtiles)]
+	high_qtiles <- qtiles[-1]
 
-	td$cut <- rep(rep(low_ptiles, each = length(combn(names(splt), 2)) / 2), 2)
-	td$high_ptile <- rep(rep(high_ptiles, 
+	td$cut <- rep(rep(low_qtiles, each = length(combn(names(splt), 2)) / 2), 2)
+	td$high_ptile <- rep(rep(high_qtiles, 
 						each = length(combn(names(splt), 2)) / 2), 2)
 	names(td)[3] <- "low_ptile"
 
@@ -47,7 +47,7 @@ td[ ,c(1:3, 5, 4)]
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
-#' @param ptiles The percentiles to split the data by and calculate effect 
+#' @param qtiles The percentiles to split the data by and calculate effect 
 #' sizes. Essentially, this is the binning argument. Defaults to 
 #' \code{seq(0, 1, .33)}, which splits the distribution into thirds (lower,
 #' middle, upper). Any sequence is valid, but it is recommended the bins be
@@ -57,13 +57,13 @@ td[ ,c(1:3, 5, 4)]
 
 
 ptile_es <- function(formula, data, ref_group = NULL, 
-	ptiles = seq(0, 1, .33)) {
+	qtiles = seq(0, 1, .33)) {
 	if(is.null(ref_group)) {
 		splt <- parse_form(formula, data)
 		ref_group <- names(which.max(sapply(splt, mean, na.rm = TRUE)))
 	}
 
-	means <- ptile_mean_diffs(formula, data, ptiles)
+	means <- ptile_mean_diffs(formula, data, qtiles)
 	means <- means[means$ref_group == ref_group, ]
 
 	sds <- pooled_sd(formula, data)
@@ -91,7 +91,7 @@ es[order(es$midpoint), ]
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
-#' @param ptiles The percentiles to split the data by and calculate effect 
+#' @param qtiles The percentiles to split the data by and calculate effect 
 #' sizes. This argument is passed directly to \link{ptile_es}. 
 #' Essentially, this is the binning argument. Defaults to \code{seq(0, 1, .33)}
 #' which splits the distribution into thirds (lower, middle, upper). Any 
@@ -117,8 +117,8 @@ es[order(es$midpoint), ]
 #' Currently not alterable when \code{theme == "dark"}, in which case the rects
 #' alternate a semi-transparent white and transparent.
 #' @param lines Logical. Should the points between effect sizes across 
-#' \code{ptiles} be connected via a line? Defaults to \code{TRUE}.
-#' @param points Logical. Should points be plotted for each \code{ptiles} be 
+#' \code{qtiles} be connected via a line? Defaults to \code{TRUE}.
+#' @param points Logical. Should points be plotted for each \code{qtiles} be 
 #' plotted? Defaults to \code{TRUE}.
 #' @param legend The type of legend to be displayed, with possible values 
 #' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
@@ -143,8 +143,8 @@ es[order(es$midpoint), ]
 #' @import utils
 #' @export
 
-ptile_plot <- function(formula, data, ref_group = NULL,
-	ptiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, refline_col = "black", 
+binned_es_plot <- function(formula, data, ref_group = NULL,
+	qtiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, refline_col = "black", 
 	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)),
 	lines = TRUE, points = TRUE, legend = NULL, theme = NULL, 
@@ -165,7 +165,7 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 	}
 	on.exit(par(op))
 
-	d <- ptile_es(formula, data, ref_group, ptiles) 
+	d <- ptile_es(formula, data, ref_group, qtiles) 
 
 	if(length(unique(d$foc_group)) > 1) {
 		if(is.null(legend)) legend <- "side"
@@ -189,9 +189,9 @@ ptile_plot <- function(formula, data, ref_group = NULL,
 					"Percentiles",
 					"Effect Size",
 					paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
-					xlim = c(0, 1),
-					ylim = c(default_ylim_low, default_ylim_high),
-					yaxt = "n",
+					default_xlim = c(0, 1),
+					default_ylim = c(default_ylim_low, default_ylim_high),
+					default_yaxt = "n",
 					...))
 	
 	if(is.null(args$yaxt)) {
