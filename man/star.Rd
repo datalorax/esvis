@@ -10,6 +10,9 @@
 	   \item{schid}{Integer. School identifier.}
     \item{condition}{Character. Classroom type the student was enrolled in 
 			(randomly assigned to).}
+	   \item{tch_experience}{Integer. Number of years of teaching experience
+			 for the teacher in the classroom in which the student was
+			 enrolled.}
 	   \item{sex}{Character. Sex of student: "girl" or "boy".}
 	   \item{freelunch}{Character. Eligibility of the student for free or
 			 reduced price lunch: "no" or "yes"}
