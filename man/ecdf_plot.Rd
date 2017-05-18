@@ -5,7 +5,7 @@
 \title{Empirical Cumulative Distribution Plot}
 \usage{
 ecdf_plot(formula, data, ref_cut = NULL, hor_ref = FALSE, rect_ref = TRUE,
-  legend = "side", theme = NULL, ...)
+  legend = "side", theme = NULL, annotate = FALSE, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -39,6 +39,15 @@ function.}
 themes implemented - a standard plot and a dark theme. If \code{NULL} 
 (default), the theme will be produced with a standard white background. If
 \code{"dark"}, a dark gray background will be used with white text and axes.}
+
+\item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
+\code{legend == "side"} the plot is rendered such that additional
+annotations can be made on the plot using low level base plotting functions
+(e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
+\link[grDevices]{dev.off} must be called before a new plot is rendered 
+(i.e., close the current plotting window). Otherwise the plot will be
+attempted to be rendered in the region designated for the legend. Argument
+is ignored when \code{legend != "side"}.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the

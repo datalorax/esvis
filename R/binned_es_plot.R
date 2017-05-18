@@ -56,7 +56,7 @@ td[ ,c(1:3, 5, 4)]
 #' @export
 
 
-ptile_es <- function(formula, data, ref_group = NULL, 
+qtile_es <- function(formula, data, ref_group = NULL, 
 	qtiles = seq(0, 1, .33)) {
 	if(is.null(ref_group)) {
 		splt <- parse_form(formula, data)
@@ -76,11 +76,11 @@ ptile_es <- function(formula, data, ref_group = NULL,
 es[order(es$midpoint), ]
 }
 
-#' Percentile-matched effect size plot
+#' Quantile-binned effect size plot
 #' 
-#' This plot plots effect size between two groups by matched percentiles 
-#' (i.e., the results from \link{ptile_es}), with the matched
-#' percentiles plotted along the x-axis and the effect size plotted along the 
+#' Plots the effect size between two groups by matched (binned) quantiles 
+#' (i.e., the results from \link{qtile_es}), with the matched
+#' quantiles plotted along the x-axis and the effect size plotted along the 
 #' y-axis. The intent is to examine how (if) the magnitude of the effect size
 #' varies at different points of the distributions.
 #' 
@@ -91,8 +91,8 @@ es[order(es$midpoint), ]
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
-#' @param qtiles The percentiles to split the data by and calculate effect 
-#' sizes. This argument is passed directly to \link{ptile_es}. 
+#' @param qtiles The quantile bins to split the data by and calculate effect 
+#' sizes. This argument is passed directly to \link{qtile_es}. 
 #' Essentially, this is the binning argument. Defaults to \code{seq(0, 1, .33)}
 #' which splits the distribution into thirds (lower, middle, upper). Any 
 #' sequence is valid, but it is recommended the bins be even. For example
@@ -143,7 +143,7 @@ es[order(es$midpoint), ]
 #' @import utils
 #' @export
 
-binned_es_plot <- function(formula, data, ref_group = NULL,
+binned_plot <- function(formula, data, ref_group = NULL,
 	qtiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, refline_col = "black", 
 	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)),
@@ -165,7 +165,7 @@ binned_es_plot <- function(formula, data, ref_group = NULL,
 	}
 	on.exit(par(op))
 
-	d <- ptile_es(formula, data, ref_group, qtiles) 
+	d <- qtile_es(formula, data, ref_group, qtiles) 
 
 	if(length(unique(d$foc_group)) > 1) {
 		if(is.null(legend)) legend <- "side"
@@ -186,7 +186,7 @@ binned_es_plot <- function(formula, data, ref_group = NULL,
 	default_ylim_high <- ifelse(max_est < 0, 0.1, 0.05*max_est + max_est)
 
 	p <- with(d, empty_plot(midpoint, es,
-					"Percentiles",
+					paste0("Quantiles (ref group: ", unique(d$ref_group), ")"),
 					"Effect Size",
 					paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
 					default_xlim = c(0, 1),

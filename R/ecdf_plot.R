@@ -34,6 +34,14 @@
 #' themes implemented - a standard plot and a dark theme. If \code{NULL} 
 #' (default), the theme will be produced with a standard white background. If
 #' \code{"dark"}, a dark gray background will be used with white text and axes.
+#' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
+#' \code{legend == "side"} the plot is rendered such that additional
+#' annotations can be made on the plot using low level base plotting functions
+#' (e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
+#' \link[grDevices]{dev.off} must be called before a new plot is rendered 
+#' (i.e., close the current plotting window). Otherwise the plot will be
+#' attempted to be rendered in the region designated for the legend. Argument
+#' is ignored when \code{legend != "side"}.
 #' @param ... Additional arguments passed to \link[graphics]{plot}. Note that
 #' it is best to use the full argument rather than partial matching, given the
 #' method used to call the plot. While some partial matching is supported 
@@ -43,7 +51,7 @@
 #' @export
 
 ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 
-	rect_ref = TRUE, legend = "side", theme = NULL, ...) {
+	rect_ref = TRUE, legend = "side", theme = NULL, annotate = FALSE, ...) {
 	
 	splt <- parse_form(formula, data)
 	ecdfs <- cdfs(formula, data)
@@ -137,5 +145,10 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 			}
 		}
 	}
+	if(annotate == TRUE) {
+		par(mfg = c(1, 1))
+		empty_plot(x_lim, seq(0, 1, length = length(x_lim)), 
+			"", "", xaxt = "n", yaxt = "n", ...)
+	} 
 invisible(c(as.list(match.call()), p))
 }
