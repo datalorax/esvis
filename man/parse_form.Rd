@@ -22,4 +22,3 @@ A list of data split by the grouping factor.
 \description{
 Parse formula
 }
-

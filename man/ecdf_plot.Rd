@@ -66,4 +66,3 @@ transformations. See
 \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
  Reardon, 2012}. (Note, not all features implemented yet)
 }
-

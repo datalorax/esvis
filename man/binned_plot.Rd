@@ -90,4 +90,3 @@ quantiles plotted along the x-axis and the effect size plotted along the
 y-axis. The intent is to examine how (if) the magnitude of the effect size
 varies at different points of the distributions.
 }
-

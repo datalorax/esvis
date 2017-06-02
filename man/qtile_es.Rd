@@ -29,4 +29,3 @@ Returns a data frame with the estimated effect size by the provided
 percentiles. Currently, the effect size is equivalent to Cohen's d, but 
 future development will allow this to vary.
 }
-

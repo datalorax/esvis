@@ -34,4 +34,3 @@ d <- data.frame(score = c(free, reduced, pay),
 
 probs(score ~ frl, d)
 }
-

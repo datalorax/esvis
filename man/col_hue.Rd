@@ -12,4 +12,3 @@ col_hue(n)
 \description{
 Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
 }
-

@@ -18,4 +18,3 @@ Matrix of values according to the function supplied.
 \description{
 Alternative to tidied data frame return.
 }
-

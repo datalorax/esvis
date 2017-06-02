@@ -19,4 +19,3 @@ create_base_legend(labels, position = "bottomright", ...)
 This function creates a legend using the base \link[graphics]{legend}
 function, but with more abbreviated syntax.
 }
-

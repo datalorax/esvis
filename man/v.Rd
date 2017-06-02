@@ -41,4 +41,3 @@ d <- data.frame(score = c(free_reduced, pay),
 
 v(score ~ frl, d)
 }
-

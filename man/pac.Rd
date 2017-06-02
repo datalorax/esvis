@@ -39,4 +39,3 @@ factor, and then calculates the proportion of the sample above any generic
 point on the scale for all groups. Alternatively only specific proportions
 can be returned.
 }
-

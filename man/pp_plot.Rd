@@ -100,4 +100,3 @@ free_reduced <- rnorm(800, 80, 20)
 
  pp_plot(score ~ frl, d)
 }
-

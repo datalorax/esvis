@@ -34,4 +34,3 @@ for a discussion on different types of effect sizes and their
 interpretation. Note that missing data are removed from the calculations of 
 the means and standard deviations.
 }
-

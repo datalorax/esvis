@@ -30,4 +30,3 @@ These data come from the Ecdat package and represent a cross-section of
  were randomly assigned to classrooms.
 }
 \keyword{datasets}
-

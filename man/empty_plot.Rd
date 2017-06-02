@@ -54,4 +54,3 @@ for specification of default \code{xlab}, \code{ylab}, and \code{main}
 arguments, while allowing the user to override those arguments. Only really
 useful when used within other functions (e.g., \link{pp_plot}).
 }
-

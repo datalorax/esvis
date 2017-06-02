@@ -25,4 +25,3 @@ plotting environment to create the legend, rather than overlaying it. I
 prefer this legend because it scales better than the base legend. It is
 currently only implemented to support lines.
 }
-
