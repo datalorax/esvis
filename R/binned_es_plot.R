@@ -5,7 +5,7 @@ pooled_sd <- function(formula, data) {
 	ns <- sapply(splt, length)
 
 	pooled <- function(v) {
-		sqrt((((ns[1] - 1)*vars[1]) + ((ns[2] - 1)*vars[2])) / 
+		sqrt((((ns[v[1]] - 1)*vars[v[1]]) + ((ns[v[2]] - 1)*vars[v[2]])) / 
 			(sum(ns[v]) - 2))
 	}
 tidy_out(names(splt), pooled)
