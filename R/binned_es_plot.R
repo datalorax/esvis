@@ -1,8 +1,8 @@
 pooled_sd <- function(formula, data) {
 	splt <- parse_form(formula, data)
 
-	vars <- sapply(splt, var, na.rm = TRUE)
-	ns <- sapply(splt, length)
+	vars <- vapply(splt, var, na.rm = TRUE, numeric(1))
+	ns <- vapply(splt, length, numeric(1))
 
 	pooled <- function(v) {
 		sqrt((((ns[v[1]] - 1)*vars[v[1]]) + ((ns[v[2]] - 1)*vars[v[2]])) / 
@@ -60,7 +60,11 @@ qtile_es <- function(formula, data, ref_group = NULL,
 	qtiles = seq(0, 1, .33)) {
 	if(is.null(ref_group)) {
 		splt <- parse_form(formula, data)
-		ref_group <- names(which.max(sapply(splt, mean, na.rm = TRUE)))
+		ref_group <- names(
+						which.max(
+							vapply(splt, mean, na.rm = TRUE, numeric(1))
+							)
+						)
 	}
 
 	means <- ptile_mean_diffs(formula, data, qtiles)
@@ -217,9 +221,9 @@ binned_plot <- function(formula, data, ref_group = NULL,
 	}
 
 	xaxes <- split(d$midpoint, d$foc_group)
-	xaxes <- xaxes[-which.min(sapply(xaxes, length))]
+	xaxes <- xaxes[-which.min(vapply(xaxes, length, numeric(1)))]
 	yaxes <- split(d$es, d$foc_group)
-	yaxes <- yaxes[-which.min(sapply(yaxes, length))]
+	yaxes <- yaxes[-which.min(vapply(yaxes, length, numeric(1)))]
 
 	if(rects) {
 		rect_left <- unique(d$low_ptile)

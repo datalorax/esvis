@@ -25,9 +25,9 @@
 coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
 
-	means <- sapply(splt, mean, na.rm = TRUE)
-	vars <- sapply(splt, var, na.rm = TRUE)
-	ns <- sapply(splt, length)
+	means <- vapply(splt, mean, na.rm = TRUE, numeric(1))
+	vars <- vapply(splt, var, na.rm = TRUE, numeric(1))
+	ns <- vapply(splt, length, numeric(1))
 
 	# vec is a vector to subset means/vars/ns for the appropriate comparison
 	es_d <- function(v) {
@@ -76,7 +76,7 @@ td
 hedg_g <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
 
-	ns <- sapply(splt, length)
+	ns <- vapply(splt, length, numeric(1))
 	ns <- outer(ns, ns, "+")
 	diag(ns) <- 0
 	v <- as.vector(ns)
@@ -126,7 +126,7 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 			tidy = TRUE) {
 
 	ecdfs <- cdfs(formula, data)
-	pacs <- sapply(ecdfs, function(f) 1 - f(cut))
+	pacs <- vapply(ecdfs, function(f) 1 - f(cut), numeric(1))
 
 	if(diff == FALSE) {
 		if(is.null(dim(pacs))) {

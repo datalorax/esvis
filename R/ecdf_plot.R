@@ -69,8 +69,8 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 	}
 	on.exit(par(op))
 
-	x_lim <- seq(min(sapply(splt, min, na.rm = TRUE)),
-				max(sapply(splt, max, na.rm = TRUE)), 
+	x_lim <- seq(min(vapply(splt, min, na.rm = TRUE, numeric(1))),
+				max(vapply(splt, max, na.rm = TRUE, numeric(1))), 
 				.1)
 
 	if(legend == "side") {

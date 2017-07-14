@@ -12,7 +12,7 @@ parse_form <- function(formula, data, order = TRUE) {
 
 	splt <- split(out, group)
 	if(order == TRUE) {
-		means <- sapply(splt, mean, na.rm = TRUE)
+		means <- vapply(splt, mean, na.rm = TRUE, numeric(1))
 		splt <- splt[order(means, decreasing = TRUE)]
 	}
 splt
@@ -34,10 +34,10 @@ create_vec <- function(levs, fun) {
 	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
 	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
 
-	set1 <- sapply(split(combos_1, 1:nrow(combos_1)), 
-				paste0, collapse = "-")
-	set2 <- sapply(split(combos_2, 1:nrow(combos_2)), 
-				paste0, collapse = "-")
+	set1 <- vapply(split(combos_1, 1:nrow(combos_1)), 
+				paste0, collapse = "-", character(1))
+	set2 <- vapply(split(combos_2, 1:nrow(combos_2)), 
+				paste0, collapse = "-", character(1))
 
 	vec <- c(mapply(fun, split(combos_1, 1:nrow(combos_1))),
 			 mapply(fun, split(combos_2, 1:nrow(combos_2))))
@@ -123,15 +123,13 @@ probs <- function(formula, data) {
 	ecdfs <- cdfs(formula, data)
 	out <- data[[ all.vars(formula)[1] ]]
 	
-	ps <- sapply(ecdfs, function(x) {
-			x(seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
-				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
-				  .1))
-		})
-	colnames(ps) <- names(ecdfs)
-	rownames(ps) <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
+	range <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
 				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
 				  .1)
+
+	ps <- vapply(ecdfs, function(x) x(range), numeric(length(range)))
+	colnames(ps) <- names(ecdfs)
+	rownames(ps) <- range
 ps
 }
 
