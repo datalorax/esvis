@@ -74,7 +74,8 @@
 #' 
 #'  pp_plot(score ~ frl, d)
 
-pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
+pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, 
+	refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
 	text = NULL, text_size = 2, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
  	legend = NULL, plot = TRUE, theme = NULL, ...) {
@@ -83,18 +84,28 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline =
 
 	if(ncol(ps) > 2 & !is.null(shade)) {
 		if(shade == TRUE) {
-			warning("The area under the curve can only be shaded with two groups. Argument `shade = TRUE` ignored")	
+			warning(
+				paste("The area under the curve can only be shaded with two",
+					"groups. Argument `shade = TRUE` ignored")
+				)	
 		}
 		
 	}
 	if(ncol(ps) > 2 & !is.null(text)) {
 		if(text == TRUE) {
-			warning("Text annotations can only be produced automatically with two groups. Argument `text = TRUE` ignored")	
+			warning(
+				paste("Text annotations can only be produced automatically",
+					"with two groups. Argument `text = TRUE` ignored")
+				)	
 		}
 		
 	}
 	if(ncol(ps) == 2 & all(par()$mfrow == c(1, 2))) {
-		warning("Two-panel plot detected without a legend. Call `dev.off()` and then rerun the plot to avoid wasted space, if only trying to plot a single curve. Ignore otherwise.")
+		warning(
+			paste("Two-panel plot detected without a legend. Call `dev.off()`",
+				"and then rerun the plot to avoid wasted space, if only",
+				"trying to plot a single curve. Ignore otherwise.")
+			)
 	}
 
 	if(is.null(ref_group)) ref_group <- colnames(ps)[1]
@@ -124,7 +135,11 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline =
 	on.exit(par(op))
 
 	if(any(par()$mfrow > 2) & any(par()$mfrow != c(1,2)) & legend == "side") {
-		message("Multi-panel settings detected with `legend == 'side'`. Change legend option if trying to produce a multi-panel plot.")
+		message(
+			paste("Multi-panel settings detected with `legend == 'side'`.",
+				"Change legend option if trying to produce a multi-panel", 
+				"plot.")
+			)
 	}
 
 	sq <- 1:ncol(ps)
@@ -173,18 +188,26 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline =
 	if(is.null(p$col)) p$col <- col_hue(ncol(ps_subset))
 
 	if((length(p$col) !=1) & (length(p$col) < ncol(ps_subset))) {
-		warning("Not enough colors supplied. Colors will be recycled when drawing lines.")
+		warning(
+			paste("Not enough colors supplied. Colors will be recycled",
+				"when drawing lines.")
+			)
 	}
 	if((length(p$lty) !=1) & (length(p$lty) < ncol(ps_subset))) {
-		warning("Not enough line types supplied. Line types will be recycled when drawing lines.")
+		warning(
+			paste("Not enough line types supplied. Line types will be",
+				"recycled when drawing lines.")
+			)
 	}
 
 	x_axs <- rep(ref_group_d, ncol(ps_subset))
 
 	if(plot == TRUE) {
 		Map(lines, 
-			x = split(x_axs, rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
-			y = split(ps_subset, rep(1:ncol(ps_subset), each = nrow(ps_subset))),
+			x = split(x_axs, 
+					rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
+			y = split(ps_subset, 
+					rep(1:ncol(ps_subset), each = nrow(ps_subset))),
 		    col = p$col, 
 			lwd = p$lwd,
 			lty = p$lty)
@@ -194,7 +217,7 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline =
 				if(theme == "dark") {
 					text(0.8, 0.2, cex = text_size, col = "white",
 					paste0("AUC = ", 
-								round(auc(formula, data, ref_group, FALSE), 2), 
+								round(auc(formula, data, ref_group, FALSE), 2),
 						   "\n", 
 						   "V = ", 
 						   		round(v(formula, data, ref_group, FALSE), 2)))

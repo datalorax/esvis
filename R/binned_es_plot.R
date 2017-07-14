@@ -13,7 +13,9 @@ tidy_out(names(splt), pooled)
 
 ptile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
 	splt <- parse_form(formula, data)
-	ptile_l <- lapply(splt, function(x) split(x, cut(x, quantile(x, qtiles, na.rm = TRUE))))
+	ptile_l <- lapply(splt, function(x) {
+		split(x, cut(x, quantile(x, qtiles, na.rm = TRUE)))
+	})
 
 	mean_diffs <- function(v) {
 		Map(function(x, y) mean(y, na.rm = TRUE) - mean(x, na.rm = TRUE),
@@ -148,8 +150,8 @@ es[order(es$midpoint), ]
 #' @export
 
 binned_plot <- function(formula, data, ref_group = NULL,
-	qtiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, refline_col = "black", 
-	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
+	qtiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, 
+	refline_col = "black", refline_lty = 2, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)),
 	lines = TRUE, points = TRUE, legend = NULL, theme = NULL, 
 	 ...) {

@@ -229,14 +229,21 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 	tpacs <- qnorm(pacs)
 	
 	if(any(tpacs == Inf|tpacs == -Inf)) {
-				warning("100% or 0% of the sample (for one or more groups) scored above/below this cut point. Cannot transform to normal scale.")
+				warning(
+					paste("100% or 0% of the sample (for one or more groups)",
+						"scored above/below this cut point. Cannot transform",
+						"to normal scale.")
+					)
 	}
 	
 	if(diff == FALSE) {
 		return(tpacs)
 	}
 	if(length(tpacs) == 1 & diff == TRUE) {
-		warning("Only one group specified with `diff = TRUE`. Call to `diff` will be ignored")
+		warning(
+			paste("Only one group specified with `diff = TRUE`.", 
+				  "Call to `diff` will be ignored")
+			)
 		return(tpacs)
 	}
 

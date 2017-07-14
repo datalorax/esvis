@@ -58,13 +58,25 @@ tidy_out <- function(levs, fun) {
 		td$estimate <- c(diff_1, diff_2)
 	}
 	else{
-		g1 <- as.data.frame(split(rep(combos_1, nrow(diff_1)), rep(1:2, each = nrow(combos_1))))
-		g2 <- as.data.frame(split(rep(combos_2, nrow(diff_2)), rep(1:2, each = nrow(combos_2))))
+		g1 <- as.data.frame(
+				split(
+					rep(combos_1, nrow(diff_1)), 
+					rep(1:2, each = nrow(combos_1))
+					)
+				)
+		g2 <- as.data.frame(
+				split(
+					rep(combos_2, nrow(diff_2)), 
+					rep(1:2, each = nrow(combos_2))
+					)
+				)
 		
 		td <- as.data.frame(rbind(g1, g2))
 		names(td) <- c("ref_group", "foc_group")
 		
-		if(is.null(rownames(diff_1))) warning("Cut score not specified as row names")
+		if(is.null(rownames(diff_1))) {
+			warning("Cut score not specified as row names")
+		}
 		
 		td$cut <- c(rep(rownames(diff_1), each = nrow(combos_1)), 
 					rep(rownames(diff_2), each = nrow(combos_2)))
