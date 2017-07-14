@@ -141,7 +141,7 @@ ps
 #' @export
 
 col_hue <- function(n) {
-  hues = seq(15, 375, length = n + 1)
+  hues <- seq(15, 375, length = n + 1)
   grDevices::hcl(h = hues, c = 100, l = 65)[1:n]
 }
 

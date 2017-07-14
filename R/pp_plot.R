@@ -153,8 +153,8 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, refline =
 			if(theme == "dark") {
 				if(is.null(p$xaxt))	axis(1, col = "white")
 				if(is.null(p$yaxt)) axis(2, col = "white")
-				if(refline_col == "gray") refline_col = "white"
-				if(refline_lwd == 1) refline_lwd = 2
+				if(refline_col == "gray") refline_col <- "white"
+				if(refline_lwd == 1) refline_lwd <- 2
 			}
 		}
 		if(refline == TRUE) {

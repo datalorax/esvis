@@ -215,8 +215,8 @@ binned_plot <- function(formula, data, ref_group = NULL,
 						 las = 2,
 						 col = "white")
 			}
-			if(refline_col == "gray") refline_col = "white"
-			if(refline_lwd == 1) refline_lwd = 2
+			if(refline_col == "gray") refline_col <- "white"
+			if(refline_lwd == 1) refline_lwd <- 2
 		}
 	}
 
