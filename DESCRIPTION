@@ -8,6 +8,8 @@ Depends:
     R (>= 3.1)
 Imports:
     sfsmisc
+URL: https://github.com/DJAnderson07/esvis
+BugReports: https://github.com/DJAnderson07/esvis/issues
 License: MIT + file LICENSE
 COPYRIGHT HOLDER: Daniel Anderson
 Encoding: UTF-8

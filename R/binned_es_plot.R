@@ -1,3 +1,11 @@
+#' Compute pooled standard deviation
+#' 
+#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
+#'   the outcome variable and \code{group} is the grouping variable. Note the
+#'   grouping variable must only include only two groups.
+#' @param data The data frame that the data in the formula come from.
+#' @importFrom stats var
+
 pooled_sd <- function(formula, data) {
 	splt <- parse_form(formula, data)
 
@@ -11,32 +19,60 @@ pooled_sd <- function(formula, data) {
 tidy_out(names(splt), pooled)
 }
 
-ptile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
+#' Compute mean differences by various quantiles
+#' 
+#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
+#'   the outcome variable and \code{group} is the grouping variable. Note the
+#'   grouping variable must only include only two groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param qtiles Quantile bins for calculating mean differences
+#' @importFrom stats quantile
+#' @importFrom utils combn
+
+
+qtile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
 	splt <- parse_form(formula, data)
-	ptile_l <- lapply(splt, function(x) {
+	qtile_l <- lapply(splt, function(x) {
 		split(x, cut(x, quantile(x, qtiles, na.rm = TRUE)))
 	})
 
 	mean_diffs <- function(v) {
 		Map(function(x, y) mean(y, na.rm = TRUE) - mean(x, na.rm = TRUE),
-			ptile_l[[ v[1] ]], 
-			ptile_l[[ v[2] ]])
+			qtile_l[[ v[1] ]], 
+			qtile_l[[ v[2] ]])
 	}
-	td <- tidy_out(names(ptile_l), mean_diffs)	
+	td <- tidy_out(names(qtile_l), mean_diffs)	
 	td$estimate <- unlist(td$estimate)
-
+	
 	low_qtiles <- qtiles[-length(qtiles)]
 	high_qtiles <- qtiles[-1]
 
 	td$cut <- rep(rep(low_qtiles, each = length(combn(names(splt), 2)) / 2), 2)
-	td$high_ptile <- rep(rep(high_qtiles, 
+	td$high_qtile <- rep(rep(high_qtiles, 
 						each = length(combn(names(splt), 2)) / 2), 2)
-	names(td)[3] <- "low_ptile"
+	names(td)[3] <- "low_qtile"
 
 td[ ,c(1:3, 5, 4)]
 }
 
-#' Compute effect sizes by percentile bins
+qtile_n <- function(formula, data, qtiles = seq(0, 1, .33)) {
+	splt <- parse_form(formula, data)
+	qtile_l <- lapply(splt, function(x) {
+		split(x, cut(x, quantile(x, qtiles, na.rm = TRUE)))
+	})
+	ns <- lapply(qtile_l, function(x) vapply(x, length, numeric(1)))
+	ns <- data.frame(group = rep(names(ns), each = length(ns[[1]])),
+			   low_qtile = qtiles[-length(qtiles)],
+			   high_qtile = qtiles[-1],		   
+			   n = unlist(ns))
+ns
+}
+
+se_es <- function(n1, n2, d) {
+		sqrt((n1 + n2)/(n1*n2) + d^2/(2*((n1 + n2))))
+}
+
+#' Compute effect sizes by quantile bins
 #' 
 #' Returns a data frame with the estimated effect size by the provided 
 #' percentiles. Currently, the effect size is equivalent to Cohen's d, but 
@@ -57,7 +93,6 @@ td[ ,c(1:3, 5, 4)]
 #' deciles.
 #' @export
 
-
 qtile_es <- function(formula, data, ref_group = NULL, 
 	qtiles = seq(0, 1, .33)) {
 	if(is.null(ref_group)) {
@@ -69,7 +104,7 @@ qtile_es <- function(formula, data, ref_group = NULL,
 						)
 	}
 
-	means <- ptile_mean_diffs(formula, data, qtiles)
+	means <- qtile_mean_diffs(formula, data, qtiles)
 	means <- means[means$ref_group == ref_group, ]
 
 	sds <- pooled_sd(formula, data)
@@ -77,10 +112,28 @@ qtile_es <- function(formula, data, ref_group = NULL,
 
 	es <- merge(means, sds, by = c("ref_group", "foc_group"), all.x = TRUE)
 	es$es <- es$estimate / es$pooled_sd
-	es$midpoint <- (es$low_ptile + es$high_ptile) / 2
+	es$midpoint <- (es$low_qtile + es$high_qtile) / 2
 
-es[order(es$midpoint), ]
+	ns <- qtile_n(formula, data, qtiles)
+	es <- merge(es, ns, 
+					by.x = c("ref_group", "low_qtile", "high_qtile"),
+					by.y = c("group", "low_qtile", "high_qtile"),
+					all.x = TRUE)
+	names(es)[ncol(es)] <- "ref_group_n"
+	es <- merge(es, ns, 
+					by.x = c("foc_group", "low_qtile", "high_qtile"),
+					by.y = c("group", "low_qtile", "high_qtile"),
+					all.x = TRUE)
+	names(es)[ncol(es)] <- "foc_group_n"
+
+
+	es$se <- se_es(es$ref_group_n, es$foc_group_n, es$es)
+
+
+es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 }
+
+
 
 #' Quantile-binned effect size plot
 #' 
@@ -103,6 +156,13 @@ es[order(es$midpoint), ]
 #' which splits the distribution into thirds (lower, middle, upper). Any 
 #' sequence is valid, but it is recommended the bins be even. For example
 #' \code{seq(0, 1, .1)} would split the distributions into deciles.
+#' @param se Logical. Should the standard errors around the effect size point
+#' estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
+#' displayed wiht shading. 
+#' @param shade_col Color of the standard error shading, if \code{se == TRUE}.
+#' Defaults to the same color as the lines.
+#' @param shade_alpha Transparency level of the standard error shading.
+#' Defaults to 0.3.
 #' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 #' \code{legend == "side"} the plot is rendered such that additional
 #' annotations can be made on the plot using low level base plotting functions
@@ -146,15 +206,16 @@ es[order(es$midpoint), ]
 #' method used to call the plot. While some partial matching is supported 
 #' (e.g., \code{m} for \code{main}, it is generally safest to supply the full
 #' argument).
-#' @import utils
+#' @importFrom graphics par layout axis rect points abline lines
+#' @importFrom grDevices rgb adjustcolor
 #' @export
 
 binned_plot <- function(formula, data, ref_group = NULL,
-	qtiles = seq(0, 1, .3333), annotate = FALSE, refline = TRUE, 
-	refline_col = "black", refline_lty = 2, refline_lwd = 2, rects = TRUE, 
-	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)),
-	lines = TRUE, points = TRUE, legend = NULL, theme = NULL, 
-	 ...) {
+	qtiles = seq(0, 1, .3333), se = TRUE, shade_col = NULL,
+	shade_alpha = 0.3, annotate = FALSE, refline = TRUE, refline_col = "black",
+	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
+	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)), lines = TRUE,
+	points = TRUE, legend = NULL, theme = NULL, ...) {
 
 	args <- as.list(match.call())
 	
@@ -228,8 +289,8 @@ binned_plot <- function(formula, data, ref_group = NULL,
 	yaxes <- yaxes[-which.min(vapply(yaxes, length, numeric(1)))]
 
 	if(rects) {
-		rect_left <- unique(d$low_ptile)
-		rect_right <- unique(d$high_ptile)
+		rect_left <- unique(d$low_qtile)
+		rect_right <- unique(d$high_qtile)
 
 		if(is.null(theme)) {
 			rect(rect_left, 
@@ -251,11 +312,30 @@ binned_plot <- function(formula, data, ref_group = NULL,
 			}
 		}
 	}
-	
+
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
 	if(is.null(p$col)) p$col <- col_hue(length(xaxes))
-	
+
+	if(se) {
+		x_shade <- split(d$midpoint, as.character(d$foc_group))
+		x_shade <- lapply(x_shade, function(x) {
+				x[1] <- x[1] - 0.01
+				x[length(x)] <- x[length(x)] + 0.01
+			return(c(x, rev(x)))
+			})
+		y_shade <- split(d, as.character(d$foc_group))
+		y_shade <- lapply(y_shade, function(x) {
+				lower <- x$es - x$se
+				upper <- x$es + x$se
+			return(c(lower, rev(upper)))
+		})
+		if(is.null(shade_col)) {
+			shade_col <- adjustcolor(p$col, alpha.f = shade_alpha)
+		}
+		Map(polygon, x_shade, y_shade, col = shade_col, border = NA)		
+	}
+
 	if(lines) {
 		Map(lines, xaxes, yaxes, col = p$col, lwd = p$lwd, lty = p$lty)	
 	}

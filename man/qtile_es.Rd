@@ -2,7 +2,7 @@
 % Please edit documentation in R/binned_es_plot.R
 \name{qtile_es}
 \alias{qtile_es}
-\title{Compute effect sizes by percentile bins}
+\title{Compute effect sizes by quantile bins}
 \usage{
 qtile_es(formula, data, ref_group = NULL, qtiles = seq(0, 1, 0.33))
 }

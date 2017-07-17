@@ -5,10 +5,11 @@
 \title{Quantile-binned effect size plot}
 \usage{
 binned_plot(formula, data, ref_group = NULL, qtiles = seq(0, 1, 0.3333),
-  annotate = FALSE, refline = TRUE, refline_col = "black",
-  refline_lty = 2, refline_lwd = 2, rects = TRUE,
-  rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2, 0)),
-  lines = TRUE, points = TRUE, legend = NULL, theme = NULL, ...)
+  se = TRUE, shade_col = NULL, shade_alpha = 0.3, annotate = FALSE,
+  refline = TRUE, refline_col = "black", refline_lty = 2,
+  refline_lwd = 2, rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1),
+  rgb(0.2, 0.2, 0.2, 0)), lines = TRUE, points = TRUE, legend = NULL,
+  theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -27,6 +28,16 @@ Essentially, this is the binning argument. Defaults to \code{seq(0, 1, .33)}
 which splits the distribution into thirds (lower, middle, upper). Any 
 sequence is valid, but it is recommended the bins be even. For example
 \code{seq(0, 1, .1)} would split the distributions into deciles.}
+
+\item{se}{Logical. Should the standard errors around the effect size point
+estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
+displayed wiht shading.}
+
+\item{shade_col}{Color of the standard error shading, if \code{se == TRUE}.
+Defaults to the same color as the lines.}
+
+\item{shade_alpha}{Transparency level of the standard error shading.
+Defaults to 0.3.}
 
 \item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 \code{legend == "side"} the plot is rendered such that additional
