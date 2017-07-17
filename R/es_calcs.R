@@ -20,7 +20,7 @@
 #'  as a vector.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
-#' @import stats
+#' @importFrom stats var qnorm
 #' @export
 coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
@@ -70,7 +70,6 @@ td
 #'  as a vector.
 #' @return By default the Hedges' \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
-#' @import stats
 #' @export
 
 hedg_g <- function(formula, data, ref_group = NULL, tidy = TRUE) {
@@ -221,6 +220,7 @@ td
 #' @return A tidy data frame (or vector) of the transformed proportion above
 #' the cutoff. Optionally (and by default) all pairwise comparisons are 
 #' calculated and returned.
+#' @importFrom stats qnorm
 #' @export 
 
 tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
@@ -342,7 +342,7 @@ td
 #'  the grouping factor are returned as a tidy data frame. Alternatively, a 
 #' vector can be returned, and/or only the V corresponding to a specific
 #' reference group can be returned.
-#' @import stats
+#' @importFrom stats qnorm
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
 #' pay <- rnorm(500, 100, 10)

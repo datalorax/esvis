@@ -63,7 +63,8 @@
 #' @return
 #' The arguments supplied to the plot are silently returned for testing 
 #' purposes.
-#' @import graphics grDevices
+#' @importFrom graphics par layout abline lines text polygon
+#' @importFrom grDevices rgb
 #' @export
 #' @examples
 #' free_reduced <- rnorm(800, 80, 20)
@@ -142,7 +143,7 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE,
 			)
 	}
 
-	sq <- 1:ncol(ps)
+	sq <- seq_len(ncol(ps))
 	ref_group_d <- ps[ ,sq[colnames(ps) == as.character(ref_group)] ]
 
 	if(plot == TRUE) {
@@ -205,9 +206,9 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE,
 	if(plot == TRUE) {
 		Map(lines, 
 			x = split(x_axs, 
-					rep(1:ncol(ps_subset), each = nrow(ps_subset))), 
+					rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))), 
 			y = split(ps_subset, 
-					rep(1:ncol(ps_subset), each = nrow(ps_subset))),
+					rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))),
 		    col = p$col, 
 			lwd = p$lwd,
 			lty = p$lty)

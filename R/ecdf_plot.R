@@ -47,7 +47,7 @@
 #' method used to call the plot. While some partial matching is supported 
 #' (e.g., \code{m} for \code{main}, it is generally safest to supply the full
 #' argument).
-#' @import graphics 
+#' @importFrom graphics par layout lines segments rect 
 #' @export
 
 ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 

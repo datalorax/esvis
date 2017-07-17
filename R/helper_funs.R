@@ -31,16 +31,16 @@ create_vec <- function(levs, fun) {
 	combos_1 <- t(utils::combn(levs, 2))
 	combos_2 <- t(utils::combn(rev(levs), 2))
 
-	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
-	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
+	diff_1 <- mapply(fun, split(combos_1, seq_len(nrow(combos_1))))
+	diff_2 <- mapply(fun, split(combos_2, seq_len(nrow(combos_2))))
 
-	set1 <- vapply(split(combos_1, 1:nrow(combos_1)), 
+	set1 <- vapply(split(combos_1, seq_len(nrow(combos_1))), 
 				paste0, collapse = "-", character(1))
-	set2 <- vapply(split(combos_2, 1:nrow(combos_2)), 
+	set2 <- vapply(split(combos_2, seq_len(nrow(combos_2))), 
 				paste0, collapse = "-", character(1))
 
-	vec <- c(mapply(fun, split(combos_1, 1:nrow(combos_1))),
-			 mapply(fun, split(combos_2, 1:nrow(combos_2))))
+	vec <- c(mapply(fun, split(combos_1, seq_len(nrow(combos_1)))),
+			 mapply(fun, split(combos_2, seq_len(nrow(combos_2)))))
 	names(vec) <- c(set1, set2)
 vec
 }
@@ -49,8 +49,8 @@ tidy_out <- function(levs, fun) {
 	combos_1 <- t(utils::combn(levs, 2))
 	combos_2 <- t(utils::combn(rev(levs), 2))
 
-	diff_1 <- mapply(fun, split(combos_1, 1:nrow(combos_1)))
-	diff_2 <- mapply(fun, split(combos_2, 1:nrow(combos_2)))
+	diff_1 <- mapply(fun, split(combos_1, seq_len(nrow(combos_1))))
+	diff_2 <- mapply(fun, split(combos_2, seq_len(nrow(combos_2))))
 
 	if(length(dim(diff_1)) == 0) {
 		td <- as.data.frame(rbind(combos_1, combos_2))
@@ -129,6 +129,7 @@ lapply(splt, stats::ecdf)
 #' 						rep("pay", 500)))
 #' 
 #' probs(score ~ frl, d)
+#' @importFrom stats sd
 #' @export
 
 probs <- function(formula, data) {
@@ -154,7 +155,7 @@ ps
 
 col_hue <- function(n) {
   hues <- seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, c = 100, l = 65)[1:n]
+  grDevices::hcl(h = hues, c = 100, l = 65)[seq_len(n)]
 }
 
 
@@ -172,6 +173,7 @@ col_hue <- function(n) {
 #' @param height The height of the legend. Counter-intuitively, larger numbers
 #' result in a smaller legend (more squished to the bottom). 
 #' @param ... Additional arguments passed to \link[graphics]{lines}.
+#' @importFrom graphics plot lines axis
 #' 
 
 create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
@@ -188,7 +190,7 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 	}
 
 	plot(seq(0, 1, length = height), 
-		 1:height,
+		 seq_len(height),
 		type = "n",
 		bty = "n", 
 		xaxt = "n",
@@ -196,7 +198,7 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 		yaxt = "n",
 		ylab = "")
 
-	axes <- cbind(c(0, 1), rep(1:n, each = 2))	
+	axes <- cbind(c(0, 1), rep(seq_len(n), each = 2))	
 	
 	Map(lines, 
 		split(axes[ ,1], axes[ ,2]), 
@@ -204,7 +206,7 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 		...)
 	axis(2, 
 		lwd = 0, 
-		at = 1:n, 
+		at = seq_len(n), 
 		labels = leg_labels, 
 		las = 2)
 }
@@ -219,7 +221,7 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 #'  \code{"bottomright"}.
 #' @param ... Additional arguments passed to \link[graphics]{legend} 
 #' (typically colors, line width, etc).
-#' 
+#' @importFrom graphics legend
 
 create_base_legend <- function(labels, position = "bottomright", ...) {
 
@@ -264,6 +266,7 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' the default \link[graphics]{plot} function.
 #' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
+#' @importFrom graphics plot
 
 empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL, 
 	default_main = NULL, default_xlim = NULL, default_ylim = NULL, 
