@@ -11,7 +11,8 @@ test_that("Transformed percentage above  cut computes and outputs correctly", {
 
 	expect_output(str(tpac(score ~ group, tmp, 75)), "data.frame")
 	expect_output(str(tpac(score ~ group, tmp, 75, tidy = FALSE)), "Named num")
-	expect_output(str(tpac(score ~ group, tmp, 75, diff = FALSE)), "Named num")
+	expect_output(str(tpac(score ~ group, tmp, 75, diff = FALSE)), 
+		"data.frame")
 	expect_output(str(tpac(score ~ group, tmp, 75, 
 							ref_group = 2, 
 							diff = FALSE, 
