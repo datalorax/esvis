@@ -237,8 +237,25 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 	}
 	
 	if(diff == FALSE) {
-		return(tpacs)
+		if(tidy) {
+			if(is.null(dim(tpacs))) {
+				td <- data.frame(group = names(tpacs), 
+							 estimate = tpacs)
+				rownames(td) <- NULL
+			}
+			else {
+				td <- data.frame(group = rep(colnames(tpacs), 
+												each = nrow(tpacs)),
+								cut = rep(cut, ncol(tpacs)))
+				dim(tpacs) <- NULL
+				td$estimate <- tpacs
+			}
+		}
+		if(tidy == FALSE) {
+			return(tpacs)	
+		}
 	}
+	
 	if(length(tpacs) == 1 & diff == TRUE) {
 		warning(
 			paste("Only one group specified with `diff = TRUE`.", 
@@ -247,24 +264,74 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 		return(tpacs)
 	}
 
-	
 	if(diff == TRUE) {
-		diff_tpac <- function(v) tpacs[[ v[1] ]] - tpacs[[ v[2] ]]
+		if(is.null(dim(tpacs))) {
+			diff_tpac <- function(v) tpacs[[ v[1] ]] - tpacs[[ v[2] ]]
 
-		if(tidy == FALSE) {
-			vec <- create_vec(names(tpacs), diff_tpac)
-			
-			if(!is.null(ref_group)) {
-				vec <- vec[grep(paste0("^", ref_group), names(vec))]
+			if(tidy == FALSE) {
+				vec <- create_vec(names(tpacs), diff_tpac)
+				
+				if(!is.null(ref_group)) {
+					vec <- vec[grep(paste0("^", ref_group), names(vec))]
+				}
+			return(vec)
 			}
-		return(vec)
+			if(tidy == TRUE) {
+				td <- tidy_out(names(tpacs), diff_tpac)
+				if(!is.null(ref_group)) {
+					td <- td[td$ref_group == ref_group, ]
+				}
+			}
 		}
-		if(tidy == TRUE) {
-			td <- tidy_out(names(tpacs), diff_tpac)
-			if(!is.null(ref_group)) {
-				td <- td[td$ref_group == ref_group, ]
+		else {
+			diffs_1 <- Map(function(i) 
+								apply(combn(tpacs[i, ], 2), 2, diff), 
+					   	   seq_len(nrow(tpacs)))
+
+			diffs_2 <- Map(function(i) 
+								apply(combn(rev(tpacs[i, ]), 2), 2, diff), 
+							seq_len(nrow(tpacs)))
+
+			vec <- c(unlist(diffs_1), unlist(diffs_2)) * -1
+
+			comparison <- c(
+				rep(
+					apply(combn(colnames(tpacs), 2), 2, 
+						paste, 
+						collapse = "-"),
+					ncol(tpacs)),
+				rep(
+					apply(combn(rev(colnames(tpacs)), 2), 2, 
+						paste, 
+						collapse = "-"),
+					ncol(tpacs))
+			)
+			if(tidy == FALSE) {
+				names(vec) <- paste(comparison, 
+							  	rep(rownames(tpacs), each = ncol(tpacs)),
+							  	sep = "_")
+				if(!is.null(ref_group)) {
+					vec <- vec[grep(paste0("^", ref_group), names(vec))]
+				}
+				return(vec)
 			}
-		}	
+			else {
+				ref <- vapply(strsplit(comparison, "-"), 
+						  function(x) x[[1]], 
+						  character(1))
+				foc <- vapply(strsplit(comparison, "-"), 
+						  function(x) x[[2]], 
+						  character(1))
+
+				td <- data.frame(ref_group = ref,
+						   foc_group = foc,
+						   cut = rep(rownames(tpacs), each = ncol(tpacs)),
+						   estimate = vec)
+				if(!is.null(ref_group)) {
+					td <- td[td$ref_group == ref_group, ]
+				}
+			}
+		}
 	}
 td
 }
