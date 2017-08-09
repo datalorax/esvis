@@ -80,9 +80,9 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 	}
 
 	p <- empty_plot(x_lim, seq(0, 1, length = length(x_lim)), 
-					xlab = all.vars(formula)[1],
-					ylab = "Proportion",
-					main = paste(as.character(formula)[c(2, 1, 3)], 
+					default_xlab = all.vars(formula)[1],
+					default_ylab = "Proportion",
+					default_main = paste(as.character(formula)[c(2, 1, 3)], 
 								collapse = " "),
 					...)
 
@@ -120,12 +120,13 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 					col = rgb(.2, .2, .2, .2), 
 					lwd = 0)	
 			}
-			if(theme == "dark") {
-				rect(ref_cut, -1, 1000, 2, 
-					col = rgb(1, 1, 1, .2), 
-					lwd = 0)
+			if(!is.null(theme)) {
+				if(theme == "dark") {
+					rect(ref_cut, -1, 1000, 2, 
+						col = rgb(1, 1, 1, .2), 
+						lwd = 0)
+				}
 			}
-			
 		}
 	}
 	if(!is.null(theme)) {
