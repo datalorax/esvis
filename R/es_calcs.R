@@ -125,7 +125,7 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 			tidy = TRUE) {
 
 	ecdfs <- cdfs(formula, data)
-	pacs <- vapply(ecdfs, function(f) 1 - f(cut), numeric(1))
+	pacs <- vapply(ecdfs, function(f) 1 - f(cut), numeric(length(cut)))
 
 	if(diff == FALSE) {
 		if(is.null(dim(pacs))) {
