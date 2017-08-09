@@ -5,6 +5,7 @@
 #'   grouping variable must only include only two groups.
 #' @param data The data frame that the data in the formula come from.
 #' @importFrom stats var
+#' @export
 
 pooled_sd <- function(formula, data) {
 	splt <- parse_form(formula, data)
@@ -28,6 +29,7 @@ tidy_out(names(splt), pooled)
 #' @param qtiles Quantile bins for calculating mean differences
 #' @importFrom stats quantile
 #' @importFrom utils combn
+#' @export
 
 
 qtile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
@@ -394,5 +396,5 @@ binned_plot <- function(formula, data, ref_group = NULL,
 			xaxt = "n", 
 			yaxt = "n")
 	} 
-invisible(list(as.list(args), p))
+invisible(c(as.list(match.call()), p, list(op)))
 }
