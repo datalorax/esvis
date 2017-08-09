@@ -128,9 +128,11 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 			
 		}
 	}
-	if(theme == "dark") {
-		if(is.null(p$xaxt))	axis(1, col = "white")
-		if(is.null(p$yaxt)) axis(2, col = "white")	
+	if(!is.null(theme)) {
+		if(theme == "dark") {
+			if(is.null(p$xaxt))	axis(1, col = "white")
+			if(is.null(p$yaxt)) axis(2, col = "white")	
+		}	
 	}
 	if(legend == "side") {
 		create_legend(length(splt), names(splt),
