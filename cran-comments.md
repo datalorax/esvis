@@ -1,3 +1,8 @@
+## Resubmission
+This is a resubmission. In this version I have:
+* Updated the DESCRIPTION file to be more specific, including references to two articles related to the methods.
+* Updated the license to use the CRAN MIT template
+
 ## Release Summary
 
 This is the initial CRAN release of esvis, an R package for visualizing and estimating effect sizes.
