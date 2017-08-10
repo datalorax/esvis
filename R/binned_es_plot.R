@@ -160,7 +160,7 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' \code{seq(0, 1, .1)} would split the distributions into deciles.
 #' @param se Logical. Should the standard errors around the effect size point
 #' estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
-#' displayed wiht shading. 
+#' displayed with shading. 
 #' @param shade_col Color of the standard error shading, if \code{se == TRUE}.
 #' Defaults to the same color as the lines.
 #' @param shade_alpha Transparency level of the standard error shading.
