@@ -31,7 +31,7 @@ library(esvis)
 binned_plot(math ~ condition, star)
 ```
 
-![](README-binned_plot-1.png)
+![binned\_plot](inst/image/README-binned_plot-1.png)
 
 Both the reference group and the quantiles used can be changed. For example `binned_plot(math ~ condition, star, ref_group = "reg", qtiles = seq(0, 1, .2))` would produce the same plot but binned by quintiles, with regular-sized classrooms serving as the reference group.
 
@@ -41,7 +41,7 @@ A probability-probability plot can be produced with a call to `pp_plot` and an e
 pp_plot(math ~ race, star)
 ```
 
-![](README-pp_plot-1.png)
+![pp\_plot](inst/image/README-pp_plot-1.png)
 
 Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments.
 
@@ -49,7 +49,7 @@ Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` fu
 ecdf_plot(reading ~ sex, star, ref_cut = c(425, 440, 467))
 ```
 
-![](README-unnamed-chunk-2-1.png)
+![ecdf\_plot](inst/image/README-ecdf_plot-1.png)
 
 Estimation Methods
 ------------------
