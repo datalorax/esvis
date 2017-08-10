@@ -19,7 +19,8 @@ test_that("`qtile_mean_diffs` produces expected output", {
 		round(qtile_mean_diffs(score ~ g, test_data3)$estimate[1:3]), 
 			rep(-100, 3))
 	expect_equal(
-		round(qtile_mean_diffs(score ~ g, test_data3, qtiles = seq(0, 1, .2))$estimate[1:5]), 
+		round(qtile_mean_diffs(score ~ g, test_data3, 
+			qtiles = seq(0, 1, .2))$estimate[1:5]), 
 			rep(-100, 5))
 })
 
