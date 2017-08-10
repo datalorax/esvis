@@ -31,7 +31,7 @@ sequence is valid, but it is recommended the bins be even. For example
 
 \item{se}{Logical. Should the standard errors around the effect size point
 estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
-displayed wiht shading.}
+displayed with shading.}
 
 \item{shade_col}{Color of the standard error shading, if \code{se == TRUE}.
 Defaults to the same color as the lines.}
