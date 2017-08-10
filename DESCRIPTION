@@ -4,7 +4,7 @@ Title: Visualization and Estimation of Effect Sizes
 Version: 0.1.0
 Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
 	   role = c("aut", "cre"))
-Description: This package is aimed at calculating a variety of effect size and easily visualizing them. I work in educational research and the package was designed with the idea of comparing "naturally occurring" distributions, such as achievement gaps and gains in test scores, across the full scale. Because these distributions often have different variances, etc., the visualizations can help one understand where on the scale the difference between the distributions are larges and smallest.
+Description: A variety of effect size visualizations are provided, as well as estimation methods. Particular emphasis is upon evaluating differences between two or more distributions across the entire scale, rather than at a single point (e.g., differences in means).
 Depends:
     R (>= 3.1)
 Imports:
