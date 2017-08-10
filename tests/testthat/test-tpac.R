@@ -22,3 +22,35 @@ test_that("Transformed percentage above  cut computes and outputs correctly", {
 	expect_warning(tpac(mean ~ grade, seda, 10))
 	expect_warning(tpac(mean ~ constant, seda, 225))
 })
+
+
+test_that("Multiple cuts work as expected", {
+	expect_output(str(tpac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				"data.frame")
+	expect_equal(nrow(tpac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				3)
+	expect_equal(ncol(tpac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				3)
+
+	expect_output(str(tpac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl")), 
+				"data.frame")
+	expect_equal(nrow(tpac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl")), 
+				3)
+	expect_equal(ncol(tpac(math ~ condition, star, c(480, 500, 520))), 
+				4)
+	expect_output(str(tpac(math ~ condition, star, c(480, 500, 520), 
+					tidy = FALSE)), "num")
+
+})
+formula <- math ~ condition
+data = star
+cut = c(480, 500, 520)
+head(star)

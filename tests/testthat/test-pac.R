@@ -35,3 +35,29 @@ test_that("Percentage above the cut computes and outputs correctly", {
 							tidy = FALSE)), 
 				"Named num")
 })
+
+test_that("Multiple cuts work as expected", {
+	expect_output(str(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				"data.frame")
+	expect_equal(nrow(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				3)
+	expect_equal(ncol(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl",
+							diff = FALSE)), 
+				3)
+
+	expect_output(str(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl")), 
+				"data.frame")
+	expect_equal(nrow(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl")), 
+				3)
+	expect_equal(ncol(pac(math ~ sex, star, c(480, 500, 520), 
+							ref_group = "girl")), 
+				4)
+
+})
