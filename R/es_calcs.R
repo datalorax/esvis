@@ -16,8 +16,8 @@
 #' (must be character and match the grouping level exactly), only the
 #' estimates corresponding to the given reference group will be returned.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). 
+#' If false, effect sizes returned as a vector.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
 #' @importFrom stats var qnorm
@@ -66,8 +66,8 @@ td
 #' (must be character and match the grouping level exactly), only the
 #' estimates corresponding to the given reference group will be returned.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). 
+#' If false, effect sizes returned as a vector.
 #' @return By default the Hedges' \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
 #' @export
@@ -115,8 +115,8 @@ td
 #' the groups be returned? If \code{FALSE} the raw proportion above
 #' the cut is returned for each group.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+#'  false, effect sizes returned as a vector.
 #' @return Tidy data frame (or vector) of the proportion above the cutoff for 
 #' each (or selected) groups.
 #' @export 
@@ -220,8 +220,9 @@ td
 #' the groups be returned? If \code{FALSE} the raw proportion above
 #' the cut is returned for each group.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+#' false, effect sizes returned as a matrix or vector (depending on other
+#' arguments passed).
 #' @return A tidy data frame (or vector) of the transformed proportion above
 #' the cutoff. Optionally (and by default) all pairwise comparisons are 
 #' calculated and returned.
@@ -359,8 +360,8 @@ td
 #' (must be character and match the grouping level exactly), only the
 #' estimates corresponding to the given reference group will be returned.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+#'  false, effect sizes returned as a vector.
 #' @return By default the area under the curve for all possible pairings of
 #' the grouping factor are returned as a tidy data frame. Alternatively, a 
 #' vector can be returned, and/or only the auc corresponding to a specific
@@ -410,8 +411,8 @@ td
 #' (must be character and match the grouping level exactly), only the
 #' estimates corresponding to the given reference group will be returned.
 #' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
-#'  as a vector.
+#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+#'  false, effect sizes returned as a vector.
 #' @return By default the V statistic for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame. Alternatively, a 
 #' vector can be returned, and/or only the V corresponding to a specific

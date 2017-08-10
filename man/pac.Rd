@@ -25,8 +25,8 @@ the groups be returned? If \code{FALSE} the raw proportion above
 the cut is returned for each group.}
 
 \item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
- as a vector.}
+\href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+ false, effect sizes returned as a vector.}
 }
 \value{
 Tidy data frame (or vector) of the proportion above the cutoff for 

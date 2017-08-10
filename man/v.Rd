@@ -18,8 +18,8 @@ variable can include any arbitrary number of groups.}
 estimates corresponding to the given reference group will be returned.}
 
 \item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). If false, effect sizes returned
- as a vector.}
+\href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
+ false, effect sizes returned as a vector.}
 }
 \value{
 By default the V statistic for all possible pairings of
