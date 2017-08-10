@@ -35,6 +35,14 @@ test_that("`ecdf_plot` produces expected output", {
 	expect_equal(ecdf_plot(mean ~ grade, seda, annotate = TRUE)$annotate,
 		TRUE)
 
+	expect_equal(ecdf_plot(mean ~ grade, seda, 
+		ref_cut = c(150, 200, 250),
+		hor_ref = TRUE)$hor_ref, TRUE)
+
+	expect_equal(ecdf_plot(mean ~ grade, seda, 
+		legend = "base",
+		theme = "dark")$theme, "dark")
+
 })
 
 test_that("Partial matching for `ecdf_plot` works", {
