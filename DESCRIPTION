@@ -1,6 +1,6 @@
 Package: esvis
 Title: Calculation and Visualization of Effect Sizes
-Version: 0.0.0.9000
+Version: 0.1.0.0000
 Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
 	   role = c("aut", "cre"))
 Description: This package is aimed at calculating a variety of effect size and easily visualizing them. I work in educational research and the package was designed with the idea of comparing "naturally occurring" distributions, such as achievement gaps and gains in test scores, across the full scale. Because these distributions often have different variances, etc., the visualizations can help one understand where on the scale the difference between the distributions are larges and smallest.
