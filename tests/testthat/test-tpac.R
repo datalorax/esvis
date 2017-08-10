@@ -50,7 +50,3 @@ test_that("Multiple cuts work as expected", {
 					tidy = FALSE)), "num")
 
 })
-formula <- math ~ condition
-data = star
-cut = c(480, 500, 520)
-head(star)
