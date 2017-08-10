@@ -148,6 +148,11 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 								cut = rep(cut, ncol(pacs)))
 				dim(pacs) <- NULL
 				td$estimate <- pacs
+				
+				if(!is.null(ref_group)) {
+					td <- td[td$group == ref_group, ]
+				}
+			return(td)
 			}
 			if(tidy == FALSE) {
 				rownames(pacs) <- cut
@@ -249,6 +254,10 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 								cut = rep(cut, ncol(tpacs)))
 				dim(tpacs) <- NULL
 				td$estimate <- tpacs
+				if(!is.null(ref_group)) {
+					td <- td[td$group == ref_group, ]
+				}
+			return(td)
 			}
 		}
 		if(tidy == FALSE) {
@@ -288,45 +297,43 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 								apply(combn(tpacs[i, ], 2), 2, diff), 
 					   	   seq_len(nrow(tpacs)))
 
+			diffs_1 <- lapply(diffs_1, function(x) {
+				names(x) <- apply(
+					combn(colnames(tpacs), 2), 
+					2, 
+					paste, collapse = "-")
+				x
+			})
+			names(diffs_1) <- rownames(tpacs)
+			diffs_1 <- do.call(rbind, diffs_1)
+	
 			diffs_2 <- Map(function(i) 
 								apply(combn(rev(tpacs[i, ]), 2), 2, diff), 
 							seq_len(nrow(tpacs)))
-
-			vec <- c(unlist(diffs_1), unlist(diffs_2)) * -1
-
-			comparison <- c(
-				rep(
-					apply(combn(colnames(tpacs), 2), 2, 
-						paste, 
-						collapse = "-"),
-					ncol(tpacs)),
-				rep(
-					apply(combn(rev(colnames(tpacs)), 2), 2, 
-						paste, 
-						collapse = "-"),
-					ncol(tpacs))
-			)
+			diffs_2 <- lapply(diffs_2, function(x) {
+				names(x) <- apply(
+					combn(rev(colnames(tpacs)), 2), 
+					2, 
+					paste, collapse = "-")
+				x
+			})
+			names(diffs_2) <- rownames(tpacs)
+			diffs_2 <- do.call(rbind, diffs_2)
+			
 			if(tidy == FALSE) {
-				names(vec) <- paste(comparison, 
-							  	rep(rownames(tpacs), each = ncol(tpacs)),
-							  	sep = "_")
-				if(!is.null(ref_group)) {
-					vec <- vec[grep(paste0("^", ref_group), names(vec))]
-				}
-				return(vec)
+				m <- cbind(diffs_1, diffs_2)
+			return(m)
 			}
 			else {
-				ref <- vapply(strsplit(comparison, "-"), 
-						  function(x) x[[1]], 
-						  character(1))
-				foc <- vapply(strsplit(comparison, "-"), 
-						  function(x) x[[2]], 
-						  character(1))
-
-				td <- data.frame(ref_group = ref,
-						   foc_group = foc,
-						   cut = rep(rownames(tpacs), each = ncol(tpacs)),
-						   estimate = vec)
+				one <- as.data.frame.table(diffs_1, responseName = "estimate")
+				two <- as.data.frame.table(diffs_2, responseName = "estimate")	
+				td <- rbind(one, two)
+				vars <- strsplit(as.character(td$Var2), "-")
+				td$ref_group <- vapply(vars, function(x) x[1], character(1))
+				td$foc_group <- vapply(vars, function(x) x[2], character(1))
+				names(td)[1] <- "cut"
+				td <- td[order(td$ref_group), c(4:5, 1, 3)]
+				rownames(td) <- NULL
 				if(!is.null(ref_group)) {
 					td <- td[td$ref_group == ref_group, ]
 				}
