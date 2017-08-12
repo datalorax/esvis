@@ -22,6 +22,22 @@
 #'  the grouping factor are returned as a tidy data frame.
 #' @importFrom stats var qnorm
 #' @export
+#' @examples
+#' 
+#' # Calculate Cohen's d for all pairwise comparisons
+#' coh_d(reading ~ condition, star) 
+#' 
+#' # Report only relative to regular-sized classrooms
+#' coh_d(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg")
+#' 
+#' # Return a vector instead of a data frame
+#' coh_d(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg", 
+#' 		tidy = FALSE)
+
 coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
 
@@ -71,6 +87,21 @@ td
 #' @return By default the Hedges' \emph{d} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
 #' @export
+#' @examples
+#' 
+#' # Calculate Hedges' g for all pairwise comparisons
+#' hedg_g(reading ~ condition, star) 
+#' 
+#' # Report only relative to regular-sized classrooms
+#' hedg_g(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg")
+#' 
+#' # Return a vector instead of a data frame
+#' hedg_g(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg", 
+#' 		tidy = FALSE)
 
 hedg_g <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	splt <- parse_form(formula, data)
@@ -106,7 +137,7 @@ td
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param cut The point at the scale from which the proportion above should
+#' @param cut The point(s) at the scale from which the proportion above should
 #' be calculated from.
 #' @param ref_group Optional. If the name of the reference group is provided
 #' (must be character and match the grouping level exactly), only the
@@ -120,6 +151,31 @@ td
 #' @return Tidy data frame (or vector) of the proportion above the cutoff for 
 #' each (or selected) groups.
 #' @export 
+#' @examples
+#' # Compute differences for all pairwise comparisons for each of three cuts
+#' pac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550)) 
+#' 
+#' # Report raw PAC, instead of differences in PAC
+#' pac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		diff = FALSE) 
+#' 
+#' # Report differences with regular-sized classrooms as the reference group
+#' pac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		ref_group = "reg") 
+#' 
+#' # Return a matrix instead of a data frame 
+#' # (returns a vector if only one cut is provided)
+#' pac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		ref_group = "reg",
+#' 		tidy = FALSE) 
 
 pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
 			tidy = TRUE) {
@@ -190,7 +246,8 @@ pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 					names(x) <- nms
 					return(x)
 				})
-			return(splt_td)
+				mat <- do.call("rbind", splt_td)
+			return(mat)
 			}			
 		}
 	}
@@ -228,6 +285,34 @@ td
 #' calculated and returned.
 #' @importFrom stats qnorm
 #' @export 
+#' @examples
+#' # Compute transformed PAC differences for all pairwise comparisons 
+#' # for each of three cuts
+#' tpac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550)) 
+#' 
+#' # Report raw transformed PAC, instead of differences in transformed PAC
+#' tpac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		diff = FALSE) 
+#' 
+#' # Report transformed differences with regular-sized classrooms as the
+#' # reference group
+#' tpac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		ref_group = "reg") 
+#' 
+#' # Return a matrix instead of a data frame 
+#' # (returns a vector if only one cut is provided)
+#' tpac(reading ~ condition, 
+#' 		star, 
+#' 		cut = c(450, 500, 550), 
+#' 		ref_group = "reg",
+#' 		tidy = FALSE) 
+
 
 tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
 			tidy = TRUE) {
@@ -375,6 +460,20 @@ td
 #' 
 #' auc(score ~ frl, d)
 #' @export
+#' @examples
+#' # Compute AUC for all pairwise comparisons
+#' auc(reading ~ condition, star)
+#' 
+#' # Specify regular-sized classrooms as the reference group
+#' auc(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg")
+#' 
+#' # Return a vector instead of a data frame
+#' auc(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg", 
+#' 		tidy = FALSE)
 
 auc <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ps <- probs(formula, data)
@@ -427,6 +526,20 @@ td
 #' 
 #' v(score ~ frl, d)
 #' @export
+#' @examples
+#' # Compute V for all pairwise comparisons
+#' v(reading ~ condition, star)
+#' 
+#' # Specify regular-sized classrooms as the reference group
+#' v(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg")
+#' 
+#' # Return a vector instead of a data frame
+#' v(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg", 
+#' 		tidy = FALSE)
 
 v <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ps <- probs(formula, data)

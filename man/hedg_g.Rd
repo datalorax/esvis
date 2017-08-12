@@ -42,3 +42,19 @@ for a discussion on different types of effect sizes and their
 interpretation. Note that missing data are removed from the calculations of 
 the means and standard deviations.
 }
+\examples{
+
+# Calculate Hedges' g for all pairwise comparisons
+hedg_g(reading ~ condition, star) 
+
+# Report only relative to regular-sized classrooms
+hedg_g(reading ~ condition, 
+		star, 
+		ref_group = "reg")
+
+# Return a vector instead of a data frame
+hedg_g(reading ~ condition, 
+		star, 
+		ref_group = "reg", 
+		tidy = FALSE)
+}

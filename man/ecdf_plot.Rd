@@ -66,3 +66,24 @@ transformations. See
 \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
  Reardon, 2012}. (Note, not all features implemented yet)
 }
+\examples{
+# Produce base empirical cummulative distribution plot
+ecdf_plot(mean ~ grade, seda)
+
+# Shade distributions to the right of three cut scores
+ecdf_plot(mean ~ grade, 
+		seda,
+		ref_cut = c(225, 245, 265))
+
+# Add horizontal reference lines
+ecdf_plot(mean ~ grade, 
+		seda,
+		ref_cut = c(225, 245, 265),
+		hor_ref = TRUE)
+
+# Apply dark theme
+ecdf_plot(mean ~ grade, 
+		seda,
+		ref_cut = c(225, 245, 265),
+		theme = "dark")
+}

@@ -16,3 +16,7 @@ grouping variable must only include only two groups.}
 \description{
 Compute pooled standard deviation
 }
+\examples{
+pooled_sd(math ~ condition, star)
+pooled_sd(reading ~ sex, star)
+}

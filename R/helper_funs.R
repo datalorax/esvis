@@ -101,6 +101,8 @@ td
 #' @param data The data frame that the data in the formula come from.
 #' @return A list with one function per group (level in the grouping factor).
 #' @export
+#' @examples
+#' cdfs(math ~ condition, star)
 
 cdfs <- function(formula, data) {
 	splt <- parse_form(formula, data)
@@ -119,16 +121,7 @@ lapply(splt, stats::ecdf)
 #' \code{rownames} corresponding to the value the paired probabilities are 
 #' calculated from.
 #' @examples
-#' 
-#' free <- rnorm(300, 80, 15)
-#' reduced <- rnorm(100, 90, 12)
-#' pay <- rnorm(500, 100, 10)
-#' d <- data.frame(score = c(free, reduced, pay), 
-#' 				frl = c(rep("free", 300), 
-#' 						rep("reduced", 100), 
-#' 						rep("pay", 500)))
-#' 
-#' probs(score ~ frl, d)
+#' probs(math ~ condition, star)
 #' @importFrom stats sd
 #' @export
 
@@ -152,6 +145,10 @@ ps
 #' 
 #' @param n The number of colors to be produced
 #' @export
+#' @examples
+#' col_hue(1)
+#' col_hue(5)
+#' col_hue(20)
 
 col_hue <- function(n) {
   hues <- seq(15, 375, length = n + 1)

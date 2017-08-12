@@ -29,3 +29,19 @@ Returns a data frame with the estimated effect size by the provided
 percentiles. Currently, the effect size is equivalent to Cohen's d, but 
 future development will allow this to vary.
 }
+\examples{
+
+# Compute effect sizes (Cohen's d) by default quantiles
+qtile_es(reading ~ condition, star)
+
+# Compute Cohen's d by quintile
+qtile_es(reading ~ condition, 
+		star, 
+		qtiles = seq(0, 1, .2))
+
+# Report effect sizes only relative to regular-sized classrooms
+qtile_es(reading ~ condition, 
+		star, 
+		ref_group = "reg",
+		qtiles = seq(0, 1, .2))
+}

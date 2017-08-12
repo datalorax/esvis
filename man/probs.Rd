@@ -23,14 +23,5 @@ calculated from.
 This formula returns the paired probabilities for any
 }
 \examples{
-
-free <- rnorm(300, 80, 15)
-reduced <- rnorm(100, 90, 12)
-pay <- rnorm(500, 100, 10)
-d <- data.frame(score = c(free, reduced, pay), 
-				frl = c(rep("free", 300), 
-						rep("reduced", 100), 
-						rep("pay", 500)))
-
-probs(score ~ frl, d)
+probs(math ~ condition, star)
 }

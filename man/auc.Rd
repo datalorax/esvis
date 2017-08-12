@@ -42,4 +42,17 @@ d <- data.frame(score = c(free_reduced, pay),
 						rep("pay", 500)))
 
 auc(score ~ frl, d)
+# Compute AUC for all pairwise comparisons
+auc(reading ~ condition, star)
+
+# Specify regular-sized classrooms as the reference group
+auc(reading ~ condition, 
+		star, 
+		ref_group = "reg")
+
+# Return a vector instead of a data frame
+auc(reading ~ condition, 
+		star, 
+		ref_group = "reg", 
+		tidy = FALSE)
 }

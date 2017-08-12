@@ -49,6 +49,26 @@
 #' argument).
 #' @importFrom graphics par layout lines segments rect 
 #' @export
+#' @examples
+#' # Produce base empirical cummulative distribution plot
+#' ecdf_plot(mean ~ grade, seda)
+#' 
+#' # Shade distributions to the right of three cut scores
+#' ecdf_plot(mean ~ grade, 
+#' 		seda,
+#' 		ref_cut = c(225, 245, 265))
+#' 
+#' # Add horizontal reference lines
+#' ecdf_plot(mean ~ grade, 
+#' 		seda,
+#' 		ref_cut = c(225, 245, 265),
+#' 		hor_ref = TRUE)
+#' 
+#' # Apply dark theme
+#' ecdf_plot(mean ~ grade, 
+#' 		seda,
+#' 		ref_cut = c(225, 245, 265),
+#' 		theme = "dark")
 
 ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 
 	rect_ref = TRUE, legend = "side", theme = NULL, annotate = FALSE, ...) {

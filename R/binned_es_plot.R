@@ -6,6 +6,9 @@
 #' @param data The data frame that the data in the formula come from.
 #' @importFrom stats var
 #' @export
+#' @examples
+#' pooled_sd(math ~ condition, star)
+#' pooled_sd(reading ~ sex, star)
 
 pooled_sd <- function(formula, data) {
 	splt <- parse_form(formula, data)
@@ -30,6 +33,12 @@ tidy_out(names(splt), pooled)
 #' @importFrom stats quantile
 #' @importFrom utils combn
 #' @export
+#' @examples
+#' qtile_mean_diffs(reading ~ condition, star)
+#' 
+#' qtile_mean_diffs(reading ~ condition, 
+#' 		star, 
+#' 		qtiles = seq(0, 1, .2))
 
 
 qtile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
@@ -94,6 +103,22 @@ se_es <- function(n1, n2, d) {
 #' even. For example \code{seq(0, 1, .1)} would split the distributions into
 #' deciles.
 #' @export
+#' @examples
+#' 
+#' # Compute effect sizes (Cohen's d) by default quantiles
+#' qtile_es(reading ~ condition, star)
+#' 
+#' # Compute Cohen's d by quintile
+#' qtile_es(reading ~ condition, 
+#' 		star, 
+#' 		qtiles = seq(0, 1, .2))
+#' 
+#' # Report effect sizes only relative to regular-sized classrooms
+#' qtile_es(reading ~ condition, 
+#' 		star, 
+#' 		ref_group = "reg",
+#' 		qtiles = seq(0, 1, .2))
+
 
 qtile_es <- function(formula, data, ref_group = NULL, 
 	qtiles = seq(0, 1, .33)) {
@@ -211,6 +236,31 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' @importFrom graphics par layout axis rect points abline lines
 #' @importFrom grDevices rgb adjustcolor
 #' @export
+#' @examples
+#' 
+#' # Default binned effect size plot
+#' binned_plot(math ~ condition, star)
+#' 
+#' # Change the reference group to regular sized classrooms
+#' binned_plot(math ~ condition, 
+#' 		star,
+#' 		ref_group = "reg")
+#' 
+#' # Change binning to deciles
+#' binned_plot(math ~ condition, 
+#' 		star,
+#' 		ref_group = "reg",
+#' 		qtiles = seq(0, 1, .1))
+#' 
+#' # Suppress the standard error shading
+#' binned_plot(math ~ condition, 
+#' 		star,
+#' 		se = FALSE)
+#' 
+#' # Change to dark theme
+#' binned_plot(math ~ condition, 
+#' 		star,
+#' 		theme = "dark")
 
 binned_plot <- function(formula, data, ref_group = NULL,
 	qtiles = seq(0, 1, .3333), se = TRUE, shade_col = NULL,

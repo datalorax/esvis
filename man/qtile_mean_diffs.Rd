@@ -18,3 +18,10 @@ grouping variable must only include only two groups.}
 \description{
 Compute mean differences by various quantiles
 }
+\examples{
+qtile_mean_diffs(reading ~ condition, star)
+
+qtile_mean_diffs(reading ~ condition, 
+		star, 
+		qtiles = seq(0, 1, .2))
+}

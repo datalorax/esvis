@@ -21,3 +21,6 @@ This function is a simple wrapper that splits the data frame by the
 grouping variable, then loops \link[stats]{ecdf} through the split
 data to return a CDF function for each group.
 }
+\examples{
+cdfs(math ~ condition, star)
+}

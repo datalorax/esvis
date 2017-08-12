@@ -12,3 +12,8 @@ col_hue(n)
 \description{
 Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
 }
+\examples{
+col_hue(1)
+col_hue(5)
+col_hue(20)
+}
