@@ -1,7 +1,8 @@
 ## Resubmission
 This is a resubmission. In this version I have:
-* Updated the DESCRIPTION file to be more specific, including references to two articles related to the methods.
-* Updated the license to use the CRAN MIT template
+* Corrected the doi formatting in the description file
+* Removed asterisks from statistics listed in the description file
+* Updated the documentation to provide minimal examples for all exported functions.
 
 ## Release Summary
 
