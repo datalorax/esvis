@@ -87,7 +87,7 @@ Or specify a reference group
 coh_d(mean ~ grade, seda, ref_group = 8)
 ```
 
-Other effect sizes are estimated equivalently. For example, compute *V* [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents) with
+Other effect sizes are estimated equivalently. For example, compute *V* ([Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)) with
 
 ```{r v}
 v(mean ~ grade, seda, ref_group = 8)
