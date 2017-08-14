@@ -19,12 +19,19 @@ R Package for effect size visualizations.
 [![Travis-CI Build Status](https://travis-ci.org/DJAnderson07/esvis.svg?branch=master)](https://travis-ci.org/DJAnderson07/esvis) 
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) 
 [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
 
 This package is designed to visually compare two or more distributions across the entirety of the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including Cohen's *d*, Hedges' *g*, percentage above a cut, transformed (normalized) percentage above a cut, the area under the curve (conceptually equivalent to the probability that a randomly selected individual from Distribution A has a higher value than a randomly selected individual from Distribution B), and the *V* statistic, which essentailly transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
 
 ## Installation
 
-You can install *esvis* from github with:
+Install directly from CRAN with
+
+```{r cran_install, eval = FALSE}
+install.packages("esvis")
+```
+
+Or the development version from from github with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
@@ -65,14 +72,29 @@ ecdf_plot(reading ~ sex, star, ref_cut = c(425, 440, 467))
 
 Compute effect sizes for all possible pairwise comparisons.
 
-```{r} 
+```{r load_package, include = FALSE}
+library(esvis)
+```
+
+```{r, coh_d1} 
 coh_d(mean ~ subject, seda)
 ```
 
 Or specify a reference group
 
 
-```{r}
+```{r, coh_d2}
 coh_d(mean ~ grade, seda, ref_group = 8)
 ```
 
+Other effect sizes are estimated equivalently. For example, compute *V* [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents) with
+
+```{r v}
+v(mean ~ grade, seda, ref_group = 8)
+```
+
+or *AUC* with
+
+```{r auc}
+auc(mean ~ grade, seda, ref_group = 8)
+```

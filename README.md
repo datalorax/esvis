@@ -5,14 +5,20 @@ esvis
 
 R Package for effect size visualizations.
 
-[![Travis-CI Build Status](https://travis-ci.org/DJAnderson07/esvis.svg?branch=master)](https://travis-ci.org/DJAnderson07/esvis) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
+[![Travis-CI Build Status](https://travis-ci.org/DJAnderson07/esvis.svg?branch=master)](https://travis-ci.org/DJAnderson07/esvis) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
 
 This package is designed to visually compare two or more distributions across the entirety of the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including Cohen's *d*, Hedges' *g*, percentage above a cut, transformed (normalized) percentage above a cut, the area under the curve (conceptually equivalent to the probability that a randomly selected individual from Distribution A has a higher value than a randomly selected individual from Distribution B), and the *V* statistic, which essentailly transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
 
 Installation
 ------------
 
-You can install *esvis* from github with:
+Install directly from CRAN with
+
+``` r
+install.packages("esvis")
+```
+
+Or the development version from from github with:
 
 ``` r
 # install.packages("devtools")
@@ -73,4 +79,28 @@ coh_d(mean ~ grade, seda, ref_group = 8)
 #> 3         8         5 1.819459
 #> 4         8         4 2.416754
 #> 5         8         3 3.004039
+```
+
+Other effect sizes are estimated equivalently. For example, compute *V* [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents) with
+
+``` r
+v(mean ~ grade, seda, ref_group = 8)
+#>   ref_group foc_group estimate
+#> 1         8         7 0.605855
+#> 2         8         6 1.202515
+#> 3         8         5 1.912094
+#> 4         8         4 2.577780
+#> 5         8         3 3.225021
+```
+
+or *AUC* with
+
+``` r
+auc(mean ~ grade, seda, ref_group = 8)
+#>   ref_group foc_group  estimate
+#> 1         8         7 0.6658216
+#> 2         8         6 0.8024226
+#> 3         8         5 0.9118211
+#> 4         8         4 0.9658305
+#> 5         8         3 0.9887090
 ```
