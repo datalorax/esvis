@@ -7,7 +7,7 @@ R Package for effect size visualizations.
 
 [![Travis-CI Build Status](https://travis-ci.org/DJAnderson07/esvis.svg?branch=master)](https://travis-ci.org/DJAnderson07/esvis) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis) [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
 
-This package is designed to visually compare two or more distributions across the entirety of the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including Cohen's *d*, Hedges' *g*, percentage above a cut, transformed (normalized) percentage above a cut, the area under the curve (conceptually equivalent to the probability that a randomly selected individual from Distribution A has a higher value than a randomly selected individual from Distribution B), and the *V* statistic, which essentailly transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
+This package is designed to visually compare two or more distributions across the entirety of the scale, rather than only by measures of central tendency (e.g., means). There are also some functions for estimating effect size, including Cohen's *d*, Hedges' *g*, percentage above a cut, transformed (normalized) percentage above a cut, the area under the curve (conceptually equivalent to the probability that a randomly selected individual from Distribution A has a higher value than a randomly selected individual from Distribution B), and the *V* statistic, which essentially transforms the area under the curve to standard deviation units (see [Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents)).
 
 Installation
 ------------
@@ -34,25 +34,37 @@ At present, the binned effect size plot can only be produced with Cohen's *d*, a
 
 ``` r
 library(esvis)
-binned_plot(math ~ condition, star)
+binned_plot(math ~ ell, benchmarks)
 ```
 
 ![binned\_plot](inst/image/README-binned_plot-1.png)
 
-Both the reference group and the quantiles used can be changed. For example `binned_plot(math ~ condition, star, ref_group = "reg", qtiles = seq(0, 1, .2))` would produce the same plot but binned by quintiles, with regular-sized classrooms serving as the reference group.
+Note that in this plot one can clearly see that the magnitude of the differences between the two three groups depends upon scale location (i.e., low achieving students versus average or high achieving students). Both the reference group and the quantiles used can be changed. For example `binned_plot(math ~ ell, benchmarks, ref_group = "Non-ELL", qtiles = seq(0, 1, .2))` would produce the same plot but binned by quintiles, with students who did not receive English language services (Non-ELL) as the reference group.
 
-A probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in math achievement by race. Notice the "other" category is jagged because the sample size is small (*n* = 27).
+A probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in reading achievement by race/ethnicity. By default, the distribution with the highest mean serves as the reference group, in this case students identifying as White.
 
 ``` r
-pp_plot(math ~ race, star)
+pp_plot(reading ~ ethnicity, benchmarks)
 ```
 
-![pp\_plot](inst/image/README-pp_plot-1.png)
+![pp\_plot1](inst/image/README-pp_plot1-1.png)
 
-Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments.
+If the grouping factor has only two levels, the area under the PP curve will be shaded, with the AUC an *V* statistics annotated onto the plot.
 
 ``` r
-ecdf_plot(reading ~ sex, star, ref_cut = c(425, 440, 467))
+pp_plot(reading ~ frl, benchmarks)
+```
+
+![pp\_plot2](inst/image/README-pp_plot2-1.png)
+
+The shading and annotations are optional and can be removed. The colors and all other plot features are also fully customizable.
+
+Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments. Below, I have included the optional `hor_ref = TRUE` argument such that horizontal reference lines appear, relative to the cuts provided.
+
+``` r
+ecdf_plot(math ~ season, benchmarks, 
+    ref_cut = c(190, 200, 215), 
+    hor_ref = TRUE)
 ```
 
 ![ecdf\_plot](inst/image/README-ecdf_plot-1.png)
