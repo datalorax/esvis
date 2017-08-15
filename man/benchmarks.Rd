@@ -35,7 +35,7 @@ monitor to progress of their students. These are relatively brief
 assessments administered to "check-in" on students' progress throughout
 the year. This dataset was simulated from a real dataset from one large
 school district using the terrific 
-[synpop](https://cran.r-project.org/web/packages/synthpop/index.html) 
+\href{https://cran.r-project.org/web/packages/synthpop/index.html}{synthpop}
 R package. Overall characteristics of the synthetic data are remarkably
 similar to the real data.
 }
