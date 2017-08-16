@@ -5,7 +5,8 @@
 \title{Empirical Cumulative Distribution Plot}
 \usage{
 ecdf_plot(formula, data, ref_cut = NULL, hor_ref = FALSE, rect_ref = TRUE,
-  legend = "side", theme = NULL, annotate = FALSE, ...)
+  scheme = "ggplot2", legend = "side", theme = NULL, annotate = FALSE,
+  ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is

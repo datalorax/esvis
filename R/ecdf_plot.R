@@ -48,6 +48,7 @@
 #' (e.g., \code{m} for \code{main}, it is generally safest to supply the full
 #' argument).
 #' @importFrom graphics par layout lines segments rect 
+#' @importFrom utils installed.packages
 #' @export
 #' @examples
 #' # Produce base empirical cummulative distribution plot
@@ -71,7 +72,8 @@
 #' 		theme = "dark")
 
 ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 
-	rect_ref = TRUE, legend = "side", theme = NULL, annotate = FALSE, ...) {
+	rect_ref = TRUE, scheme = "ggplot2", legend = "side", theme = NULL,
+	annotate = FALSE, ...) {
 	
 	splt <- parse_form(formula, data)
 	ecdfs <- cdfs(formula, data)
@@ -108,7 +110,32 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) p$col <- col_hue(length(splt))
+	if(is.null(p$col)) {
+		if(scheme == "ggplot2") {
+			p$col <- col_hue(length(splt))	
+		} 
+		if(any(scheme == "viridis" |
+			   scheme == "magma" |
+			   scheme == "inferno" |
+			   scheme == "plasma")) {
+			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
+				stop(paste0("Please install the viridisLite ",
+				 	"package to use this color scheme"))
+			}
+		}
+		if(scheme == "viridis") {
+			p$col <- viridisLite::viridis(length(splt))	
+		}
+		if(scheme == "magma") {
+			p$col <- viridisLite::magma(length(splt))	
+		}
+		if(scheme == "inferno") {
+			p$col <- viridisLite::inferno(length(splt))	
+		}
+		if(scheme == "plasma") {
+			p$col <- viridisLite::plasma(length(splt))	
+		} 
+	}
 
 	Map(lines, 
 		ecdfs,
