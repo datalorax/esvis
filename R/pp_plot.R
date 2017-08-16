@@ -19,7 +19,8 @@
 #' package, and must be installed first. These are the same options available
 #' in the package: "viridis", "magma", "inferno", and "plasma". These color 
 #' schemes work well for color blindness and print well in black and white.
-#' Alternatively, colors can be supplied manually through a call to\code{col}.
+#' Alternatively, colors can be supplied manually through a call to \code{col}
+#' (through \code{...}).
 #' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 #' \code{legend == "side"} the plot is rendered such that additional
 #' annotations can be made on the plot using low level base plotting functions
