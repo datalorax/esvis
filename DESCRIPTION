@@ -41,4 +41,6 @@ BugReports: https://github.com/DJAnderson07/esvis/issues
 License: MIT + file LICENSE
 LazyData: true
 RoxygenNote: 6.0.1
-Suggests: testthat
+Suggests: 
+	testthat, 
+	viridisLite
