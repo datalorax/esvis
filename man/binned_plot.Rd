@@ -5,11 +5,11 @@
 \title{Quantile-binned effect size plot}
 \usage{
 binned_plot(formula, data, ref_group = NULL, qtiles = seq(0, 1, 0.3333),
-  se = TRUE, shade_col = NULL, shade_alpha = 0.3, annotate = FALSE,
-  refline = TRUE, refline_col = "black", refline_lty = 2,
-  refline_lwd = 2, rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1),
-  rgb(0.2, 0.2, 0.2, 0)), lines = TRUE, points = TRUE, legend = NULL,
-  theme = NULL, ...)
+  scheme = "ggplot2", se = TRUE, shade_col = NULL, shade_alpha = 0.3,
+  annotate = FALSE, refline = TRUE, refline_col = "black",
+  refline_lty = 2, refline_lwd = 2, rects = TRUE,
+  rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2, 0)),
+  lines = TRUE, points = TRUE, legend = NULL, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -28,6 +28,15 @@ Essentially, this is the binning argument. Defaults to \code{seq(0, 1, .33)}
 which splits the distribution into thirds (lower, middle, upper). Any 
 sequence is valid, but it is recommended the bins be even. For example
 \code{seq(0, 1, .1)} would split the distributions into deciles.}
+
+\item{scheme}{What color scheme should the lines follow? Defaults to 
+mimic the ggplot2 color scheme. Other options come from the 
+\href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
+package, and must be installed first. These are the same options available
+in the package: "viridis", "magma", "inferno", and "plasma". These color 
+schemes work well for color blindness and print well in black and white.
+Alternatively, colors can be supplied manually through a call to \code{col}
+(through \code{...}).}
 
 \item{se}{Logical. Should the standard errors around the effect size point
 estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 

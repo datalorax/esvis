@@ -183,6 +183,14 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' which splits the distribution into thirds (lower, middle, upper). Any 
 #' sequence is valid, but it is recommended the bins be even. For example
 #' \code{seq(0, 1, .1)} would split the distributions into deciles.
+#' @param scheme What color scheme should the lines follow? Defaults to 
+#' mimic the ggplot2 color scheme. Other options come from the 
+#' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
+#' package, and must be installed first. These are the same options available
+#' in the package: "viridis", "magma", "inferno", and "plasma". These color 
+#' schemes work well for color blindness and print well in black and white.
+#' Alternatively, colors can be supplied manually through a call to \code{col}
+#' (through \code{...}).
 #' @param se Logical. Should the standard errors around the effect size point
 #' estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
 #' displayed with shading. 
@@ -235,6 +243,7 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' argument).
 #' @importFrom graphics par layout axis rect points abline lines
 #' @importFrom grDevices rgb adjustcolor
+#' @importFrom utils installed.packages
 #' @export
 #' @examples
 #' 
@@ -263,7 +272,7 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' 		theme = "dark")
 
 binned_plot <- function(formula, data, ref_group = NULL,
-	qtiles = seq(0, 1, .3333), se = TRUE, shade_col = NULL,
+	qtiles = seq(0, 1, .3333), scheme = "ggplot2", se = TRUE, shade_col = NULL,
 	shade_alpha = 0.3, annotate = FALSE, refline = TRUE, refline_col = "black",
 	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)), lines = TRUE,
@@ -367,7 +376,32 @@ binned_plot <- function(formula, data, ref_group = NULL,
 
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) p$col <- col_hue(length(xaxes))
+	if(is.null(p$col)) {
+		if(scheme == "ggplot2") {
+			p$col <- col_hue(length(xaxes))	
+		} 
+		if(any(scheme == "viridis" |
+			   scheme == "magma" |
+			   scheme == "inferno" |
+			   scheme == "plasma")) {
+			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
+				stop(paste0("Please install the viridisLite ",
+				 	"package to use this color scheme"))
+			}
+		}
+		if(scheme == "viridis") {
+			p$col <- viridisLite::viridis(length(xaxes))	
+		}
+		if(scheme == "magma") {
+			p$col <- viridisLite::magma(length(xaxes))	
+		}
+		if(scheme == "inferno") {
+			p$col <- viridisLite::inferno(length(xaxes))	
+		}
+		if(scheme == "plasma") {
+			p$col <- viridisLite::plasma(length(xaxes))	
+		} 
+	}
 
 	if(se) {
 		x_shade <- split(d$midpoint, as.character(d$foc_group))
