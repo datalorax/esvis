@@ -29,6 +29,15 @@ test_that("`ecdf_plot` produces expected output", {
 		theme = "dark")$theme, 
 				"dark")
 
+	expect_equal(ecdf_plot(mean ~ grade, seda, scheme = "viridis")$scheme, 
+				"viridis")
+	expect_equal(ecdf_plot(mean ~ grade, seda, scheme = "magma")$scheme, 
+				"magma")
+	expect_equal(ecdf_plot(mean ~ grade, seda, scheme = "inferno")$scheme, 
+				"inferno")
+	expect_equal(ecdf_plot(mean ~ grade, seda, scheme = "plasma")$scheme, 
+				"plasma")
+
 	par(mfrow = c(1, 1))
 	expect_equal(ecdf_plot(mean ~ grade, seda, legend = "base")$legend,
 		"base")
