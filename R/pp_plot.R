@@ -13,6 +13,13 @@
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
+#' @param scheme What color scheme should the lines follow? Defaults to 
+#' mimic the ggplot2 color scheme. Other options come from the 
+#' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
+#' package, and must be installed first. These are the same options available
+#' in the package: "viridis", "magma", "inferno", and "plasma". These color 
+#' schemes work well for color blindness and print well in black and white.
+#' Alternatively, colors can be supplied manually through a call to\code{col}.
 #' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 #' \code{legend == "side"} the plot is rendered such that additional
 #' annotations can be made on the plot using low level base plotting functions
@@ -65,6 +72,7 @@
 #' purposes.
 #' @importFrom graphics par layout abline lines text polygon
 #' @importFrom grDevices rgb
+#' @importFrom utils installed.packages
 #' @export
 #' @examples
 #' # Prouduce default Probability-Probability plot with two groups
@@ -96,8 +104,7 @@
 #' 		ref_group = "3")
 #' 
 
-pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE, 
-	refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
+pp_plot <- function(formula, data, ref_group = NULL, scheme = "ggplot2", annotate = FALSE, refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
 	text = NULL, text_size = 2, shade = NULL, 
 	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
  	legend = NULL, plot = TRUE, theme = NULL, ...) {
@@ -207,7 +214,32 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE,
 	
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) p$col <- col_hue(ncol(ps_subset))
+	if(is.null(p$col)) {
+		if(scheme == "ggplot2") {
+			p$col <- col_hue(ncol(ps_subset))	
+		} 
+		if(any(scheme == "viridis" |
+			   scheme == "magma" |
+			   scheme == "inferno" |
+			   scheme == "plasma")) {
+			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
+				stop(paste0("Please install the viridisLite ",
+				 	"package to use this color scheme"))
+			}
+		}
+		if(scheme == "viridis") {
+			p$col <- viridisLite::viridis(ncol(ps_subset))	
+		}
+		if(scheme == "magma") {
+			p$col <- viridisLite::magma(ncol(ps_subset))	
+		}
+		if(scheme == "inferno") {
+			p$col <- viridisLite::inferno(ncol(ps_subset))	
+		}
+		if(scheme == "plasma") {
+			p$col <- viridisLite::plasma(ncol(ps_subset))	
+		} 
+	}
 
 	if((length(p$col) !=1) & (length(p$col) < ncol(ps_subset))) {
 		warning(
@@ -257,6 +289,22 @@ pp_plot <- function(formula, data, ref_group = NULL, annotate = FALSE,
 
 		if(shade == TRUE) {
 			xlims <- seq(0, 1, length = nrow(ps))
+			if(shade_rgb == 
+				rgb(102, 178, 255, alpha = 30, maxColorValue = 255)) {
+				
+				if(scheme == "viridis") {
+					shade_rgb <- viridisLite::viridis(2, alpha = 0.3)[2]	
+				}
+				if(scheme == "magma") {
+					shade_rgb <- viridisLite::magma(2, alpha = 0.3)[2]	
+				}
+				if(scheme == "inferno") {
+					shade_rgb <- viridisLite::inferno(2, alpha = 0.3)[2]	
+				}
+				if(scheme == "plasma") {
+					shade_rgb <- viridisLite::plasma(2, alpha = 0.3)[2]	
+				} 
+			}
 			polygon(c(xlims, rev(ps[ ,1])), 
 					c(rep(-1, length(xlims)), rev(ps[ ,2])),
 				col = shade_rgb,

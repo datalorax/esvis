@@ -36,6 +36,25 @@ test_that("`pp_plot` produces expected output", {
 				"p(3)")
 	expect_equal(pp_plot(mean ~ grade, seda, legend = "base")$legend,
 		"base")
+
+	expect_equal(pp_plot(mean ~ grade, seda, scheme = "viridis")$scheme,
+		"viridis")
+	expect_equal(pp_plot(mean ~ grade, seda, scheme = "inferno")$scheme,
+		"inferno")
+	expect_equal(pp_plot(mean ~ grade, seda, scheme = "magma")$scheme,
+		"magma")
+	expect_equal(pp_plot(mean ~ grade, seda, scheme = "plasma")$scheme,
+		"plasma")
+
+	par(mfrow = c(1, 1))
+	expect_equal(pp_plot(math ~ frl, benchmarks, scheme = "viridis")$scheme,
+		"viridis")
+	expect_equal(pp_plot(math ~ frl, benchmarks, scheme = "inferno")$scheme,
+		"inferno")
+	expect_equal(pp_plot(math ~ frl, benchmarks, scheme = "magma")$scheme,
+		"magma")
+	expect_equal(pp_plot(math ~ frl, benchmarks, scheme = "plasma")$scheme,
+		"plasma")
 })
 
 test_that("Partial matching for `pp_plot` works", {

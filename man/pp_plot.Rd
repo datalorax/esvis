@@ -4,10 +4,11 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(formula, data, ref_group = NULL, annotate = FALSE, refline = TRUE,
-  refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
-  text_size = 2, shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30,
-  maxColorValue = 255), legend = NULL, plot = TRUE, theme = NULL, ...)
+pp_plot(formula, data, ref_group = NULL, scheme = "ggplot2",
+  annotate = FALSE, refline = TRUE, refline_col = "gray40",
+  refline_lty = 2, refline_lwd = 2, text = NULL, text_size = 2,
+  shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
+  255), legend = NULL, plot = TRUE, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -19,6 +20,14 @@ grouping variable must only include only two groups.}
 \item{ref_group}{Optional character vector (of length 1) naming the
 reference group to be plotted on the x-axis. Defaults to the highest
 scoring group.}
+
+\item{scheme}{What color scheme should the lines follow? Defaults to 
+mimic the ggplot2 color scheme. Other options come from the 
+\href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
+package, and must be installed first. These are the same options available
+in the package: "viridis", "magma", "inferno", and "plasma". These color 
+schemes work well for color blindness and print well in black and white.
+Alternatively, colors can be supplied manually through a call to\code{col}.}
 
 \item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 \code{legend == "side"} the plot is rendered such that additional
