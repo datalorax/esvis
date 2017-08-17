@@ -19,6 +19,14 @@
 #'  reference lines be plotted at the location of \code{ref_cut}? 
 #' @param rect_ref Logical, defaults to \code{TRUE}. Should semi-transparent 
 #' rectangle(s) be plotted at the locations of \code{ref_cut}? 
+#' @param scheme What color scheme should the lines follow? Defaults to 
+#' mimic the ggplot2 color scheme. Other options come from the 
+#' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
+#' package, and must be installed first. These are the same options available
+#' in the package: "viridis", "magma", "inferno", and "plasma". These color 
+#' schemes work well for color blindness and print well in black and white.
+#' Alternatively, colors can be supplied manually through a call to \code{col}
+#' (through \code{...}).
 #' @param legend The type of legend to be displayed, with possible values 
 #' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
 #' when there are more than two groups and \code{"none"} when only comparing
