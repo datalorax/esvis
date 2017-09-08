@@ -129,9 +129,9 @@ probs <- function(formula, data) {
 	ecdfs <- cdfs(formula, data)
 	out <- data[[ all.vars(formula)[1] ]]
 	
-	range <- seq(min(out, na.rm = TRUE) - sd(out, na.rm = TRUE), 
-				  max(out, na.rm = TRUE) + sd(out, na.rm = TRUE),
-				  .1)
+	range <- seq(min(out, na.rm = TRUE) - floor(sd(out, na.rm = TRUE)), 
+				  max(out, na.rm = TRUE) + ceiling(sd(out, na.rm = TRUE)),
+				  1)
 
 	ps <- vapply(ecdfs, function(x) x(range), numeric(length(range)))
 	colnames(ps) <- names(ecdfs)
