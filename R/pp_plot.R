@@ -275,8 +275,8 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 	}
 	if(!is.null(cut)) {
 		cuts <- ps[rownames(ps) %in% cut, , drop = FALSE]
-		cut_cols <- col_scheme(scheme,
-			length(p$col) + nrow(cuts))[-1:-length(p$col)]
+		full_cols <- col_scheme(scheme, length(p$col) + nrow(cuts))
+		cut_cols <- full_cols[!full_cols %in% p$col]
 
 		if(class(cuts) == "numeric") {
 			for(i in seq_along(cuts)[-1]) {
