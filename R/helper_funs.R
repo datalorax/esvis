@@ -165,7 +165,6 @@ seg_match <- function(x, y, ...) {
 	points(x, y, ...)
 }
 
-
 #' Color hues
 #'
 #' Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
