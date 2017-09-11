@@ -4,10 +4,13 @@
 \alias{col_hue}
 \title{Color hues}
 \usage{
-col_hue(n)
+col_hue(n, ...)
 }
 \arguments{
 \item{n}{The number of colors to be produced}
+
+\item{...}{Additional arguments passed to \link[grDevices]{hcl}, such as 
+\code{alpha}.}
 }
 \description{
 Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
