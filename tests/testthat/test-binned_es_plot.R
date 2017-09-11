@@ -28,8 +28,6 @@ test_that("`qtile_es` produces expected output", {
 	expect_equal(round(qtile_es(score ~ g, test_data1)$es[1]), 0)
 })
 
-
-
 test_that("`binned_plot` produces expected output", {
 	expect_equal(binned_plot(mean ~ grade, seda)$type, "n")
 	
