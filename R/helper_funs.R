@@ -139,22 +139,77 @@ probs <- function(formula, data) {
 ps
 }
 
+#' Match segments on a plot
+#'
+#' Given an x and y coordinate, this function will produce segments that 
+#' extend from -1 to the corresponding xy intersection, with a point
+#' at the intersection. 
+#' 
+#' @param x The x-coordinate.
+#' @param y The y-coordinate.
+#' @param ... Additional parameters passed to \link[graphics]{segments}. Note
+#' that whatever parameters are passed here are also passed to 
+#' \link[graphics]{points} (e.g., \code{col}).
+#' @export
+#' @examples
+#' plot(1:10, (1:10)^2, type = "l")
+#' seg_match(3, 9)
+#' seg_match(c(6, 8), c(36, 64), 
+#' 	col = c("blue", "green"),
+#' 	pch = 21, 
+#' 	bg = c("blue", "green"), 
+#' 	lty = 3)
+seg_match <- function(x, y, ...) {
+	segments(x, -1, x, y, ...)
+	segments(-1, y, x, y, ...)
+	points(x, y, ...)
+}
+
+
 #' Color hues
 #'
 #' Emulates ggplot's default colors. Evenly spaced hues around the color wheel.
 #' 
 #' @param n The number of colors to be produced
+#' @param ... Additional arguments passed to \link[grDevices]{hcl}, such as 
+#' \code{alpha}.
 #' @export
 #' @examples
 #' col_hue(1)
 #' col_hue(5)
 #' col_hue(20)
 
-col_hue <- function(n) {
+col_hue <- function(n, ...) {
   hues <- seq(15, 375, length = n + 1)
-  grDevices::hcl(h = hues, c = 100, l = 65)[seq_len(n)]
+  grDevices::hcl(h = hues, c = 100, l = 65, ...)[seq_len(n)]
 }
 
+#' Determine the color scheme to be used for the plotting
+#' 
+#' @param scheme The chosen color scheme. Options are "ggplot2", "virdis",
+#' "magma", "inferno", or "plasma". Note all but "ggplot2" depend upon the
+#' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite} package
+#' @param n The number of colors to be produced for the given scheme.
+#' @param ... Additional arguments passed, typically being \code{alpha}.
+
+col_scheme <- function(scheme, n, ...) {
+	if(any(scheme == "viridis" |
+			   scheme == "magma" |
+			   scheme == "inferno" |
+			   scheme == "plasma")) {
+		if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
+			stop(paste0("Please install the viridisLite ",
+			 	"package to use this color scheme"))
+		}
+	}
+	switch(scheme,
+			ggplot2 = col_hue(n, ...),
+			viridis = viridisLite::viridis(n, ...),
+			magma 	= viridisLite::magma(n, ...),
+			inferno	= viridisLite::inferno(n, ...),
+			plasma 	= viridisLite::plasma(n, ...)
+			)
+} 
 
 #' Create a legend for a plot
 #' 
