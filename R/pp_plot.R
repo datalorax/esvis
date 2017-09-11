@@ -13,6 +13,9 @@
 #' @param ref_group Optional character vector (of length 1) naming the
 #'   reference group to be plotted on the x-axis. Defaults to the highest
 #'   scoring group.
+#' @param cut Integer. Optional vector (or single number) of scores used to 
+#' annotate the plot. If supplied, line segments will extend from the 
+#' corresponding x and y axes and meet at the PP curve.
 #' @param scheme What color scheme should the lines follow? Defaults to 
 #' mimic the ggplot2 color scheme. Other options come from the 
 #' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
@@ -42,9 +45,8 @@
 #' @param shade Logical. Should the area under the curve be shaded? Defaults
 #'    to \code{TRUE} if there are only two group. Currently it cannot be 
 #'    produced for more than two groups.
-#' @param shade_rgb The color of the shading via \link[grDevices]{rgb}. 
-#'    Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
-#'    light blue color.
+#' @param shade_col The color of the shading. Defaults to the second color in
+#' the chosen color \code{scheme}.
 #' @param legend The type of legend to be displayed, with possible values 
 #' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
 #' when there are more than two groups and \code{"none"} when only comparing
@@ -56,9 +58,6 @@
 #' When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
 #' latter of which produces the legend with the base \link[graphics]{legend}
 #' function.
-#' @param plot Logical. Should the plot be produced? Defaults to \code{TRUE}. 
-#' Sometimes it is useful to only get the output from the plot, which is why
-#' this functionality exists (likely to be implemented in a panel plot). 
 #' @param theme Visual properties of the plot. There are currently only two
 #' themes implemented - a standard plot and a dark theme. If \code{NULL} 
 #' (default), the theme will be produced with a standard white background. If
@@ -89,7 +88,7 @@
 #' # Change color of shading & line, line width, and title
 #' pp_plot(math ~ freelunch, 
 #' 		star, 
-#' 		shade_rgb = rgb(0.1, 0.8, 0.2, 0.5), 
+#' 		shade_col = rgb(0.1, 0.8, 0.2, 0.5), 
 #' 		col = "purple", lwd = 5, 
 #' 		main = "Probability-Probability Plot")
 #' 
@@ -105,10 +104,11 @@
 #' 		ref_group = "3")
 #' 
 
-pp_plot <- function(formula, data, ref_group = NULL, scheme = "ggplot2", annotate = FALSE, refline = TRUE, refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
-	text = NULL, text_size = 2, shade = NULL, 
-	shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue = 255), 
- 	legend = NULL, plot = TRUE, theme = NULL, ...) {
+pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
+ 	scheme = "ggplot2", annotate = FALSE, refline = TRUE, 
+ 	refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
+	text = NULL, text_size = 2, shade = NULL, shade_col = NULL, 
+	legend = NULL, theme = NULL, ...) {
 
 	ps <- probs(formula, data)
 
@@ -174,73 +174,49 @@ pp_plot <- function(formula, data, ref_group = NULL, scheme = "ggplot2", annotat
 
 	sq <- seq_len(ncol(ps))
 	ref_group_d <- ps[ ,sq[colnames(ps) == as.character(ref_group)] ]
-
-	if(plot == TRUE) {
-		if(legend == "side") {
-			layout(t(c(1, 2)), widths = c(0.9, 0.1))	
-		}
-		if(ncol(ps) == 2) {
-			p <- empty_plot(ref_group_d, ps[ ,2], 
-				paste0("p(",colnames(ps)[1],")"),
-				paste0("p(",colnames(ps)[2],")"),
-				paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
-				...)
-		}
-		if(ncol(ps) > 2) {
-			p <- empty_plot(ref_group_d, ps[ ,2], 
-				paste0("p(", ref_group, ")"),
-				"p(Focal Group)",
-				paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
-				...)
-		}
-		
-		if(!is.null(theme)) {
-			if(theme == "dark") {
-				if(is.null(p$xaxt))	axis(1, col = "white")
-				if(is.null(p$yaxt)) axis(2, col = "white")
-				if(refline_col == "gray") refline_col <- "white"
-				if(refline_lwd == 1) refline_lwd <- 2
-			}
-		}
-		if(refline == TRUE) {
-			abline(0, 1, 
-				col = refline_col, 
-				lty = refline_lty, 
-				lwd = refline_lwd)
-		}
-	}
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
+
+	if(legend == "side") {
+		max_char <- max(nchar(colnames(ps_subset)))
+		score_len <- max(nchar(paste0("Score: ", rownames(ps))))
+		if(max_char < score_len & !is.null(cut)) max_char <- score_len
+		wdth <- 0.9 - (max_char * 0.01)
+		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))	
+	}
+	if(ncol(ps) == 2) {
+		p <- empty_plot(ref_group_d, ps[ ,2], 
+			paste0("p(",colnames(ps)[1],")"),
+			paste0("p(",colnames(ps)[2],")"),
+			paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
+			...)
+	}
+	if(ncol(ps) > 2) {
+		p <- empty_plot(ref_group_d, ps[ ,2], 
+			paste0("p(", ref_group, ")"),
+			"p(Focal Group)",
+			paste(as.character(formula)[c(2, 1, 3)], collapse = " "),
+			...)
+	}
 	
+	if(!is.null(theme)) {
+		if(theme == "dark") {
+			if(is.null(p$xaxt))	axis(1, col = "white")
+			if(is.null(p$yaxt)) axis(2, col = "white")
+			if(refline_col == "gray") refline_col <- "white"
+			if(refline_lwd == 1) refline_lwd <- 2
+		}
+	}
+	if(refline == TRUE) {
+		abline(0, 1, 
+			col = refline_col, 
+			lty = refline_lty, 
+			lwd = refline_lwd)
+	}
 	
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) {
-		if(scheme == "ggplot2") {
-			p$col <- col_hue(ncol(ps_subset))	
-		} 
-		if(any(scheme == "viridis" |
-			   scheme == "magma" |
-			   scheme == "inferno" |
-			   scheme == "plasma")) {
-			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
-				stop(paste0("Please install the viridisLite ",
-				 	"package to use this color scheme"))
-			}
-		}
-		if(scheme == "viridis") {
-			p$col <- viridisLite::viridis(ncol(ps_subset))	
-		}
-		if(scheme == "magma") {
-			p$col <- viridisLite::magma(ncol(ps_subset))	
-		}
-		if(scheme == "inferno") {
-			p$col <- viridisLite::inferno(ncol(ps_subset))	
-		}
-		if(scheme == "plasma") {
-			p$col <- viridisLite::plasma(ncol(ps_subset))	
-		} 
-	}
+	if(is.null(p$col)) p$col <- col_scheme(scheme, ncol(ps_subset))
 
 	if((length(p$col) !=1) & (length(p$col) < ncol(ps_subset))) {
 		warning(
@@ -257,81 +233,107 @@ pp_plot <- function(formula, data, ref_group = NULL, scheme = "ggplot2", annotat
 
 	x_axs <- rep(ref_group_d, ncol(ps_subset))
 
-	if(plot == TRUE) {
-		Map(lines, 
-			x = split(x_axs, 
-					rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))), 
-			y = split(ps_subset, 
-					rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))),
-		    col = p$col, 
-			lwd = p$lwd,
-			lty = p$lty)
+	Map(lines, 
+		x = split(x_axs, 
+				rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))), 
+		y = split(ps_subset, 
+				rep(seq_len(ncol(ps_subset)), each = nrow(ps_subset))),
+	    col = p$col, 
+		lwd = p$lwd,
+		lty = p$lty)
 
-		if(text == TRUE) {
-			if(!is.null(theme)) {
-				if(theme == "dark") {
-					text(0.8, 0.2, cex = text_size, col = "white",
-					paste0("AUC = ", 
-								round(auc(formula, data, ref_group, FALSE), 2),
-						   "\n", 
-						   "V = ", 
-						   		round(v(formula, data, ref_group, FALSE), 2)))
-				}	
-			}
-			else {
-				text(0.8, 0.2, cex = text_size, 
-					paste0("AUC = ", 
-								round(auc(formula, data, ref_group, FALSE), 2), 
-						   "\n", 
-						   "V = ", 
-						   		round(v(formula, data, ref_group, FALSE), 2)))
+	if(text == TRUE) {
+		if(!is.null(theme)) {
+			if(theme == "dark") {
+				text(0.8, 0.2, cex = text_size, col = "white",
+				paste0("AUC = ", 
+							round(auc(formula, data, ref_group, FALSE), 2),
+					   "\n", 
+					   "V = ", 
+					   		round(v(formula, data, ref_group, FALSE), 2)))
+			}	
+		}
+		else {
+			text(0.8, 0.2, cex = text_size, 
+				paste0("AUC = ", 
+							round(auc(formula, data, ref_group, FALSE), 2), 
+					   "\n", 
+					   "V = ", 
+					   		round(v(formula, data, ref_group, FALSE), 2)))
+		}
+	}
+
+	if(shade == TRUE) {
+		xlims <- seq(0, 1, length = nrow(ps))
+		if(is.null(shade_col))  {
+			shade_col <- col_scheme(scheme, 2, alpha = .3)[2]
+		}
+		polygon(c(xlims, rev(ps[ ,1])), 
+				c(rep(-1, length(xlims)), rev(ps[ ,2])),
+			col = shade_col,
+			border = NA)
+	}
+	if(!is.null(cut)) {
+		cuts <- ps[rownames(ps) %in% cut, , drop = FALSE]
+		cut_cols <- col_scheme(scheme,
+			length(p$col) + nrow(cuts))[-1:-length(p$col)]
+
+		if(class(cuts) == "numeric") {
+			for(i in seq_along(cuts)[-1]) {
+				seg_match(cuts[1], cuts[i], 
+					col = cut_cols[i - 1],
+					pch = 21,
+					bg = cut_cols[i - 1],
+					lty = 3)
 			}
 		}
 
-		if(shade == TRUE) {
-			xlims <- seq(0, 1, length = nrow(ps))
-			if(shade_rgb == 
-				rgb(102, 178, 255, alpha = 30, maxColorValue = 255)) {
-				
-				if(scheme == "viridis") {
-					shade_rgb <- viridisLite::viridis(2, alpha = 0.3)[2]	
+		if(class(cuts) == "matrix") {
+			sp_cuts <- split(cuts, seq_len(nrow(cuts)))
+			
+			lapply(seq_along(sp_cuts), function(j) {
+				for(i in seq_along(sp_cuts[[1]])[-1]) {
+					seg_match(sp_cuts[[j]][1], sp_cuts[[j]][i], 
+						col = cut_cols[j],
+						pch = 21,
+						bg = cut_cols[j],
+						lty = 3)
 				}
-				if(scheme == "magma") {
-					shade_rgb <- viridisLite::magma(2, alpha = 0.3)[2]	
-				}
-				if(scheme == "inferno") {
-					shade_rgb <- viridisLite::inferno(2, alpha = 0.3)[2]	
-				}
-				if(scheme == "plasma") {
-					shade_rgb <- viridisLite::plasma(2, alpha = 0.3)[2]	
-				} 
-			}
-			polygon(c(xlims, rev(ps[ ,1])), 
-					c(rep(-1, length(xlims)), rev(ps[ ,2])),
-				col = shade_rgb,
-				border = NA)
+			})
 		}
-		if(legend == "side") {
+	}
+
+	if(legend == "side") {
+		if(!is.null(cut)) {
+			create_legend(ncol(ps_subset) + length(cut),
+				c(colnames(ps_subset), paste0("Score: ", cut)),
+				col = c(p$col, cut_cols),
+				lwd = c(rep(p$lwd, ncol(ps_subset)), rep(1, length(cut))),
+				lty = c(rep(p$lty, ncol(ps_subset)), rep(3, length(cut))),
+				left_mar = max_char * .35)
+		}
+		else{ 
 			create_legend(ncol(ps_subset), colnames(ps_subset), 
+				col = p$col, 
+				lwd = p$lwd, 
+				lty = p$lty,
+				left_mar = max_char * .35)
+		}
+	}
+	if(legend == "base") {
+		if(is.null(theme)) {
+			create_base_legend(colnames(ps_subset), 
 				col = p$col, 
 				lwd = p$lwd, 
 				lty = p$lty)
 		}
-		if(legend == "base") {
-			if(is.null(theme)) {
+		if(!is.null(theme)) {
+			if(theme == "dark") {
 				create_base_legend(colnames(ps_subset), 
 					col = p$col, 
 					lwd = p$lwd, 
-					lty = p$lty)
-			}
-			if(!is.null(theme)) {
-				if(theme == "dark") {
-					create_base_legend(colnames(ps_subset), 
-						col = p$col, 
-						lwd = p$lwd, 
-						lty = p$lty,
-						text.col = "white")
-				}
+					lty = p$lty,
+					text.col = "white")
 			}
 		}
 	}

@@ -4,11 +4,10 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(formula, data, ref_group = NULL, scheme = "ggplot2",
+pp_plot(formula, data, ref_group = NULL, cut = NULL, scheme = "ggplot2",
   annotate = FALSE, refline = TRUE, refline_col = "gray40",
   refline_lty = 2, refline_lwd = 2, text = NULL, text_size = 2,
-  shade = NULL, shade_rgb = rgb(102, 178, 255, alpha = 30, maxColorValue =
-  255), legend = NULL, plot = TRUE, theme = NULL, ...)
+  shade = NULL, shade_col = NULL, legend = NULL, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -20,6 +19,10 @@ grouping variable must only include only two groups.}
 \item{ref_group}{Optional character vector (of length 1) naming the
 reference group to be plotted on the x-axis. Defaults to the highest
 scoring group.}
+
+\item{cut}{Integer. Optional vector (or single number) of scores used to 
+annotate the plot. If supplied, line segments will extend from the 
+corresponding x and y axes and meet at the PP curve.}
 
 \item{scheme}{What color scheme should the lines follow? Defaults to 
 mimic the ggplot2 color scheme. Other options come from the 
@@ -59,9 +62,8 @@ statistics be displayed on the plot? Defaults to \code{TRUE} when there
 to \code{TRUE} if there are only two group. Currently it cannot be 
 produced for more than two groups.}
 
-\item{shade_rgb}{The color of the shading via \link[grDevices]{rgb}. 
-Defaults to \code{rgb(102, 178, 255, alpha = 30, max = 255)} which is a 
-light blue color.}
+\item{shade_col}{The color of the shading. Defaults to the second color in
+the chosen color \code{scheme}.}
 
 \item{legend}{The type of legend to be displayed, with possible values 
 \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
@@ -74,10 +76,6 @@ multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
 When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
 latter of which produces the legend with the base \link[graphics]{legend}
 function.}
-
-\item{plot}{Logical. Should the plot be produced? Defaults to \code{TRUE}. 
-Sometimes it is useful to only get the output from the plot, which is why
-this functionality exists (likely to be implemented in a panel plot).}
 
 \item{theme}{Visual properties of the plot. There are currently only two
 themes implemented - a standard plot and a dark theme. If \code{NULL} 
@@ -115,7 +113,7 @@ pp_plot(math ~ freelunch,
 # Change color of shading & line, line width, and title
 pp_plot(math ~ freelunch, 
 		star, 
-		shade_rgb = rgb(0.1, 0.8, 0.2, 0.5), 
+		shade_col = rgb(0.1, 0.8, 0.2, 0.5), 
 		col = "purple", lwd = 5, 
 		main = "Probability-Probability Plot")
 
