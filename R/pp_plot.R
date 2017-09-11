@@ -16,6 +16,8 @@
 #' @param cut Integer. Optional vector (or single number) of scores used to 
 #' annotate the plot. If supplied, line segments will extend from the 
 #' corresponding x and y axes and meet at the PP curve.
+#' @param cut_table Logical. Should a data.frame of the cuts and corresponding
+#' proportions be returned? Defaults to FALSE.
 #' @param scheme What color scheme should the lines follow? Defaults to 
 #' mimic the ggplot2 color scheme. Other options come from the 
 #' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
@@ -104,8 +106,8 @@
 #' 		ref_group = "3")
 #' 
 
-pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
- 	scheme = "ggplot2", annotate = FALSE, refline = TRUE, 
+pp_plot <- function(formula, data, ref_group = NULL, cut = NULL, 
+	cut_table = FALSE, scheme = "ggplot2", annotate = FALSE, refline = TRUE, 
  	refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
 	text = NULL, text_size = 2, shade = NULL, shade_col = NULL, 
 	legend = NULL, theme = NULL, ...) {
@@ -274,9 +276,9 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 			border = NA)
 	}
 	if(!is.null(cut)) {
-		cuts <- ps[rownames(ps) %in% cut, , drop = FALSE]
+		cuts <- ps[rownames(ps) %in% cut, ,drop = FALSE]
 		full_cols <- col_scheme(scheme, length(p$col) + nrow(cuts))
-		cut_cols <- full_cols[!full_cols %in% p$col]
+		cut_cols <- full_cols[!full_cols %in% p$col][seq_len(nrow(cuts))]
 
 		if(class(cuts) == "numeric") {
 			for(i in seq_along(cuts)[-1]) {
@@ -305,16 +307,17 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 
 	if(legend == "side") {
 		if(!is.null(cut)) {
-			create_legend(ncol(ps_subset) + length(cut),
-				c(colnames(ps_subset), paste0("Score: ", cut)),
-				col = c(p$col, cut_cols),
-				lwd = c(rep(p$lwd, ncol(ps_subset)), rep(1, length(cut))),
-				lty = c(rep(p$lty, ncol(ps_subset)), rep(3, length(cut))),
-				left_mar = max_char * .35)
+			create_legend(ncol(ps_subset),
+				colnames(ps_subset),
+				main_cols = p$col,
+				cut_cols = cut_cols,
+				lwd = 2,
+				left_mar = max_char * .35,
+				cut = cut)
 		}
 		else{ 
 			create_legend(ncol(ps_subset), colnames(ps_subset), 
-				col = p$col, 
+				main_cols = p$col, 
 				lwd = p$lwd, 
 				lty = p$lty,
 				left_mar = max_char * .35)
@@ -341,5 +344,10 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 		par(mfg = c(1, 1))
 		empty_plot(ref_group_d, ps[ ,2], "", "", xaxt = "n", yaxt = "n", ...)
 	} 
+	if(cut_table) {
+		cuts <- as.data.frame.table(cuts, responseName = "proportion")
+		names(cuts)[1:2] <- c("cut", "group")
+	return(cuts)
+	}
 invisible(c(as.list(match.call()), p, op))
 }

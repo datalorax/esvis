@@ -4,10 +4,11 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(formula, data, ref_group = NULL, cut = NULL, scheme = "ggplot2",
-  annotate = FALSE, refline = TRUE, refline_col = "gray40",
-  refline_lty = 2, refline_lwd = 2, text = NULL, text_size = 2,
-  shade = NULL, shade_col = NULL, legend = NULL, theme = NULL, ...)
+pp_plot(formula, data, ref_group = NULL, cut = NULL, cut_table = FALSE,
+  scheme = "ggplot2", annotate = FALSE, refline = TRUE,
+  refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
+  text_size = 2, shade = NULL, shade_col = NULL, legend = NULL,
+  theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -23,6 +24,9 @@ scoring group.}
 \item{cut}{Integer. Optional vector (or single number) of scores used to 
 annotate the plot. If supplied, line segments will extend from the 
 corresponding x and y axes and meet at the PP curve.}
+
+\item{cut_table}{Logical. Should a data.frame of the cuts and corresponding
+proportions be returned? Defaults to FALSE.}
 
 \item{scheme}{What color scheme should the lines follow? Defaults to 
 mimic the ggplot2 color scheme. Other options come from the 
