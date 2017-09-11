@@ -223,11 +223,14 @@ col_scheme <- function(scheme, n, ...) {
 #' legend more to the right.
 #' @param height The height of the legend. Counter-intuitively, larger numbers
 #' result in a smaller legend (more squished to the bottom). 
+#' @param main_cols Primary colors (of the lines, rather than the cut scores)
+#' @param cut Cut scores (see \link{pp_plot}).
+#' @param cut_cols The color of the lines/points for the cut scores.
 #' @param ... Additional arguments passed to \link[graphics]{lines}.
 #' @importFrom graphics plot lines axis
-#' 
 
-create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
+create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, 
+	main_cols = NULL, cut = NULL, cut_cols = NULL, ...) {
 	op <- par(mar = c(5.1, left_mar, 4.1, 0))
 	on.exit(par(op))
 	
@@ -250,14 +253,37 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, ...) {
 		ylab = "")
 
 	axes <- cbind(c(0, 1), rep(seq_len(n), each = 2))	
-	
+	if(!is.null(cut)) {
+		axes_cut <- cbind(c(0, 1), 
+					  rep(seq_len(n + length(cut) + 1)[-c(seq_len(n), n + 1)], 
+					  	each = 2))	
+	}
+
 	Map(lines, 
 		split(axes[ ,1], axes[ ,2]), 
 		split(axes[ ,2], axes[ ,2]),
+		col = main_cols,
 		...)
+
+	locs <- unique(axes[ ,2])
+
+	if(!is.null(cut)) {
+		Map(lines, 
+			split(axes_cut[ ,1], axes_cut[ ,2]), 
+			split(axes_cut[ ,2], axes_cut[ ,2]),
+			col = cut_cols,
+			lty = 3,
+			...)
+		points(rep(0.5, length(cut)), unique(axes_cut[ ,2]),
+			col = cut_cols,
+			bg = cut_cols,
+			pch = 21)
+		leg_labels <- c(leg_labels, paste0("Score: ", cut))
+		locs <- c(locs, unique(axes_cut[ ,2]))
+	}
 	axis(2, 
 		lwd = 0, 
-		at = seq_len(n), 
+		at = locs,
 		labels = leg_labels, 
 		las = 2)
 }
