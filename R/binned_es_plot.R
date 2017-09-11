@@ -448,7 +448,7 @@ binned_plot <- function(formula, data, ref_group = NULL,
 
 	if(legend == "side") {
 		create_legend(length(xaxes), names(xaxes), 
-			col = p$col, 
+			main_cols = p$col, 
 			lwd = p$lwd, 
 			lty = p$lty,
 			left_mar = max_char * .35)

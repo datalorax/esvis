@@ -192,7 +192,7 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 	}
 	if(legend == "side") {
 		create_legend(length(splt), names(splt),
-			col = p$col,
+			main_cols = p$col,
 			lwd = p$lwd,
 			lty = p$lty,
 			left_mar = max_char * .35)
