@@ -45,6 +45,8 @@
 #' @param text Logical. Should the \code{link{auc}} and \code{link{v}}
 #'    statistics be displayed on the plot? Defaults to \code{TRUE} when there
 #' 	  are two groups. Cannot currently be displayed for more than two groups.
+#' @param text_x The x-axis location for the text.
+#' @param text_y The y-axis location for the text.
 #' @param text_size The size of the text to be displayed. Defaults to 2. 
 #' @param shade Logical. Should the area under the curve be shaded? Defaults
 #'    to \code{TRUE} if there are only two group. Currently it cannot be 
@@ -79,7 +81,6 @@
 #' The arguments supplied to the plot are silently returned for testing 
 #' purposes.
 #' @importFrom graphics par layout abline lines text polygon
-#' @importFrom utils installed.packages
 #' @export
 #' @examples
 #' # Prouduce default Probability-Probability plot with two groups
@@ -114,12 +115,12 @@
 pp_plot <- function(formula, data, ref_group = NULL, cut = NULL, 
 	cut_table = FALSE, grid = NULL, scheme = "ggplot2", annotate = FALSE,
 	refline = TRUE, refline_col = NULL, refline_lty = 2, refline_lwd = 2,
-	text = NULL, text_x = 0.8, text_y = 0.2, text_size = 2, shade = NULL,
+	text = NULL, text_x = 0.8, text_y = 0.2, text_size = 1.5, shade = NULL,
 	shade_col = NULL, leg = NULL, n_1 = FALSE, theme = "standard", ...) {
 
 	call <- as.list(match.call())
 	
-	calcs <- pp_calcs(formula, data, ref_group, ...)
+	calcs <- pp_calcs(formula, data, ref_group)
 	
 	if(!is.null(grid)) {
 		if(grid & !is.null(cut)) {
@@ -209,34 +210,9 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 			theme = theme,
 			...)
 	}
-	if(grid){
-		grid(col = adjustcolor(themes(theme)$line_col, alpha.f = 0.3))
-	}
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
 	if(is.null(p$col)) p$col <- col_scheme(scheme, ncol(calcs$ps_subset))
-	
-	if(shade == TRUE) {
-		xlims <- seq(0, 1, length = nrow(calcs$ps))
-		if(is.null(shade_col))  {
-			shade_col <- col_scheme(scheme, 2, alpha = .3)[2]
-		}
-		polygon(c(xlims, rev(calcs$ps[ ,1])), 
-				c(rep(-1, length(xlims)), rev(calcs$ps[ ,2])),
-			col = shade_col,
-			border = NA)
-	}
-	if(text == TRUE) {
-		pp_annotate(formula, data, calcs$ref_group, text_x, text_y, text_size,
-			theme)
-	}
-
-	if(refline == TRUE) {
-		abline(0, 1, 
-			col = themes(theme)$line_col, 
-			lty = refline_lty, 
-			lwd = refline_lwd)
-	}
 
 	if((length(p$col) !=1) & (length(p$col) < ncol(calcs$ps_subset))) {
 		warning(
@@ -251,7 +227,29 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 				"recycled when drawing lines.")
 			)
 	}
-
+	if(grid){
+		grid(col = adjustcolor(themes(theme)$line_col, alpha.f = 0.3))
+	}
+	if(shade) {
+		xlims <- seq(0, 1, length = nrow(calcs$ps))
+		if(is.null(shade_col))  {
+			shade_col <- col_scheme(scheme, 2, alpha = .3)[2]
+		}
+		polygon(c(xlims, rev(calcs$ps[ ,1])), 
+				c(rep(-1, length(xlims)), rev(calcs$ps[ ,2])),
+			col = shade_col,
+			border = NA)
+	}
+	if(text) {
+		pp_annotate(formula, data, calcs$ref_group, text_x, text_y, text_size,
+			theme)
+	}
+	if(refline) {
+		abline(0, 1, 
+			col = themes(theme)$line_col, 
+			lty = refline_lty, 
+			lwd = refline_lwd)
+	}
 	Map(lines, 
 		x = calcs$x_lines, 
 		y = calcs$y_lines,
@@ -259,73 +257,25 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 		lwd = p$lwd,
 		lty = p$lty)
 
-	
-	if(!is.null(cut)) {
-		cuts <- calcs$ps[rownames(calcs$ps) %in% cut, ,drop = FALSE]
-		full_cols <- col_scheme(scheme, length(p$col) + nrow(cuts))
-		cut_cols <- full_cols[!full_cols %in% p$col][seq_len(nrow(cuts))]
-
-		if(class(cuts) == "numeric") {
-			for(i in seq_along(cuts)[-1]) {
-				seg_match(cuts[1], cuts[i], 
-					col = cut_cols[i - 1],
-					pch = 21,
-					bg = cut_cols[i - 1],
-					lty = 3)
-			}
-		}
-
-		if(class(cuts) == "matrix") {
-			sp_cuts <- split(cuts, seq_len(nrow(cuts)))
-			
-			lapply(seq_along(sp_cuts), function(j) {
-				for(i in seq_along(sp_cuts[[1]])[-1]) {
-					seg_match(sp_cuts[[j]][1], sp_cuts[[j]][i], 
-						col = cut_cols[j],
-						pch = 21,
-						bg = cut_cols[j],
-						lty = 3)
-				}
-			})
-		}
-	}
+	if(!is.null(cut)) cut_cols <- create_cut_refs(cut, calcs, p, scheme)
 
 	if(leg == "side") {
-		if(!is.null(cut)) {
-			create_legend(ncol(calcs$ps_subset),
-				colnames(calcs$ps_subset),
-				main_cols = p$col,
-				cut_cols = cut_cols,
-				lwd = 2,
-				left_mar = max_char * .35,
-				n_1 = n_1,
-				cut = cut)
-		}
-		else{ 
-			create_legend(ncol(calcs$ps_subset), colnames(calcs$ps_subset), 
-				main_cols = p$col, 
-				lwd = p$lwd, 
-				lty = p$lty,
-				left_mar = max_char * .35,
-				n_1 = n_1)
-		}
+		create_legend(ncol(calcs$ps_subset),
+			colnames(calcs$ps_subset),
+			main_cols = p$col,
+			cut_cols = cut_cols,
+			lwd = 2,
+			left_mar = max_char * .35,
+			n_1 = n_1,
+			cut = cut)	
 	}
 	if(leg == "base") {
-		if(is.null(theme)) {
-			create_base_legend(colnames(calcs$ps_subset), 
-				col = p$col, 
-				lwd = p$lwd, 
-				lty = p$lty)
-		}
-		if(!is.null(theme)) {
-			if(theme == "dark") {
-				create_base_legend(colnames(calcs$ps_subset), 
-					col = p$col, 
-					lwd = p$lwd, 
-					lty = p$lty,
-					text.col = "white")
-			}
-		}
+		create_base_legend(colnames(calcs$ps_subset), 
+			col = p$col, 
+			lwd = p$lwd, 
+			lty = p$lty,
+			text.col = "white")
+	
 	}
 	if(annotate == TRUE) {
 		par(mfg = c(1, 1))
