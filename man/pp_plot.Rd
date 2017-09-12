@@ -5,10 +5,10 @@
 \title{Produces the paired probability plot for two groups}
 \usage{
 pp_plot(formula, data, ref_group = NULL, cut = NULL, cut_table = FALSE,
-  scheme = "ggplot2", annotate = FALSE, refline = TRUE,
-  refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
-  text_size = 2, shade = NULL, shade_col = NULL, leg = NULL,
-  n_1 = FALSE, theme = NULL, ...)
+  grid = NULL, scheme = "ggplot2", annotate = FALSE, refline = TRUE,
+  refline_col = NULL, refline_lty = 2, refline_lwd = 2, text = NULL,
+  text_x = 0.8, text_y = 0.2, text_size = 2, shade = NULL,
+  shade_col = NULL, leg = NULL, n_1 = FALSE, theme = "standard", ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -27,6 +27,9 @@ corresponding x and y axes and meet at the PP curve.}
 
 \item{cut_table}{Logical. Should a data.frame of the cuts and corresponding
 proportions be returned? Defaults to FALSE.}
+
+\item{grid}{Logical. Should gridlines behind the plot be displayed 
+according to the theme?}
 
 \item{scheme}{What color scheme should the lines follow? Defaults to 
 mimic the ggplot2 color scheme. Other options come from the 
