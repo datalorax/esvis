@@ -7,7 +7,7 @@
 pp_plot(formula, data, ref_group = NULL, cut = NULL, cut_table = FALSE,
   grid = NULL, scheme = "ggplot2", annotate = FALSE, refline = TRUE,
   refline_col = NULL, refline_lty = 2, refline_lwd = 2, text = NULL,
-  text_x = 0.8, text_y = 0.2, text_size = 2, shade = NULL,
+  text_x = 0.8, text_y = 0.2, text_size = 1.5, shade = NULL,
   shade_col = NULL, leg = NULL, n_1 = FALSE, theme = "standard", ...)
 }
 \arguments{
@@ -62,6 +62,10 @@ reference line, representing the point of equal probabilities, be
 \item{text}{Logical. Should the \code{link{auc}} and \code{link{v}}
 statistics be displayed on the plot? Defaults to \code{TRUE} when there
    are two groups. Cannot currently be displayed for more than two groups.}
+
+\item{text_x}{The x-axis location for the text.}
+
+\item{text_y}{The y-axis location for the text.}
 
 \item{text_size}{The size of the text to be displayed. Defaults to 2.}
 
