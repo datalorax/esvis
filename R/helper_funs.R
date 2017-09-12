@@ -363,7 +363,7 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL, 
 	default_main = NULL, default_xlim = NULL, default_ylim = NULL, 
 	default_xaxt = NULL, default_yaxt = NULL, default_bty = "n",
-	...) {
+	theme = "standard", ...) {
 
 	pargs <- list(x = quote(x), 
 				  y = quote(y),
@@ -422,5 +422,9 @@ empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL,
 	if(is.null(pargs$bty)) pargs$bty <- default_bty
 
 	do.call("plot", pargs)
+	
+	axis(1, col = themes(theme)$line_col)
+	axis(2, col = themes(theme)$line_col)
+	
 invisible(pargs)
 }

@@ -6,7 +6,8 @@
 \usage{
 empty_plot(x, y, default_xlab = NULL, default_ylab = NULL,
   default_main = NULL, default_xlim = NULL, default_ylim = NULL,
-  default_xaxt = NULL, default_yaxt = NULL, default_bty = "n", ...)
+  default_xaxt = NULL, default_yaxt = NULL, default_bty = "n",
+  theme = "standard", ...)
 }
 \arguments{
 \item{x}{The x variable to be plotted.}
