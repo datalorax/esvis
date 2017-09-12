@@ -34,7 +34,7 @@ test_that("`pp_plot` produces expected output", {
 	expect_equal(pp_plot(mean ~ grade, seda, 
 					3)$xlab, 
 				"p(3)")
-	expect_equal(pp_plot(mean ~ grade, seda, legend = "base")$legend,
+	expect_equal(pp_plot(mean ~ grade, seda, leg = "base")$leg,
 		"base")
 
 	expect_equal(pp_plot(mean ~ grade, seda, scheme = "viridis")$scheme,
@@ -87,7 +87,7 @@ test_that("`pp_plot` throws warnings when it should", {
 	expect_warning(pp_plot(mean ~ subject, seda))
 
 	par(mfrow = c(4, 2))
-	expect_message(pp_plot(mean ~ subject, seda, legend = "side"))
+	expect_message(pp_plot(mean ~ subject, seda, leg = "side"))
 })
 
 test_that("dark theme works for `pp_plot`", {
@@ -99,6 +99,6 @@ test_that("dark theme works for `pp_plot`", {
 	
 	expect_equal(pp_plot(mean ~ grade, seda, 
 		theme = "dark", 
-		legend = "base")$legend,
+		leg = "base")$leg,
 		"base")
 })
