@@ -4,7 +4,7 @@
 \alias{pp_calcs}
 \title{Produce calculations necessary for \link{pp_plot}.}
 \usage{
-pp_calcs(formula, data, ref_group = NULL, scheme = "ggplot2", ...)
+pp_calcs(formula, data, ref_group = NULL, scheme = "ggplot2")
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
