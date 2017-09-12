@@ -45,6 +45,8 @@ the default \link[graphics]{plot} function.}
 \item{default_bty}{The default background type, which can be overridden by 
 the user. Defaults to \code{"n"}.}
 
+\item{theme}{The theme to be applied.}
+
 \item{...}{Additional arguments supplied to \link[graphics]{plot} (e.g., 
 \code{xlim}, \code{ylim}, \code{cex}, etc.)}
 }

@@ -356,6 +356,7 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' @param default_yaxt The default y-axis type, which can be overridden by the 
 #' user. Defaults to \code{NULL}, in which case the type is defined by
 #' the default \link[graphics]{plot} function.
+#' @param theme The theme to be applied.
 #' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
 #' @importFrom graphics plot
