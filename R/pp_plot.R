@@ -27,13 +27,13 @@
 #' Alternatively, colors can be supplied manually through a call to \code{col}
 #' (through \code{...}).
 #' @param annotate Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
-#' \code{legend == "side"} the plot is rendered such that additional
+#' \code{leg == "side"} the plot is rendered such that additional
 #' annotations can be made on the plot using low level base plotting functions
 #' (e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
 #' \link[grDevices]{dev.off} must be called before a new plot is rendered 
 #' (i.e., close the current plotting window). Otherwise the plot will be
 #' attempted to be rendered in the region designated for the legend). Argument
-#' is ignored when \code{legend != "side"}.
+#' is ignored when \code{leg != "side"}.
 #' @param refline Logical. Defaults to \code{TRUE}. Should a diagonal
 #'    reference line, representing the point of equal probabilities, be
 #' 	  plotted?
@@ -49,7 +49,7 @@
 #'    produced for more than two groups.
 #' @param shade_col The color of the shading. Defaults to the second color in
 #' the chosen color \code{scheme}.
-#' @param legend The type of legend to be displayed, with possible values 
+#' @param leg The type of legend to be displayed, with possible values 
 #' \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
 #' when there are more than two groups and \code{"none"} when only comparing
 #' two groups. If the option \code{"side"} is used the plot is split into two
@@ -60,6 +60,10 @@
 #' When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
 #' latter of which produces the legend with the base \link[graphics]{legend}
 #' function.
+#' @param n_1 Logical. Should the lines on the legend be displayed when there
+#' is only one curve? Defaults to \code{FALSE}, and is relevant when values to
+#' \code{cut} are provided. Forced to \code{TRUE} if \code{legend == "side"}
+#' and no values to \code{cut} are supplied.
 #' @param theme Visual properties of the plot. There are currently only two
 #' themes implemented - a standard plot and a dark theme. If \code{NULL} 
 #' (default), the theme will be produced with a standard white background. If
@@ -73,7 +77,6 @@
 #' The arguments supplied to the plot are silently returned for testing 
 #' purposes.
 #' @importFrom graphics par layout abline lines text polygon
-#' @importFrom grDevices rgb
 #' @importFrom utils installed.packages
 #' @export
 #' @examples
@@ -90,7 +93,7 @@
 #' # Change color of shading & line, line width, and title
 #' pp_plot(math ~ freelunch, 
 #' 		star, 
-#' 		shade_col = rgb(0.1, 0.8, 0.2, 0.5), 
+#' 		shade_col = grDevices::rgb(0.1, 0.8, 0.2, 0.5), 
 #' 		col = "purple", lwd = 5, 
 #' 		main = "Probability-Probability Plot")
 #' 
@@ -110,10 +113,13 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 	cut_table = FALSE, scheme = "ggplot2", annotate = FALSE, refline = TRUE, 
  	refline_col = "gray40", refline_lty = 2, refline_lwd = 2,
 	text = NULL, text_size = 2, shade = NULL, shade_col = NULL, 
-	legend = NULL, theme = NULL, ...) {
+	leg = NULL, n_1 = FALSE, theme = NULL, ...) {
 
 	ps <- probs(formula, data)
 
+	if(!is.null(leg)) {
+		if(leg == "side") n_1 <- TRUE	
+	} 
 	if(ncol(ps) > 2 & !is.null(shade)) {
 		if(shade == TRUE) {
 			warning(
@@ -132,7 +138,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 		}
 		
 	}
-	if(ncol(ps) == 2 & all(par()$mfrow == c(1, 2))) {
+	if(ncol(ps) == 2 & all(par()$mfrow == c(1, 2)) & is.null(cut)) {
 		warning(
 			paste("Two-panel plot detected without a legend. Call `dev.off()`",
 				"and then rerun the plot to avoid wasted space, if only",
@@ -145,10 +151,11 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 	if(ncol(ps) > 2) {
 		shade <- FALSE
 		text <- FALSE
-		if(is.null(legend)) legend <- "side"
+		if(is.null(leg)) leg <- "side"
 	}
 	if(ncol(ps) == 2) {
-		if(is.null(legend)) legend <- "none"
+		if(is.null(leg) & is.null(cut)) leg <- "none"
+		if(is.null(leg) & !is.null(cut)) leg <- "side"
 		if(is.null(text)) text <- TRUE
 		if(is.null(shade)) shade <- TRUE
 	}
@@ -166,7 +173,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 	}
 	on.exit(par(op))
 
-	if(any(par()$mfrow > 2) & any(par()$mfrow != c(1,2)) & legend == "side") {
+	if(any(par()$mfrow > 2) & any(par()$mfrow != c(1,2)) & leg == "side") {
 		message(
 			paste("Multi-panel settings detected with `legend == 'side'`.",
 				"Change legend option if trying to produce a multi-panel", 
@@ -179,7 +186,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
 
-	if(legend == "side") {
+	if(leg == "side") {
 		max_char <- max(nchar(colnames(ps_subset)))
 		score_len <- max(nchar(paste0("Score: ", rownames(ps))))
 		if(max_char < score_len & !is.null(cut)) max_char <- score_len
@@ -215,7 +222,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 			lty = refline_lty, 
 			lwd = refline_lwd)
 	}
-	
+
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
 	if(is.null(p$col)) p$col <- col_scheme(scheme, ncol(ps_subset))
@@ -305,7 +312,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 		}
 	}
 
-	if(legend == "side") {
+	if(leg == "side") {
 		if(!is.null(cut)) {
 			create_legend(ncol(ps_subset),
 				colnames(ps_subset),
@@ -313,6 +320,7 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 				cut_cols = cut_cols,
 				lwd = 2,
 				left_mar = max_char * .35,
+				n_1 = n_1,
 				cut = cut)
 		}
 		else{ 
@@ -320,10 +328,11 @@ pp_plot <- function(formula, data, ref_group = NULL, cut = NULL,
 				main_cols = p$col, 
 				lwd = p$lwd, 
 				lty = p$lty,
-				left_mar = max_char * .35)
+				left_mar = max_char * .35,
+				n_1 = n_1)
 		}
 	}
-	if(legend == "base") {
+	if(leg == "base") {
 		if(is.null(theme)) {
 			create_base_legend(colnames(ps_subset), 
 				col = p$col, 

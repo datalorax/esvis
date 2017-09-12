@@ -5,7 +5,7 @@
 \title{Create a legend for a plot}
 \usage{
 create_legend(n, leg_labels, left_mar = 0, height = NULL,
-  main_cols = NULL, cut = NULL, cut_cols = NULL, ...)
+  main_cols = NULL, cut = NULL, cut_cols = NULL, n_1 = FALSE, ...)
 }
 \arguments{
 \item{n}{Number of lines to produce on the legend.}
@@ -23,6 +23,10 @@ result in a smaller legend (more squished to the bottom).}
 \item{cut}{Cut scores (see \link{pp_plot}).}
 
 \item{cut_cols}{The color of the lines/points for the cut scores.}
+
+\item{n_1}{Should the lines on the legend be displayed when there
+is only one value? Defaults to \code{FALSE}, and is relevant when values to
+\code{cut} are provided.}
 
 \item{...}{Additional arguments passed to \link[graphics]{lines}.}
 }

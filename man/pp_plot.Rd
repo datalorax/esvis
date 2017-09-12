@@ -7,8 +7,8 @@
 pp_plot(formula, data, ref_group = NULL, cut = NULL, cut_table = FALSE,
   scheme = "ggplot2", annotate = FALSE, refline = TRUE,
   refline_col = "gray40", refline_lty = 2, refline_lwd = 2, text = NULL,
-  text_size = 2, shade = NULL, shade_col = NULL, legend = NULL,
-  theme = NULL, ...)
+  text_size = 2, shade = NULL, shade_col = NULL, leg = NULL,
+  n_1 = FALSE, theme = NULL, ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -38,13 +38,13 @@ Alternatively, colors can be supplied manually through a call to \code{col}
 (through \code{...}).}
 
 \item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
-\code{legend == "side"} the plot is rendered such that additional
+\code{leg == "side"} the plot is rendered such that additional
 annotations can be made on the plot using low level base plotting functions
 (e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
 \link[grDevices]{dev.off} must be called before a new plot is rendered 
 (i.e., close the current plotting window). Otherwise the plot will be
 attempted to be rendered in the region designated for the legend). Argument
-is ignored when \code{legend != "side"}.}
+is ignored when \code{leg != "side"}.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be
@@ -69,7 +69,7 @@ produced for more than two groups.}
 \item{shade_col}{The color of the shading. Defaults to the second color in
 the chosen color \code{scheme}.}
 
-\item{legend}{The type of legend to be displayed, with possible values 
+\item{leg}{The type of legend to be displayed, with possible values 
 \code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
 when there are more than two groups and \code{"none"} when only comparing
 two groups. If the option \code{"side"} is used the plot is split into two
@@ -80,6 +80,11 @@ multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
 When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
 latter of which produces the legend with the base \link[graphics]{legend}
 function.}
+
+\item{n_1}{Logical. Should the lines on the legend be displayed when there
+is only one curve? Defaults to \code{FALSE}, and is relevant when values to
+\code{cut} are provided. Forced to \code{TRUE} if \code{legend == "side"}
+and no values to \code{cut} are supplied.}
 
 \item{theme}{Visual properties of the plot. There are currently only two
 themes implemented - a standard plot and a dark theme. If \code{NULL} 
@@ -117,7 +122,7 @@ pp_plot(math ~ freelunch,
 # Change color of shading & line, line width, and title
 pp_plot(math ~ freelunch, 
 		star, 
-		shade_col = rgb(0.1, 0.8, 0.2, 0.5), 
+		shade_col = grDevices::rgb(0.1, 0.8, 0.2, 0.5), 
 		col = "purple", lwd = 5, 
 		main = "Probability-Probability Plot")
 
