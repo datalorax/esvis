@@ -226,14 +226,19 @@ col_scheme <- function(scheme, n, ...) {
 #' @param main_cols Primary colors (of the lines, rather than the cut scores)
 #' @param cut Cut scores (see \link{pp_plot}).
 #' @param cut_cols The color of the lines/points for the cut scores.
+#' @param n_1 Should the lines on the legend be displayed when there
+#' is only one value? Defaults to \code{FALSE}, and is relevant when values to
+#' \code{cut} are provided. 
 #' @param ... Additional arguments passed to \link[graphics]{lines}.
 #' @importFrom graphics plot lines axis
 
 create_legend <- function(n, leg_labels, left_mar = 0, height = NULL, 
-	main_cols = NULL, cut = NULL, cut_cols = NULL, ...) {
+	main_cols = NULL, cut = NULL, cut_cols = NULL, n_1 = FALSE, ...) {
+	
 	op <- par(mar = c(5.1, left_mar, 4.1, 0))
 	on.exit(par(op))
 	
+
 	if(is.null(height)) {
 		if(n < 15) {
 			height <-  20
@@ -250,36 +255,46 @@ create_legend <- function(n, leg_labels, left_mar = 0, height = NULL,
 		xaxt = "n",
 		xlab = "", 
 		yaxt = "n",
-		ylab = "")
+		ylab = "")	
 
-	axes <- cbind(c(0, 1), rep(seq_len(n), each = 2))	
+	if(n > 1 | n_1) {
+		axes <- cbind(c(0, 1), rep(seq_len(n), each = 2))
+		Map(lines, 
+			split(axes[ ,1], axes[ ,2]), 
+			split(axes[ ,2], axes[ ,2]),
+			col = main_cols,
+			...)
+
+		locs <- unique(axes[ ,2])
+	}
 	if(!is.null(cut)) {
 		axes_cut <- cbind(c(0, 1), 
-					  rep(seq_len(n + length(cut) + 1)[-c(seq_len(n), n + 1)], 
+					  rep(max(height):(max(height) - (length(cut) - 1)), 
 					  	each = 2))	
-	}
-
-	Map(lines, 
-		split(axes[ ,1], axes[ ,2]), 
-		split(axes[ ,2], axes[ ,2]),
-		col = main_cols,
-		...)
-
-	locs <- unique(axes[ ,2])
-
-	if(!is.null(cut)) {
 		Map(lines, 
 			split(axes_cut[ ,1], axes_cut[ ,2]), 
 			split(axes_cut[ ,2], axes_cut[ ,2]),
 			col = cut_cols,
 			lty = 3,
 			...)
-		points(rep(0.5, length(cut)), unique(axes_cut[ ,2]),
+		points(rep(0.5, length(cut)), rev(unique(axes_cut[ ,2])),
 			col = cut_cols,
 			bg = cut_cols,
 			pch = 21)
-		leg_labels <- c(leg_labels, paste0("Score: ", cut))
-		locs <- c(locs, unique(axes_cut[ ,2]))
+		
+		if(n > 1 | n_1) {
+			leg_labels <- c(leg_labels, paste0("Score: ", rev(cut)))
+		}
+		else {
+			leg_labels <- paste0("Score: ", rev(cut))
+		}
+		
+		if(exists("locs")) {
+			locs <- c(locs, unique(axes_cut[ ,2]))
+		}
+		else {
+			locs <- unique(axes_cut[ ,2])
+		}
 	}
 	axis(2, 
 		lwd = 0, 
