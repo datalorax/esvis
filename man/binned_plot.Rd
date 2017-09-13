@@ -6,10 +6,10 @@
 \usage{
 binned_plot(formula, data, ref_group = NULL, qtiles = seq(0, 1, 0.3333),
   scheme = "ggplot2", se = TRUE, shade_col = NULL, shade_alpha = 0.3,
-  annotate = FALSE, refline = TRUE, refline_col = "black",
-  refline_lty = 2, refline_lwd = 2, rects = TRUE,
-  rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2, 0)),
-  lines = TRUE, points = TRUE, legend = NULL, theme = NULL, ...)
+  annotate = FALSE, refline = TRUE, refline_lty = 2, refline_lwd = 2,
+  rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2,
+  0)), lines = TRUE, points = TRUE, legend = NULL, theme = "standard",
+  ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -59,8 +59,6 @@ is ignored when \code{legend != "side"}.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be plotted?}
-
-\item{refline_col}{Color of the reference line. Defaults to \code{"gray"}.}
 
 \item{refline_lty}{Line type of the reference line. Defaults to \code{2}.}
 

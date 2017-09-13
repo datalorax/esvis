@@ -1,167 +1,3 @@
-#' Compute pooled standard deviation
-#' 
-#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
-#'   the outcome variable and \code{group} is the grouping variable. Note the
-#'   grouping variable must only include only two groups.
-#' @param data The data frame that the data in the formula come from.
-#' @importFrom stats var
-#' @export
-#' @examples
-#' pooled_sd(math ~ condition, star)
-#' pooled_sd(reading ~ sex, star)
-
-pooled_sd <- function(formula, data) {
-	splt <- parse_form(formula, data)
-
-	vars <- vapply(splt, var, na.rm = TRUE, numeric(1))
-	ns <- vapply(splt, length, numeric(1))
-
-	pooled <- function(v) {
-		sqrt((((ns[v[1]] - 1)*vars[v[1]]) + ((ns[v[2]] - 1)*vars[v[2]])) / 
-			(sum(ns[v]) - 2))
-	}
-tidy_out(names(splt), pooled)
-}
-
-#' Compute mean differences by various quantiles
-#' 
-#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
-#'   the outcome variable and \code{group} is the grouping variable. Note the
-#'   grouping variable must only include only two groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param qtiles Quantile bins for calculating mean differences
-#' @importFrom stats quantile
-#' @importFrom utils combn
-#' @export
-#' @examples
-#' qtile_mean_diffs(reading ~ condition, star)
-#' 
-#' qtile_mean_diffs(reading ~ condition, 
-#' 		star, 
-#' 		qtiles = seq(0, 1, .2))
-
-
-qtile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
-	splt <- parse_form(formula, data)
-	qtile_l <- lapply(splt, function(x) {
-		split(x, cut(x, quantile(x, qtiles, na.rm = TRUE)))
-	})
-
-	mean_diffs <- function(v) {
-		Map(function(x, y) mean(y, na.rm = TRUE) - mean(x, na.rm = TRUE),
-			qtile_l[[ v[1] ]], 
-			qtile_l[[ v[2] ]])
-	}
-	td <- tidy_out(names(qtile_l), mean_diffs)	
-	td$estimate <- unlist(td$estimate)
-	
-	low_qtiles <- qtiles[-length(qtiles)]
-	high_qtiles <- qtiles[-1]
-
-	td$cut <- rep(rep(low_qtiles, each = length(combn(names(splt), 2)) / 2), 2)
-	td$high_qtile <- rep(rep(high_qtiles, 
-						each = length(combn(names(splt), 2)) / 2), 2)
-	names(td)[3] <- "low_qtile"
-
-td[ ,c(1:3, 5, 4)]
-}
-
-qtile_n <- function(formula, data, qtiles = seq(0, 1, .33)) {
-	splt <- parse_form(formula, data)
-	qtile_l <- lapply(splt, function(x) {
-		split(x, cut(x, quantile(x, qtiles, na.rm = TRUE)))
-	})
-	ns <- lapply(qtile_l, function(x) vapply(x, length, numeric(1)))
-	ns <- data.frame(group = rep(names(ns), each = length(ns[[1]])),
-			   low_qtile = qtiles[-length(qtiles)],
-			   high_qtile = qtiles[-1],		   
-			   n = unlist(ns))
-ns
-}
-
-se_es <- function(n1, n2, d) {
-		sqrt((n1 + n2)/(n1*n2) + d^2/(2*((n1 + n2))))
-}
-
-#' Compute effect sizes by quantile bins
-#' 
-#' Returns a data frame with the estimated effect size by the provided 
-#' percentiles. Currently, the effect size is equivalent to Cohen's d, but 
-#' future development will allow this to vary.
-#' 
-#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
-#'   the outcome variable and \code{group} is the grouping variable. Note the
-#'   grouping variable must only include only two groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param ref_group Optional character vector (of length 1) naming the
-#'   reference group to be plotted on the x-axis. Defaults to the highest
-#'   scoring group.
-#' @param qtiles The percentiles to split the data by and calculate effect 
-#' sizes. Essentially, this is the binning argument. Defaults to 
-#' \code{seq(0, 1, .33)}, which splits the distribution into thirds (lower,
-#' middle, upper). Any sequence is valid, but it is recommended the bins be
-#' even. For example \code{seq(0, 1, .1)} would split the distributions into
-#' deciles.
-#' @export
-#' @examples
-#' 
-#' # Compute effect sizes (Cohen's d) by default quantiles
-#' qtile_es(reading ~ condition, star)
-#' 
-#' # Compute Cohen's d by quintile
-#' qtile_es(reading ~ condition, 
-#' 		star, 
-#' 		qtiles = seq(0, 1, .2))
-#' 
-#' # Report effect sizes only relative to regular-sized classrooms
-#' qtile_es(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg",
-#' 		qtiles = seq(0, 1, .2))
-
-
-qtile_es <- function(formula, data, ref_group = NULL, 
-	qtiles = seq(0, 1, .33)) {
-	if(is.null(ref_group)) {
-		splt <- parse_form(formula, data)
-		ref_group <- names(
-						which.max(
-							vapply(splt, mean, na.rm = TRUE, numeric(1))
-							)
-						)
-	}
-
-	means <- qtile_mean_diffs(formula, data, qtiles)
-	means <- means[means$ref_group == ref_group, ]
-
-	sds <- pooled_sd(formula, data)
-	names(sds)[3] <- "pooled_sd"
-
-	es <- merge(means, sds, by = c("ref_group", "foc_group"), all.x = TRUE)
-	es$es <- es$estimate / es$pooled_sd
-	es$midpoint <- (es$low_qtile + es$high_qtile) / 2
-
-	ns <- qtile_n(formula, data, qtiles)
-	es <- merge(es, ns, 
-					by.x = c("ref_group", "low_qtile", "high_qtile"),
-					by.y = c("group", "low_qtile", "high_qtile"),
-					all.x = TRUE)
-	names(es)[ncol(es)] <- "ref_group_n"
-	es <- merge(es, ns, 
-					by.x = c("foc_group", "low_qtile", "high_qtile"),
-					by.y = c("group", "low_qtile", "high_qtile"),
-					all.x = TRUE)
-	names(es)[ncol(es)] <- "foc_group_n"
-
-
-	es$se <- se_es(es$ref_group_n, es$foc_group_n, es$es)
-
-
-es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
-}
-
-
-
 #' Quantile-binned effect size plot
 #' 
 #' Plots the effect size between two groups by matched (binned) quantiles 
@@ -208,7 +44,6 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 #' is ignored when \code{legend != "side"}.
 #' @param refline Logical. Defaults to \code{TRUE}. Should a diagonal
 #' reference line, representing the point of equal probabilities, be plotted?
-#' @param refline_col Color of the reference line. Defaults to \code{"gray"}.
 #' @param refline_lty Line type of the reference line. Defaults to \code{2}.
 #' @param refline_lwd Line width of the reference line. Defaults to \code{2}.
 #' @param rects Logical. Should semi-transparent rectangles be plotted in the 
@@ -273,28 +108,19 @@ es[order(es$midpoint), c(4, 1:3, 8, 7, 11)]
 
 binned_plot <- function(formula, data, ref_group = NULL,
 	qtiles = seq(0, 1, .3333), scheme = "ggplot2", se = TRUE, shade_col = NULL,
-	shade_alpha = 0.3, annotate = FALSE, refline = TRUE, refline_col = "black",
+	shade_alpha = 0.3, annotate = FALSE, refline = TRUE,
 	refline_lty = 2, refline_lwd = 2, rects = TRUE, 
 	rect_colors = c(rgb(.2, .2, .2, .1), rgb(0.2, 0.2, 0.2, 0)), lines = TRUE,
-	points = TRUE, legend = NULL, theme = NULL, ...) {
+	points = TRUE, legend = NULL, theme = "standard", ...) {
 
 	args <- as.list(match.call())
 	
-	if(!is.null(theme)) {
-		if(theme == "dark") {
-			op <- par(bg = "gray21", 
-					  col.axis = "white", 
-					  col.lab = "white",
-					  col.main = "white")
-		}
-	}
-	else {
-		op <- par(bg = "transparent")	
-	}
+	op <- themes(theme)$op
 	on.exit(par(op))
 
 	d <- qtile_es(formula, data, ref_group, qtiles) 
-
+	d <- d[order(d$foc_group), ]
+	
 	if(length(unique(d$foc_group)) > 1) {
 		if(is.null(legend)) legend <- "side"
 	}
@@ -307,8 +133,8 @@ binned_plot <- function(formula, data, ref_group = NULL,
 		wdth <- 0.9 - (max_char * 0.01)
 		layout(t(c(1, 2)), widths = c(wdth, 1 - wdth))	
 	}
-	min_est <- min(d$es, na.rm = TRUE)
-	max_est <- max(d$es, na.rm = TRUE)
+	min_est <- min(d$es - d$se, na.rm = TRUE)
+	max_est <- max(d$es + d$se, na.rm = TRUE)
 
 	default_ylim_low <- ifelse(min_est < 0, 0.05*min_est + min_est, -0.1)
 	default_ylim_high <- ifelse(max_est < 0, 0.1, 0.05*max_est + max_est)
@@ -320,29 +146,9 @@ binned_plot <- function(formula, data, ref_group = NULL,
 					default_xlim = c(0, 1),
 					default_ylim = c(default_ylim_low, default_ylim_high),
 					default_yaxt = "n",
+					default_xaxt = "n",
+					theme = theme,
 					...))
-	
-	if(is.null(args$yaxt)) {
-		axis(2, at = seq(round(default_ylim_low - 2), 
-						 round(default_ylim_high + 2), 
-						 .2), 
-						 las = 2)
-	}
-
-    if(!is.null(theme)) {
-		if(theme == "dark") {
-			if(is.null(p$xaxt))	axis(1, col = "white")
-			if(is.null(args$yaxt))  {
-				axis(2, at = seq(round(default_ylim_low - 2), 
-						 round(default_ylim_high + 2), 
-						 .2), 
-						 las = 2,
-						 col = "white")
-			}
-			if(refline_col == "gray") refline_col <- "white"
-			if(refline_lwd == 1) refline_lwd <- 2
-		}
-	}
 
 	xaxes <- split(d$midpoint, d$foc_group)
 	xaxes <- xaxes[-which.min(vapply(xaxes, length, numeric(1)))]
@@ -353,55 +159,18 @@ binned_plot <- function(formula, data, ref_group = NULL,
 		rect_left <- unique(d$low_qtile)
 		rect_right <- unique(d$high_qtile)
 
-		if(is.null(theme)) {
-			rect(rect_left, 
-				min(d$es, na.rm = TRUE) - 1, 
-				rect_right, 
-				max(d$es, na.rm = TRUE) + 1, 
-				col = rect_colors, 
-				lwd = 0)
-		}
-		if(!is.null(theme)) {
-			if(theme == "dark") {
-				rect(rect_left, 
-					min(d$es, na.rm = TRUE) - 1, 
-					rect_right, 
-					max(d$es, na.rm = TRUE) + 1, 
-					col = c(rgb(1, 1, 1, .2), 
-							rgb(0.1, 0.3, 0.4, 0)), 
-					lwd = 0)
-			}
-		}
+		rect(rect_left, 
+			min(d$es, na.rm = TRUE) - 1, 
+			rect_right, 
+			max(d$es, na.rm = TRUE) + 1, 
+			col = c(adjustcolor(themes(theme)$line_col, alpha.f = 0.2),
+					adjustcolor(themes(theme)$line_col, alpha.f = 0)),
+			lwd = 0)
 	}
 
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) {
-		if(scheme == "ggplot2") {
-			p$col <- col_hue(length(xaxes))	
-		} 
-		if(any(scheme == "viridis" |
-			   scheme == "magma" |
-			   scheme == "inferno" |
-			   scheme == "plasma")) {
-			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
-				stop(paste0("Please install the viridisLite ",
-				 	"package to use this color scheme"))
-			}
-		}
-		if(scheme == "viridis") {
-			p$col <- viridisLite::viridis(length(xaxes))	
-		}
-		if(scheme == "magma") {
-			p$col <- viridisLite::magma(length(xaxes))	
-		}
-		if(scheme == "inferno") {
-			p$col <- viridisLite::inferno(length(xaxes))	
-		}
-		if(scheme == "plasma") {
-			p$col <- viridisLite::plasma(length(xaxes))	
-		} 
-	}
+	if(is.null(p$col)) p$col <- col_scheme(scheme, length(xaxes))
 
 	if(se) {
 		x_shade <- split(d$midpoint, as.character(d$foc_group))
@@ -437,13 +206,10 @@ binned_plot <- function(formula, data, ref_group = NULL,
 				bg = p$bg)
 	}
 	if(refline) {
-		if(is.null(theme)) {
-			abline(h = 0, 
-				col = refline_col, 
-				lwd = refline_lwd,
-				lty = refline_lty)
-		}
-		if(!is.null(theme)) abline(h = 0, lwd = 2, lty = 2, col = "white")
+		abline(h = 0, 
+			col = themes(theme)$line_col, 
+			lwd = refline_lwd,
+			lty = refline_lty)
 	}
 
 	if(legend == "side") {
@@ -454,21 +220,11 @@ binned_plot <- function(formula, data, ref_group = NULL,
 			left_mar = max_char * .35)
 	}
 	if(legend == "base") {
-		if(is.null(theme)) {
-			create_base_legend(names(xaxes), 
-				col = p$col, 
-				lwd = p$lwd, 
-				lty = p$lty)
-		}
-		if(!is.null(theme)) {
-			if(theme == "dark") {
-				create_base_legend(names(xaxes), 
-					col = p$col, 
-					lwd = p$lwd, 
-					lty = p$lty,
-					text.col = "white")
-			}
-		}
+		create_base_legend(names(xaxes), 
+			col = p$col, 
+			lwd = p$lwd, 
+			lty = p$lty, 
+			text.col = themes(theme)$line_col)
 	}
 	if(annotate == TRUE) {
 		par(mfg = c(1, 1))
