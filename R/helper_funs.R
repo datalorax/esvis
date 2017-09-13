@@ -18,6 +18,38 @@ parse_form <- function(formula, data, order = TRUE) {
 splt
 }
 
+
+#' Theme settings
+#' 
+#' Parameters for each theme currently implemented.
+#' @param theme The name of the theme.
+#' @return list with the \code{par} settings and the primary line color (e.g., 
+#' white for theme = "dark" and black for theme = "standard").
+themes <- function(theme) {
+	op <- switch(theme,
+		standard = par(bg = "transparent"),
+		dark 	 = par(bg = "gray21", 
+					  col.axis = "white", 
+					  col.lab = "white",
+					  col.main = "white"),
+		tan 	 = par(bg = "cornsilk2",
+					   col.axis = "darkslategray", 
+					   col.lab = "darkslategray",
+					   col.main = "darkslategray"),
+		blue 	 = par(bg = "cornflowerblue",
+					   col.axis = "deeppink", 
+					   col.lab = "deeppink",
+					   col.main = "deeppink"))
+
+	line_col <- switch(theme,
+		standard = "black",
+		dark 	 = "white",
+		tan 	 = "darkslategray",
+		blue 	 = "deeppink")
+list(op = op, line_col = line_col)
+}
+
+
 #' Create a named vector of all possible combinations
 #' 
 #' Alternative to tidied data frame return.
@@ -357,6 +389,8 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 #' user. Defaults to \code{NULL}, in which case the type is defined by
 #' the default \link[graphics]{plot} function.
 #' @param theme The theme to be applied.
+#' @param las The axis option. Defaults to \code{c(1, 2)} which makes the 
+#' labels all horizontal.
 #' @param ... Additional arguments supplied to \link[graphics]{plot} (e.g., 
 #' \code{xlim}, \code{ylim}, \code{cex}, etc.)
 #' @importFrom graphics plot
@@ -364,7 +398,7 @@ create_base_legend <- function(labels, position = "bottomright", ...) {
 empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL, 
 	default_main = NULL, default_xlim = NULL, default_ylim = NULL, 
 	default_xaxt = NULL, default_yaxt = NULL, default_bty = "n",
-	theme = "standard", ...) {
+	theme = "standard", las = c(1, 2), ...) {
 
 	pargs <- list(x = quote(x), 
 				  y = quote(y),
@@ -405,8 +439,11 @@ empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL,
 			pargs$yli <- NULL
 		}
 	}
-	if(is.null(pargs$xaxt)) pargs$xaxt <- default_xaxt
-	if(is.null(pargs$yaxt)) pargs$yaxt <- default_yaxt
+	if(!is.null(pargs$xaxt)) user_xaxt <- pargs$xaxt 
+	if(is.null(pargs$xaxt)) pargs$xaxt <- "n"
+	
+	if(!is.null(pargs$yaxt)) user_yaxt <- pargs$yaxt 
+	if(is.null(pargs$yaxt)) pargs$yaxt <- "n"
 		
 	
 	if(is.null(pargs$main)) {
@@ -423,9 +460,13 @@ empty_plot <- function(x, y, default_xlab = NULL, default_ylab = NULL,
 	if(is.null(pargs$bty)) pargs$bty <- default_bty
 
 	do.call("plot", pargs)
-	
-	axis(1, col = themes(theme)$line_col)
-	axis(2, col = themes(theme)$line_col)
+
+	if(!exists("user_xaxt")) {
+		axis(1, col = themes(theme)$line_col, las = las[1])	
+	}
+	if(!exists("user_yaxt")) {
+		axis(2, col = themes(theme)$line_col, las = las[2])	
+	}
 	
 invisible(pargs)
 }
