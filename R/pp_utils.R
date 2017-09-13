@@ -22,11 +22,12 @@
 pp_calcs <- function(formula, data, ref_group = NULL, scheme = "ggplot2") {
 	ps <- probs(formula, data)
 	if(is.null(ref_group)) ref_group <- colnames(ps)[1]
-	
+
 	sq <- seq_len(ncol(ps))
 	ref_group_d <- ps[ ,sq[colnames(ps) == as.character(ref_group)] ]
 	ps_subset <- ps[ ,-sq[colnames(ps) == as.character(ref_group)], 
 					drop = FALSE]
+	ps_subset <- ps_subset[ ,order(colnames(ps_subset)), drop = FALSE]
 
 	x_axs <- rep(ref_group_d, ncol(ps_subset))
 	
@@ -43,35 +44,6 @@ pp_calcs <- function(formula, data, ref_group = NULL, scheme = "ggplot2") {
 			y_lines = y_lines))
 }
 
-#' Theme settings
-#' 
-#' Parameters for each theme currently implemented.
-#' @param theme The name of the theme.
-#' @return list with the \code{par} settings and the primary line color (e.g., 
-#' white for theme = "dark" and black for theme = "standard").
-themes <- function(theme) {
-	op <- switch(theme,
-		standard = par(bg = "transparent"),
-		dark 	 = par(bg = "gray21", 
-					  col.axis = "white", 
-					  col.lab = "white",
-					  col.main = "white"),
-		tan 	 = par(bg = "cornsilk2",
-					   col.axis = "darkslategray", 
-					   col.lab = "darkslategray",
-					   col.main = "darkslategray"),
-		blue 	 = par(bg = "cornflowerblue",
-					   col.axis = "deeppink", 
-					   col.lab = "deeppink",
-					   col.main = "deeppink"))
-
-	line_col <- switch(theme,
-		standard = "black",
-		dark 	 = "white",
-		tan 	 = "darkslategray",
-		blue 	 = "deeppink")
-list(op = op, line_col = line_col)
-}
 
 #' Annotation function to add AUC/V to a given plot
 #' 
@@ -116,9 +88,10 @@ pp_annotate <- function(formula, data, ref_group = NULL, x, y,
 
 create_cut_refs <- function(cut, calcs, p, scheme) {
 	cuts <- calcs$ps[rownames(calcs$ps) %in% cut, ,drop = FALSE]
-	full_cols <- col_scheme(scheme, length(p$col) + nrow(cuts))
-	cut_cols <- full_cols[!full_cols %in% p$col][seq_len(nrow(cuts))]
-
+	full_cols <- col_scheme(scheme, length(p$col) + nrow(cuts) + 1)
+	rem_cols <- col_scheme(scheme, length(p$col) + 1)
+	cut_cols <- full_cols[!full_cols %in% rem_cols][seq_along(p$col)]
+	
 	if(class(cuts) == "numeric") {
 		for(i in seq_along(cuts)[-1]) {
 			seg_match(cuts[1], cuts[i], 
