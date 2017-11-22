@@ -47,8 +47,8 @@ coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 
 	# vec is a vector to subset means/vars/ns for the appropriate comparison
 	es_d <- function(v) {
-		(means[ v[1] ] - means[ v[2] ]) / 
-		sqrt((((ns[1] - 1)*vars[1]) + ((ns[2] - 1)*vars[2])) / 
+		(means[ v[2] ] - means[ v[1] ]) / 
+		sqrt((((ns[ v[1] ] - 1)*vars[ v[1]] ) + ((ns[ v[2] ] - 1)*vars[ v[2] ])) / 
 			(sum(ns[v]) - 2))
 	}
 
