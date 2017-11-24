@@ -5,7 +5,7 @@
 \title{Compute probabilities from the empirical CDFs of a grouping variable for
 each group.}
 \usage{
-probs(formula, data)
+probs(formula, data, center = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -13,6 +13,8 @@ the outcome variable and \code{group} is the grouping variable. Note this
 variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
+
+\item{center}{Logical. Should the functions be centerd prior to plotting?}
 }
 \value{
 A matrix of probabilities with separate columns for each group and

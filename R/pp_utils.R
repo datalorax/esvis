@@ -20,7 +20,7 @@
 #' the reference group and all other groups, and data for the x/y axes.
 
 pp_calcs <- function(formula, data, ref_group = NULL, scheme = "ggplot2") {
-	ps <- probs(formula, data)
+	ps <- probs(formula, data, center = FALSE)
 	if(is.null(ref_group)) ref_group <- colnames(ps)[1]
 
 	sq <- seq_len(ncol(ps))

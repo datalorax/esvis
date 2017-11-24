@@ -56,7 +56,7 @@ test_that("`ecdf_plot` produces expected output", {
 
 test_that("Partial matching for `ecdf_plot` works", {
 	expect_equal(ecdf_plot(mean ~ grade,  seda, 
-					m = "new title")$main,
+					mai = "new title")$main,
 				"new title")
 	
 	expect_equal(ecdf_plot(mean ~ grade,  seda, 

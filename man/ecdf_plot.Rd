@@ -4,9 +4,9 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(formula, data, ref_cut = NULL, hor_ref = FALSE, rect_ref = TRUE,
-  scheme = "ggplot2", legend = "side", theme = NULL, annotate = FALSE,
-  ...)
+ecdf_plot(formula, data, ref_cut = NULL, center = TRUE, max_line = TRUE,
+  hor_ref = FALSE, rect_ref = TRUE, scheme = "ggplot2", legend = "side",
+  annotate = FALSE, theme = "standard", ...)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -17,6 +17,12 @@ variable can include any arbitrary number of groups.}
 
 \item{ref_cut}{Optional numeric vector stating the location of reference 
 line(s) and/or rectangle(s).}
+
+\item{center}{Logical. Should the functions be centerd prior to plotting?}
+
+\item{max_line}{Logical. Should the maximium distance between any two curves
+be plotted? This distance is equivalent to the value tested by the 
+Kolmogorov-Smirnov test.}
 
 \item{hor_ref}{Logical, defaults to \code{FALSE}. Should horizontal
 reference lines be plotted at the location of \code{ref_cut}?}
@@ -45,11 +51,6 @@ When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
 latter of which produces the legend with the base \link[graphics]{legend}
 function.}
 
-\item{theme}{Visual properties of the plot. There are currently only two
-themes implemented - a standard plot and a dark theme. If \code{NULL} 
-(default), the theme will be produced with a standard white background. If
-\code{"dark"}, a dark gray background will be used with white text and axes.}
-
 \item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
 \code{legend == "side"} the plot is rendered such that additional
 annotations can be made on the plot using low level base plotting functions
@@ -58,6 +59,11 @@ annotations can be made on the plot using low level base plotting functions
 (i.e., close the current plotting window). Otherwise the plot will be
 attempted to be rendered in the region designated for the legend. Argument
 is ignored when \code{legend != "side"}.}
+
+\item{theme}{Visual properties of the plot. There are currently only two
+themes implemented - a standard plot and a dark theme. If \code{NULL} 
+(default), the theme will be produced with a standard white background. If
+\code{"dark"}, a dark gray background will be used with white text and axes.}
 
 \item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
 it is best to use the full argument rather than partial matching, given the

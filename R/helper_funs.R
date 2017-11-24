@@ -131,13 +131,17 @@ td
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
+#' @param center Logical. Should the functions be centerd prior to plotting?
 #' @return A list with one function per group (level in the grouping factor).
 #' @export
 #' @examples
 #' cdfs(math ~ condition, star)
 
-cdfs <- function(formula, data) {
+cdfs <- function(formula, data, center = FALSE) {
 	splt <- parse_form(formula, data)
+	if(center) {
+		splt <- lapply(splt, function(x) as.numeric(scale(x, scale = FALSE)))
+	}
 lapply(splt, stats::ecdf)
 }
 
@@ -149,6 +153,7 @@ lapply(splt, stats::ecdf)
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
+#' @param center Logical. Should the functions be centerd prior to plotting?
 #' @return A matrix of probabilities with separate columns for each group and
 #' \code{rownames} corresponding to the value the paired probabilities are 
 #' calculated from.
@@ -157,10 +162,12 @@ lapply(splt, stats::ecdf)
 #' @importFrom stats sd
 #' @export
 
-probs <- function(formula, data) {
-	ecdfs <- cdfs(formula, data)
+probs <- function(formula, data, center = FALSE) {
+	ecdfs <- cdfs(formula, data, center)
 	out <- data[[ all.vars(formula)[1] ]]
-	
+	if(center) {
+		out <- scale(out, scale = FALSE)
+	}
 	range <- seq(min(out, na.rm = TRUE) - floor(sd(out, na.rm = TRUE)), 
 				  max(out, na.rm = TRUE) + ceiling(sd(out, na.rm = TRUE)),
 				  1)

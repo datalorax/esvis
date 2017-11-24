@@ -4,7 +4,7 @@
 \alias{cdfs}
 \title{Compute the empirical distribution functions for each of several groups.}
 \usage{
-cdfs(formula, data)
+cdfs(formula, data, center = FALSE)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
@@ -12,6 +12,8 @@ the outcome variable and \code{group} is the grouping variable. Note this
 variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
+
+\item{center}{Logical. Should the functions be centerd prior to plotting?}
 }
 \value{
 A list with one function per group (level in the grouping factor).

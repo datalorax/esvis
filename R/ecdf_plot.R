@@ -15,6 +15,10 @@
 #' @param data The data frame that the data in the formula come from.
 #' @param ref_cut Optional numeric vector stating the location of reference 
 #' line(s) and/or rectangle(s).
+#' @param center Logical. Should the functions be centerd prior to plotting?
+#' @param max_line Logical. Should the maximium distance between any two curves
+#' be plotted? This distance is equivalent to the value tested by the 
+#' Kolmogorov-Smirnov test.
 #' @param hor_ref Logical, defaults to \code{FALSE}. Should horizontal
 #'  reference lines be plotted at the location of \code{ref_cut}? 
 #' @param rect_ref Logical, defaults to \code{TRUE}. Should semi-transparent 
@@ -79,24 +83,18 @@
 #' 		ref_cut = c(225, 245, 265),
 #' 		theme = "dark")
 
-ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE, 
-	rect_ref = TRUE, scheme = "ggplot2", legend = "side", theme = NULL,
-	annotate = FALSE, ...) {
+ecdf_plot <- function(formula, data, ref_cut = NULL, 
+	center = TRUE, max_line = TRUE, hor_ref = FALSE, rect_ref = TRUE, 
+	scheme = "ggplot2", legend = "side", annotate = FALSE, 
+	theme = "standard", ...) {
 	
 	splt <- parse_form(formula, data)
-	ecdfs <- cdfs(formula, data)
+	if(center) {
+		splt <- lapply(splt, function(x) as.numeric(scale(x, scale = FALSE)))
+	}
+	ecdfs <- cdfs(formula, data, center)
 
-	if(!is.null(theme)) {
-		if(theme == "dark") {
-			op <- par(bg = "gray21", 
-					  col.axis = "white", 
-					  col.lab = "white",
-					  col.main = "white")
-		}
-	}
-	else {
-		op <- par(bg = "transparent")	
-	}
+	op <- themes(theme)$op	
 	on.exit(par(op))
 
 	x_lim <- seq(min(vapply(splt, min, na.rm = TRUE, numeric(1))),
@@ -114,36 +112,12 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 					default_ylab = "Proportion",
 					default_main = paste(as.character(formula)[c(2, 1, 3)], 
 								collapse = " "),
+					theme = theme,
 					...)
 
 	if(is.null(p$lwd)) p$lwd <- 2
 	if(is.null(p$lty)) p$lty <- 1
-	if(is.null(p$col)) {
-		if(scheme == "ggplot2") {
-			p$col <- col_hue(length(splt))	
-		} 
-		if(any(scheme == "viridis" |
-			   scheme == "magma" |
-			   scheme == "inferno" |
-			   scheme == "plasma")) {
-			if(!any(is.element("viridisLite", installed.packages()[ ,1]))) {
-				stop(paste0("Please install the viridisLite ",
-				 	"package to use this color scheme"))
-			}
-		}
-		if(scheme == "viridis") {
-			p$col <- viridisLite::viridis(length(splt))	
-		}
-		if(scheme == "magma") {
-			p$col <- viridisLite::magma(length(splt))	
-		}
-		if(scheme == "inferno") {
-			p$col <- viridisLite::inferno(length(splt))	
-		}
-		if(scheme == "plasma") {
-			p$col <- viridisLite::plasma(length(splt))	
-		} 
-	}
+	if(is.null(p$col)) p$col <- col_scheme(scheme, length(splt))
 
 	Map(lines, 
 		ecdfs,
@@ -153,6 +127,19 @@ ecdf_plot <- function(formula, data, ref_cut = NULL, hor_ref = FALSE,
 		col.01line = FALSE, 
 		verticals = TRUE, 
 		do.points = FALSE)
+	
+	if(max_line) {
+		differences <- probs(formula, data, center)
+		differences <- apply(differences, 1, function(x) max(abs(diff(x))))
+		x_int <- as.numeric(names(differences[which.max(differences)]))
+		ys <- vapply(ecdfs, function(x) x(x_int), numeric(1))
+		y_start <- min(ys)
+		y_end <- max(ys)
+		anno_col <- col_scheme(scheme, length(p$col) + 1)
+		anno_col <- anno_col[!anno_col %in% p$col]
+		anno_col <- anno_col[!anno_col %in% p$col][length(anno_col)]
+		segments(x_int, y_start, x_int, y_end, lwd = 4, col = "gray40")
+	}
 
 	if(!is.null(ref_cut)) {
 		if(hor_ref) {
