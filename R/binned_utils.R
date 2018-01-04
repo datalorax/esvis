@@ -66,6 +66,22 @@ qtile_mean_diffs <- function(formula, data, qtiles = seq(0, 1, .33)) {
 td[ ,c(1:3, 5, 4)]
 }
 
+#' Compute sample size for each quantile bin for each group
+#' 
+#' @param formula  A formula of the type \code{out ~ group} where \code{out} is
+#'   the outcome variable and \code{group} is the grouping variable. Note the
+#'   grouping variable must only include only two groups.
+#' @param data The data frame that the data in the formula come from.
+#' @param qtiles Quantile bins for calculating mean differences
+#' @importFrom stats quantile
+#' @export
+#' @examples
+#' qtile_n(reading ~ condition, star)
+#' 
+#' qtile_n(reading ~ condition, 
+#' 		star, 
+#' 		qtiles = seq(0, 1, .2))
+
 qtile_n <- function(formula, data, qtiles = seq(0, 1, .33)) {
 	splt <- parse_form(formula, data)
 	qtile_l <- lapply(splt, function(x) {
