@@ -158,13 +158,10 @@ binned_plot <- function(formula, data, ref_group = NULL,
 	if(rects) {
 		rect_left <- unique(d$low_qtile)
 		rect_right <- unique(d$high_qtile)
-
-		rect(rect_left, 
-			min(d$es, na.rm = TRUE) - 1, 
-			rect_right, 
-			max(d$es, na.rm = TRUE) + 1, 
+		
+		rect(rect_left, -1e5, rect_right, 1e5, 
 			col = c(adjustcolor(themes(theme)$line_col, alpha.f = 0.2),
-					adjustcolor(themes(theme)$line_col, alpha.f = 0)),
+					    adjustcolor(themes(theme)$line_col, alpha.f = 0)),
 			lwd = 0)
 	}
 
