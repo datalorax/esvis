@@ -4,8 +4,8 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(formula, data, ref_cut = NULL, center = TRUE, max_line = TRUE,
-  hor_ref = FALSE, rect_ref = TRUE, scheme = "ggplot2", legend = "side",
+ecdf_plot(formula, data, ref_cut = NULL, center = FALSE, max_line = FALSE,
+  ref_hor = FALSE, ref_rect = TRUE, scheme = "ggplot2", legend = "side",
   annotate = FALSE, theme = "standard", ...)
 }
 \arguments{
@@ -18,16 +18,16 @@ variable can include any arbitrary number of groups.}
 \item{ref_cut}{Optional numeric vector stating the location of reference 
 line(s) and/or rectangle(s).}
 
-\item{center}{Logical. Should the functions be centerd prior to plotting?}
+\item{center}{Logical. Should the functions be centerd prior to plotting? Defaults to \code{FALSE}.}
 
 \item{max_line}{Logical. Should the maximium distance between any two curves
 be plotted? This distance is equivalent to the value tested by the 
-Kolmogorov-Smirnov test.}
+Kolmogorov-Smirnov test. Defaults to \code{FALSE}.}
 
-\item{hor_ref}{Logical, defaults to \code{FALSE}. Should horizontal
+\item{ref_hor}{Logical, defaults to \code{FALSE}. Should horizontal
 reference lines be plotted at the location of \code{ref_cut}?}
 
-\item{rect_ref}{Logical, defaults to \code{TRUE}. Should semi-transparent 
+\item{ref_rect}{Logical, defaults to \code{TRUE}. Should semi-transparent 
 rectangle(s) be plotted at the locations of \code{ref_cut}?}
 
 \item{scheme}{What color scheme should the lines follow? Defaults to 
@@ -95,7 +95,7 @@ ecdf_plot(mean ~ grade,
 ecdf_plot(mean ~ grade, 
 		seda,
 		ref_cut = c(225, 245, 265),
-		hor_ref = TRUE)
+		ref_hor = TRUE)
 
 # Apply dark theme
 ecdf_plot(mean ~ grade, 
