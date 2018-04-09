@@ -131,7 +131,7 @@ td
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param center Logical. Should the functions be centerd prior to plotting?
+#' @param center Logical. Should the functions be centered prior to plotting?
 #' @return A list with one function per group (level in the grouping factor).
 #' @export
 #' @examples
@@ -153,7 +153,7 @@ lapply(splt, stats::ecdf)
 #' the outcome variable and \code{group} is the grouping variable. Note this
 #' variable can include any arbitrary number of groups.
 #' @param data The data frame that the data in the formula come from.
-#' @param center Logical. Should the functions be centerd prior to plotting?
+#' @param center Logical. Should the functions be centered prior to plotting?
 #' @return A matrix of probabilities with separate columns for each group and
 #' \code{rownames} corresponding to the value the paired probabilities are 
 #' calculated from.
@@ -224,7 +224,7 @@ col_hue <- function(n, ...) {
 
 #' Determine the color scheme to be used for the plotting
 #' 
-#' @param scheme The chosen color scheme. Options are "ggplot2", "virdis",
+#' @param scheme The chosen color scheme. Options are "ggplot2", "viridis",
 #' "magma", "inferno", or "plasma". Note all but "ggplot2" depend upon the
 #' \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite} package
 #' @param n The number of colors to be produced for the given scheme.

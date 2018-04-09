@@ -7,7 +7,7 @@
 col_scheme(scheme, n, ...)
 }
 \arguments{
-\item{scheme}{The chosen color scheme. Options are "ggplot2", "virdis",
+\item{scheme}{The chosen color scheme. Options are "ggplot2", "viridis",
 "magma", "inferno", or "plasma". Note all but "ggplot2" depend upon the
 \href{https://CRAN.R-project.org/package=viridisLite}{viridisLite} package}
 

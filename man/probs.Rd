@@ -14,7 +14,7 @@ variable can include any arbitrary number of groups.}
 
 \item{data}{The data frame that the data in the formula come from.}
 
-\item{center}{Logical. Should the functions be centerd prior to plotting?}
+\item{center}{Logical. Should the functions be centered prior to plotting?}
 }
 \value{
 A matrix of probabilities with separate columns for each group and

@@ -20,7 +20,7 @@ line(s) and/or rectangle(s).}
 
 \item{center}{Logical. Should the functions be centerd prior to plotting? Defaults to \code{FALSE}.}
 
-\item{max_line}{Logical. Should the maximium distance between any two curves
+\item{max_line}{Logical. Should the maximum distance between any two curves
 be plotted? This distance is equivalent to the value tested by the 
 Kolmogorov-Smirnov test. Defaults to \code{FALSE}.}
 

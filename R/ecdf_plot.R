@@ -16,7 +16,7 @@
 #' @param ref_cut Optional numeric vector stating the location of reference 
 #' line(s) and/or rectangle(s).
 #' @param center Logical. Should the functions be centerd prior to plotting? Defaults to \code{FALSE}.
-#' @param max_line Logical. Should the maximium distance between any two curves
+#' @param max_line Logical. Should the maximum distance between any two curves
 #' be plotted? This distance is equivalent to the value tested by the 
 #' Kolmogorov-Smirnov test. Defaults to \code{FALSE}.
 #' @param ref_hor Logical, defaults to \code{FALSE}. Should horizontal
