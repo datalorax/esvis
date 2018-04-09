@@ -27,7 +27,7 @@ splt
 #' white for theme = "dark" and black for theme = "standard").
 themes <- function(theme) {
 	op <- switch(theme,
-		standard = par(bg = "transparent"),
+		standard = par(bg = "white"),
 		dark 	 = par(bg = "gray21", 
 					  col.axis = "white", 
 					  col.lab = "white",
