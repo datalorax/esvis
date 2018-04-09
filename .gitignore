@@ -34,3 +34,4 @@ vignettes/*.pdf
 
 # Mac garbage
 .DS_Store
+.Rproj.user
