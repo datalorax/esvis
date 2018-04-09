@@ -545,7 +545,7 @@ v <- function(formula, data, ref_group = NULL, tidy = TRUE) {
 	ps <- probs(formula, data)
 
 	v_fun <- function(v) {
-		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,v[1]], ps[ ,v[2]]))
+		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,v[2]], ps[ ,v[1]]))
 	}
 	
 	if(tidy == FALSE) {
