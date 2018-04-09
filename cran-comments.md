@@ -1,16 +1,10 @@
-## Resubmission
-This is a resubmission. In this version I have:
-* Corrected the doi formatting in the description file
-* Removed asterisks from statistics listed in the description file
-* Updated the documentation to provide minimal examples for all exported functions.
-
 ## Release Summary
 
-This is the initial CRAN release of esvis, an R package for visualizing and estimating effect sizes.
+This is the release of esvis, version 0.2.0, an R package for visualizing and estimating effect sizes.
 
 ## Test environments
-* Local OS X install, R 3.4.1
-* Ubuntu 12.04 (on Travis-CI), R 3.4.1
+* Local OS X install, R 3.4.3
+* Ubuntu 14.04 (on Travis-CI), R 3.4.4
 * Win-builder (devel and release)
 
 ## R CMD check results
