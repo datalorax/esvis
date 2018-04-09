@@ -159,7 +159,7 @@ ecdf_plot <- function(formula, data, ref_cut = NULL,
 		}
 		if(ref_rect) {
 				rect(ref_cut, -1, 1000, 2, 
-					col = adjustcolor(esvis:::themes(theme)$line_col, alpha.f = 0.2), 
+					col = adjustcolor(themes(theme)$line_col, alpha.f = 0.2), 
 					lwd = 0)
 			}
 		}
