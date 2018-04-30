@@ -34,8 +34,9 @@ Description: A variety of methods are provided to estimate and visualize
     group (distribution) can be specified.
 Depends:
     R (>= 3.1)
-Imports:
-    sfsmisc
+Imports: 
+    sfsmisc,
+    ggplot2
 URL: https://github.com/DJAnderson07/esvis
 BugReports: https://github.com/DJAnderson07/esvis/issues
 License: MIT + file LICENSE

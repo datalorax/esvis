@@ -4,16 +4,16 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(formula, data, ref_cut = NULL, center = FALSE, max_line = FALSE,
+ecdf_plot(data, formula, ref_cut = NULL, center = FALSE, max_line = FALSE,
   ref_hor = FALSE, ref_rect = TRUE, scheme = "ggplot2", legend = "side",
   annotate = FALSE, theme = "standard", ...)
 }
 \arguments{
+\item{data}{The data frame that the data in the formula come from.}
+
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
 variable can include any arbitrary number of groups.}
-
-\item{data}{The data frame that the data in the formula come from.}
 
 \item{ref_cut}{Optional numeric vector stating the location of reference 
 line(s) and/or rectangle(s).}
