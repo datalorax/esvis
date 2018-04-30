@@ -30,13 +30,13 @@
 #' @export
 #' @examples
 #' 
-#' ecdf_plot(tmp, math ~ ell, 
+#' ecdf_plot(benchmarks, math ~ ell, 
 #'           ref_cut = c(190, 205, 210), 
 #'           ref_line_cols = c("#D68EE3", "#9BE38E", "#144ECA")) +
 #'   theme_minimal() +
 #'   theme(legend.position = "bottom")
 #'
-#' ecdf_plot(esvis::seda, mean ~ grade) +
+#' ecdf_plot(seda, mean ~ grade) +
 #'   scale_fill_brewer(palette = "Set2") +
 #'   theme_minimal()
 #'
@@ -44,23 +44,6 @@
 #' ecdf_plot(seda, mean ~ grade) +
 #'   scale_fill_brewer(palette = "Set2) +
 #'   theme_minimal()
-#' 
-#' # Shade distributions to the right of three cut scores
-#' ecdf_plot(mean ~ grade, 
-#' 		seda,
-#' 		ref_cut = c(225, 245, 265))
-#' 
-#' # Add horizontal reference lines
-#' ecdf_plot(mean ~ grade, 
-#' 		seda,
-#' 		ref_cut = c(225, 245, 265),
-#' 		ref_hor = TRUE)
-#' 
-#' # Apply dark theme
-#' ecdf_plot(mean ~ grade, 
-#' 		seda,
-#' 		ref_cut = c(225, 245, 265),
-#' 		theme = "dark")
 
 ecdf_plot <- function(data, formula, ref_cut = NULL, linewidth = 1.2, 
                       ref_line_cols = "gray40", ref_linetype = "solid", 
@@ -81,7 +64,7 @@ ecdf_plot <- function(data, formula, ref_cut = NULL, linewidth = 1.2,
         mutate(!!sym(lhs) := scale(!!sym(lhs), scale = FALSE))
   }
 
-  p <- ggplot(data, aes_string(vars[1], color = vars[2]))
+  p <- ggplot(data, aes_(as.name(vars[1]), color = as.name(vars[2])))
 
   if(length(vars) == 3) {
     p <- p + facet_wrap(as.formula(paste0("~", vars[3])))
@@ -99,4 +82,3 @@ ecdf_plot <- function(data, formula, ref_cut = NULL, linewidth = 1.2,
   p + stat_ecdf(size = linewidth)
 }
 
-ecdf_plot(tmp, math ~ ell, center = TRUE)

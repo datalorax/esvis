@@ -4,102 +4,45 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(data, formula, ref_cut = NULL, center = FALSE, max_line = FALSE,
-  ref_hor = FALSE, ref_rect = TRUE, scheme = "ggplot2", legend = "side",
-  annotate = FALSE, theme = "standard", ...)
+ecdf_plot(data, formula, ref_cut = NULL, linewidth = 1.2,
+  ref_line_cols = "gray40", ref_linetype = "solid", center = FALSE,
+  ref_rect = TRUE, ref_rect_col = "gray40", ref_rect_alpha = 0.7)
 }
 \arguments{
-\item{data}{The data frame that the data in the formula come from.}
+\item{data}{A tidy data frame containing the data to be plotted.}
 
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
-variable can include any arbitrary number of groups.}
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate plots by the secondary or
+tertiary varaible (e.g., \code{out ~ group + characteristic1 + 
+characteristic2}). No more than two additional characteristics can be 
+supplied at this time.}
 
 \item{ref_cut}{Optional numeric vector stating the location of reference 
 line(s) and/or rectangle(s).}
 
-\item{center}{Logical. Should the functions be centered prior to plotting? Defaults to \code{FALSE}.}
+\item{linewidth}{Width of ECDF lines. Note that the color of the lines can 
+be controlled through additional functions (e.g., \code{scale_color_brewer,
+  scale_color_manual}).}
 
-\item{max_line}{Logical. Should the maximum distance between any two curves
-be plotted? This distance is equivalent to the value tested by the 
-Kolmogorov-Smirnov test. Defaults to \code{FALSE}.}
+\item{ref_line_cols}{Optional vector (or single value) of colors for 
+\code{ref_cut} lines.}
 
-\item{ref_hor}{Logical, defaults to \code{FALSE}. Should horizontal
-reference lines be plotted at the location of \code{ref_cut}?}
+\item{ref_linetype}{Optional vector (or single value) of line types for 
+\code{ref_cut} lines. Takes any of the arguments supplied by 
+\link[ggplot2]{linetype}.}
 
-\item{ref_rect}{Logical, defaults to \code{TRUE}. Should semi-transparent 
-rectangle(s) be plotted at the locations of \code{ref_cut}?}
+\item{center}{Logical. Should the functions be centered prior to plotting? 
+Defaults to \code{FALSE}. Note that if paneled/faceted plots are produced, 
+the centering occurs by group.}
 
-\item{scheme}{What color scheme should the lines follow? Defaults to 
-mimic the ggplot2 color scheme. Other options come from the 
-\href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
-package, and must be installed first. These are the same options available
-in the package: "viridis", "magma", "inferno", and "plasma". These color 
-schemes work well for color blindness and print well in black and white.
-Alternatively, colors can be supplied manually through a call to \code{col}
-(through \code{...}).}
-
-\item{legend}{The type of legend to be displayed, with possible values 
-\code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
-when there are more than two groups and \code{"none"} when only comparing
-two groups. If the option \code{"side"} is used the plot is split into two
-plots, via \link[graphics]{layout}, with the legend displayed in the second 
-plot. This scales better than the base legend (i.e., manually manipulating
-the size of the plot after it is rendered), but is not compatible with 
-multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
-When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
-latter of which produces the legend with the base \link[graphics]{legend}
-function.}
-
-\item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
-\code{legend == "side"} the plot is rendered such that additional
-annotations can be made on the plot using low level base plotting functions
-(e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
-\link[grDevices]{dev.off} must be called before a new plot is rendered 
-(i.e., close the current plotting window). Otherwise the plot will be
-attempted to be rendered in the region designated for the legend. Argument
-is ignored when \code{legend != "side"}.}
-
-\item{theme}{Visual properties of the plot. There are currently only two
-themes implemented - a standard plot and a dark theme. If \code{NULL} 
-(default), the theme will be produced with a standard white background. If
-\code{"dark"}, a dark gray background will be used with white text and axes.}
-
-\item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
-it is best to use the full argument rather than partial matching, given the
-method used to call the plot. While some partial matching is supported 
-(e.g., \code{m} for \code{main}, it is generally safest to supply the full
-argument).}
+\item{ref_rect}{Logical, defaults to \code{TRUE} when \code{ref_cut} takes 
+any non-null value. Should semi-transparent rectangle(s) be plotted at the 
+locations of \code{ref_cut}?}
 }
 \description{
-This function dresses up the \link[stats]{plot.ecdf} function and provides
-some additional functionality to directly compare distributions at specific
-locations along the scale. Specifically, multiple empirical CDFs can be 
-plotted with a single call, and the differences between any pair, or all, 
-CDFs can optionally be plotted in terms of both raw percentage differences 
-and/or in terms of standard deviation units through inverse normal
-transformations. See 
-\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
- Reardon, 2012}. (Note, not all features implemented yet)
-}
-\examples{
-# Produce base empirical cummulative distribution plot
-ecdf_plot(mean ~ grade, seda)
-
-# Shade distributions to the right of three cut scores
-ecdf_plot(mean ~ grade, 
-		seda,
-		ref_cut = c(225, 245, 265))
-
-# Add horizontal reference lines
-ecdf_plot(mean ~ grade, 
-		seda,
-		ref_cut = c(225, 245, 265),
-		ref_hor = TRUE)
-
-# Apply dark theme
-ecdf_plot(mean ~ grade, 
-		seda,
-		ref_cut = c(225, 245, 265),
-		theme = "dark")
+This is a wrapper function for the \link[ggplot2]{stat_ecdf} function and 
+helps make it easy to directly compare distributions at specific
+locations along the scale.
 }
