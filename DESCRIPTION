@@ -36,7 +36,11 @@ Depends:
     R (>= 3.1)
 Imports: 
     sfsmisc,
-    ggplot2
+    ggplot2,
+    magrittr,
+    dplyr,
+    rlang,
+    tidyr
 URL: https://github.com/DJAnderson07/esvis
 BugReports: https://github.com/DJAnderson07/esvis/issues
 License: MIT + file LICENSE
