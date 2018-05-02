@@ -106,5 +106,6 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
     }
   }
   p + stat_ecdf(aes_(color = as.name(vars[2])),
-                size = linewidth)
+                size = linewidth) +
+    labs(y = "Proportion")
 }

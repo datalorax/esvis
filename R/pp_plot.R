@@ -158,7 +158,8 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
   }
   if(length(rhs) == 2) p <- p + facet_wrap(~panel)
   if(length(rhs) == 3) p <- p + facet_grid(f1 ~ f2)
-p + labs(y = ref_group) 
+p + labs(x = "Focal Group",
+         y = ref_group) 
 }
 
 

@@ -6,7 +6,7 @@
 #'   filter matches group_by_all
 #' @importFrom tidyr  spread fill gather separate
 #' @importFrom rlang := sym quo .data
-#' @importFrom graphics par layout lines segments rect 
+#' @importFrom graphics par layout lines segments rect polygon
 #' @importFrom utils installed.packages
 #' @importFrom grDevices adjustcolor
 #' @importFrom stats as.formula terms setNames
