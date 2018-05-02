@@ -4,9 +4,9 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(data, formula, ref_cut = NULL, linewidth = 1.2,
+ecdf_plot(data, formula, cuts = NULL, linewidth = 1.2,
   ref_line_cols = "gray40", ref_linetype = "solid", center = FALSE,
-  ref_rect = TRUE, ref_rect_col = "gray40", ref_rect_alpha = 0.7)
+  ref_rect = TRUE, ref_rect_col = "gray40", ref_rect_alpha = 0.15)
 }
 \arguments{
 \item{data}{A tidy data frame containing the data to be plotted.}
@@ -19,7 +19,7 @@ tertiary varaible (e.g., \code{out ~ group + characteristic1 +
 characteristic2}). No more than two additional characteristics can be 
 supplied at this time.}
 
-\item{ref_cut}{Optional numeric vector stating the location of reference 
+\item{cuts}{Optional numeric vector stating the location of reference 
 line(s) and/or rectangle(s).}
 
 \item{linewidth}{Width of ECDF lines. Note that the color of the lines can 
@@ -27,22 +27,52 @@ be controlled through additional functions (e.g., \code{scale_color_brewer,
   scale_color_manual}).}
 
 \item{ref_line_cols}{Optional vector (or single value) of colors for 
-\code{ref_cut} lines.}
+\code{cuts} lines.}
 
 \item{ref_linetype}{Optional vector (or single value) of line types for 
-\code{ref_cut} lines. Takes any of the arguments supplied by 
+\code{cuts} lines. Takes any of the arguments supplied by 
 \link[ggplot2]{linetype}.}
 
 \item{center}{Logical. Should the functions be centered prior to plotting? 
 Defaults to \code{FALSE}. Note that if paneled/faceted plots are produced, 
 the centering occurs by group.}
 
-\item{ref_rect}{Logical, defaults to \code{TRUE} when \code{ref_cut} takes 
+\item{ref_rect}{Logical, defaults to \code{TRUE} when \code{cuts} takes 
 any non-null value. Should semi-transparent rectangle(s) be plotted at the 
-locations of \code{ref_cut}?}
+locations of \code{cuts}?}
+
+\item{ref_rect_col}{Color of the fill for the reference rectangles. Defaults 
+to a dark gray.}
+
+\item{ref_rect_alpha}{Transparency of the fill for the reference rectangles. 
+Defaults to 0.7.}
 }
 \description{
 This is a wrapper function for the \link[ggplot2]{stat_ecdf} function and 
 helps make it easy to directly compare distributions at specific
 locations along the scale.
+}
+\examples{
+ecdf_plot(benchmarks, math ~ ell, 
+          cuts = c(190, 205, 210), 
+          ref_line_cols = c("#D68EE3", "#9BE38E", "#144ECA"))
+
+# Customize the plot with ggplot2 functions
+library(ggplot2)
+ecdf_plot(benchmarks, math ~ ell, 
+          cuts = c(190, 205, 210), 
+          ref_line_cols = c("#D68EE3", "#9BE38E", "#144ECA")) +
+  theme_minimal() +
+  theme(legend.position = "bottom")
+
+ecdf_plot(seda, mean ~ grade) +
+  scale_fill_brewer(palette = "Set2") +
+  theme_minimal()
+  
+# Use within the dplyr pipeline
+library(dplyr)
+benchmarks \%>\% 
+  mutate(season = factor(season, 
+                         levels = c("Fall", "Winter", "Spring"))) \%>\% 
+  ecdf_plot(math ~ ell + season + frl)
 }
