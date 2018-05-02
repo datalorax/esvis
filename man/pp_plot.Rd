@@ -101,7 +101,9 @@ pp_plot(benchmarks,
         cuts = c(190, 210, 215))
 
 ## Make another interesting plot. Use ggplot to customize
-library(tidyverse)
+library(tidyr)
+library(ggplot2)
+
 benchmarks \%>\% 
   gather(subject, score, reading, math) \%>\% 
   pp_plot(score ~ ell + subject + season,
