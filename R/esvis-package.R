@@ -1,8 +1,9 @@
 #' @keywords internal
 #' @importFrom ggplot2 ggplot aes_ stat_ecdf facet_wrap facet_grid geom_vline
-#'   ggplot_build geom_label geom_line geom_ribbon geom_segment labs geom_abline
+#'   ggplot_build geom_label geom_line geom_ribbon geom_segment labs 
+#'   geom_abline geom_rect
 #' @importFrom dplyr mutate mutate_at select group_by_at arrange distinct 
-#'   filter matches
+#'   filter matches group_by_all
 #' @importFrom tidyr  spread fill gather separate
 #' @importFrom rlang := sym quo .data
 #' @importFrom graphics par layout lines segments rect 
