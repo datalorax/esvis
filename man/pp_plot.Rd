@@ -108,8 +108,8 @@ benchmarks \%>\%
   gather(subject, score, reading, math) \%>\% 
   pp_plot(score ~ ell + subject + season,
           ref_group = "Non-ELL") +
-    scale_fill_viridis_d() +
-    scale_color_viridis_d() +
+    scale_fill_brewer(palette = "Pastel2") +
+    scale_color_brewer(palette = "Pastel2") +
     labs(title = "Differences among English Language Learning Groups",
          subtitle = "Note crossing of reference line") +
     theme_minimal()
