@@ -2,10 +2,16 @@
 % Please edit documentation in R/pp_utils.R
 \name{sanitize_names}
 \alias{sanitize_names}
-\title{Internal function to clean a character vector of dahses, spaces, and periods}
+\title{Internal function to clean/sanitize a character vector of dahses, spaces, 
+and periods.}
 \usage{
 sanitize_names(x)
 }
-\description{
-Internal function to clean a character vector of dahses, spaces, and periods
+\arguments{
+\item{x}{Character vector to be sanitized.}
 }
+\description{
+Internal function to clean/sanitize a character vector of dahses, spaces, 
+and periods.
+}
+\keyword{internal}

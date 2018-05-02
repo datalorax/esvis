@@ -1,5 +1,8 @@
-#' Internal function to clean a character vector of dahses, spaces, and periods
+#' Internal function to clean/sanitize a character vector of dahses, spaces, 
+#' and periods.
+#' 
 #' @keywords internal
+#' @param x Character vector to be sanitized.
 
 sanitize_names <- function(x) {
   gsub("-|\\s|\\.", "", x)  
