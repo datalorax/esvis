@@ -100,17 +100,25 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
     ref_group <- names(group_means)[which.max(group_means)]
   }
   
-  d <- extract_pp_data(data, formula, ref_group)
+  d <- paired_ecdf(data, formula, cuts) %>%
+    unnest() %>%
+    filter(!!sym(rhs[1]) == ref_group) 
   
-  ref_group_s <- sanitize_names(ref_group)
-  
-  p <- ggplot(d, aes_(quote(focal_group), as.name(ref_group_s))) 
+  if(length(rhs) == 2) {
+    d <- filter(d, !!sym(rhs[2]) == !!sym(paste0(rhs[2], 1)))
+  }
+  if(length(rhs) == 3) {
+    d <- filter(d, 
+                !!sym(rhs[2]) == !!sym(paste0(rhs[2], 1)),
+                !!sym(rhs[3]) == !!sym(paste0(rhs[3], 1)))
+  }
+  p <- ggplot(d, aes_(quote(y_foc), quote(y_ref))) 
   
   if(shade) {
     p <- p + 
-      geom_ribbon(aes_(fill = as.name(rhs[1]),
+      geom_ribbon(aes_(fill = as.name(paste0(rhs[1], 1)),
                        ymin = -Inf,
-                       ymax = as.name(ref_group_s)),
+                       ymax = quote(y_ref)),
                   alpha = shade_alpha)
   }
   if(refline) {
@@ -121,7 +129,7 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
                          size      = refline_width)
   }
   if(lines) {
-    p <- p + geom_line(aes_(color = as.name(rhs[1])),
+    p <- p + geom_line(aes_(color = as.name(paste0(rhs[1], 1))),
                        linetype   = linetype,
                        size       = linewidth)
   }
@@ -130,34 +138,33 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
       filter(.data$x %in% cuts)
     
     p <- p +
-      geom_segment(aes_(x     = quote(focal_group),
-                        xend  = quote(focal_group), 
+      geom_segment(aes_(x     = quote(y_foc),
+                        xend  = quote(y_foc), 
                         y     = -Inf,
-                        yend  = as.name(ref_group_s),
-                        color = as.name(rhs[1])),
+                        yend  = quote(y_ref),
+                        color = as.name(paste0(rhs[1], 1))),
                    cut_data) +
       geom_segment(aes_(x     = -Inf,
-                        xend  = quote(focal_group), 
-                        y     = as.name(ref_group_s), 
-                        yend  = as.name(ref_group_s), 
-                        color = as.name(rhs[1])),
+                        xend  = quote(y_foc), 
+                        y     = quote(y_ref), 
+                        yend  = quote(y_ref), 
+                        color = as.name(paste0(rhs[1], 1))),
                    cut_data)
       if(cut_labels) {
-        ref_data <- cut_data %>% 
-          select(.data$x, ref_group_s, matches("^f\\d")) %>% 
-          distinct() %>% 
-          mutate(x = as.character(.data$x))
-       
         p <- p + 
           geom_label(aes_(x = 0.02,
-                          y = as.name(ref_group_s),
+                          y = quote(y_ref),
                           label = quote(x)),
-                     ref_data, 
+                     cut_data, 
                  size = 3)
       }
   }
-  if(length(rhs) == 2) p <- p + facet_wrap(~panel)
-  if(length(rhs) == 3) p <- p + facet_grid(f1 ~ f2)
+  if(length(rhs) == 2) {
+    p <- p + facet_wrap(as.formula(paste0("~", rhs[2])))
+  }
+  if(length(rhs) == 3) {
+    p <- p + facet_grid(as.formula(paste0(rhs[2], "~", rhs[3])))
+  } 
 p + labs(x = "Focal Group",
          y = ref_group) 
 }
