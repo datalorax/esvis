@@ -1,3 +1,25 @@
+#' Cohen's d 
+#' 
+#' Wraps the equation into a function
+#' @keywords internal
+#' @param n1 The sample size for group 1
+#' @param n2 The sample size for group 2
+#' @param mn1 The mean for group 1
+#' @param mn2 The mean for group 2
+#' @param vr1 The variance for group 1
+#' @param vr2 The variance for group 2
+
+coh <- function(n1, n2, mn1, mn2, vr1, vr2) {
+		num   <- mn1 - mn2 
+    
+		dnum1 <- (n1 - 1)*vr1
+    dnum2 <- (n2 - 1)*vr2
+    ddnom  <- n1 + n2 - 2
+    
+    denom <- sqrt((dnum1 + dnum2) / ddnom)
+    
+    num / denom
+}
 
 #' Compute Cohen's \emph{d}
 #' 
@@ -8,63 +30,76 @@
 #' for a discussion on different types of effect sizes and their
 #' interpretation. Note that missing data are removed from the calculations of 
 #' the means and standard deviations.
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). 
-#' If false, effect sizes returned as a vector.
+#' @inheritParams pp_plot 
+#' @param ref_group Optional. A character vector or forumla listing the 
+#' reference group levels for each variable on the right hand side of the 
+#' formula, supplied in the same order as the formula. Note that if using the
+#' formula version, levels with hyphens, spaces, etc., should be wrapped in 
+#' back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
+#' it is safest to use the back ticks, as they will not interfere with anything
+#' if they are not needed. See examples below for more details.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
-#'  the grouping factor are returned as a tidy data frame.
-#' @importFrom stats var qnorm
+#'  the grouping factor(s) are returned.
 #' @export
 #' @examples
 #' 
 #' # Calculate Cohen's d for all pairwise comparisons
-#' coh_d(reading ~ condition, star) 
+#' coh_d(star, reading ~ condition) 
 #' 
 #' # Report only relative to regular-sized classrooms
-#' coh_d(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg")
+#' coh_d(star,
+#'       reading ~ condition, 
+#' 		   ref_group = "reg")
 #' 
-#' # Return a vector instead of a data frame
-#' coh_d(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg", 
-#' 		tidy = FALSE)
+#' # Report by ELL and FRL groups for each season, compare to non-ELL students
+#' # who were not eligible for free or reduced price lunch in the fall (using
+#' # the formula interface for reference group referencing).
+#' 
+#' coh_d(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+#' 
+#' # Same thing but with character vector supplied, rather than a formula
+#' coh_d(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 
-coh_d <- function(formula, data, ref_group = NULL, tidy = TRUE) {
-	splt <- parse_form(formula, data)
+coh_d <- function(data, formula, ref_group = NULL) {
+  rhs  <- labels(terms(formula))
 
-	means <- vapply(splt, mean, na.rm = TRUE, numeric(1))
-	vars <- vapply(splt, var, na.rm = TRUE, numeric(1))
-	ns <- vapply(splt, length, numeric(1))
-
-	# vec is a vector to subset means/vars/ns for the appropriate comparison
-	es_d <- function(v) {
-		(means[ v[2] ] - means[ v[1] ]) / 
-		sqrt((((ns[ v[1] ] - 1)*vars[ v[1]] ) + ((ns[ v[2] ] - 1)*vars[ v[2] ])) / 
-			(sum(ns[v]) - 2))
-	}
-
-	td <- tidy_out(names(splt), es_d)
-	if(!is.null(ref_group)) {
-		td <- td[td$ref_group == ref_group, ]
-	}
-
-	if(tidy == FALSE) {
-		vec <- td$estimate
-		names(vec) <- paste(td$ref_group, td$foc_group, sep = "-")
-		return(vec)
-	}
-td
+  stats <- descrip_stats(data, formula)
+  
+  d <- stats %>% 
+    mutate(coh_d = coh(.data$n, 
+                       .data$n1, 
+                       .data$mn, 
+                       .data$mn1, 
+                       .data$vr, 
+                       .data$vr1)) %>% 
+    select(-.data$n, 
+           -.data$n1, 
+           -.data$mn, 
+           -.data$mn1, 
+           -.data$vr, 
+           -.data$vr1) 
+  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  rename_ref_foc(d, formula)
 }
 
+#' Hedge's d 
+#' 
+#' Wraps the equation into a function
+#' @keywords internal
+#' @param n1 The sample size for group 1
+#' @param n2 The sample size for group 2
+#' @param d The value of Cohen's d
+#' 
+hedg <- function(n1, n2, d) {
+  d * (1 - (3 / (4*(n1 + n2) - 9)))
+}
 
 #' Compute Hedges' \emph{g}
 #' This function calculates effect sizes in terms of Hedges' \emph{g}, also
@@ -74,57 +109,192 @@ td
 #' for a discussion on different types of effect sizes and their
 #' interpretation. Note that missing data are removed from the calculations of 
 #' the means and standard deviations.
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). 
-#' If false, effect sizes returned as a vector.
-#' @return By default the Hedges' \emph{d} for all possible pairings of
+#' @inheritParams coh_d 
+#' @return By default the Hedges' \emph{g} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
 #' @export
 #' @examples
 #' 
 #' # Calculate Hedges' g for all pairwise comparisons
-#' hedg_g(reading ~ condition, star) 
+#' hedg_g(star, reading ~ condition) 
 #' 
 #' # Report only relative to regular-sized classrooms
-#' hedg_g(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg")
+#' hedg_g(star, 
+#'        reading ~ condition, 
+#'        ref_group = "reg")
 #' 
-#' # Return a vector instead of a data frame
-#' hedg_g(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg", 
-#' 		tidy = FALSE)
+#' # Report by ELL and FRL groups for each season, compare to non-ELL students
+#' # who were not eligible for free or reduced price lunch in the fall (using
+#' # the formula interface for reference group referencing).
+#' 
+#' hedg_g(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+#' 
+#' # Same thing but with character vector supplied, rather than a formula
+#' hedg_g(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 
-hedg_g <- function(formula, data, ref_group = NULL, tidy = TRUE) {
-	splt <- parse_form(formula, data)
-
-	ns <- vapply(splt, length, numeric(1))
-	ns <- outer(ns, ns, "+")
-	diag(ns) <- 0
-	v <- as.vector(ns)
-
-	td <- coh_d(formula, data)
-	
-	td$estimate <- td$estimate * (1 - ( 3 /( (4*v[v!=0]) - 9) ) )
-	if(!is.null(ref_group)) {
-		td <- td[td$ref_group == ref_group, ]
-	}
-
-	if(tidy == FALSE) {
-		vec <- td$estimate
-		names(vec) <- paste(td$ref_group, td$foc_group, sep = "-")
-		return(vec)
-	}
-td
+hedg_g <- function(data, formula, ref_group = NULL) {
+  stats <- descrip_stats(data, formula)
+  
+  g <- stats %>% 
+    mutate(coh_d  = coh(.data$n, .data$n1, 
+                        .data$mn, .data$mn1, 
+                        .data$vr, .data$vr1),
+           hedg_g = hedg(.data$n, .data$n1, .data$coh_d)) %>% 
+    select(-.data$n, -.data$n1, 
+           -.data$mn, -.data$mn1, 
+           -.data$vr, -.data$vr1, 
+           -.data$coh_d)
+  
+  if(!is.null(ref_group)) {
+    g <- ref_subset(g, formula, ref_group)
+  }
+  rename_ref_foc(g, formula)
 }
+
+#' Computes the empirical cummulative distribution function for all groups
+#' supplied by the formula.
+#' @inheritParams coh_d
+#' @param cuts Optional vector of cut scores. If supplied, the ECDF will be
+#' guaranteed to include these points. Otherwise, there could be gaps in the 
+#' ECDF at those particular points (used in plotting the cut scores).
+#' @keywords internal
+
+ecdf_fun <- function(data, formula, cuts = NULL) {
+  if(is.null(cuts)) cuts <- 0
+  rhs  <- labels(terms(formula))
+  lhs  <- all.vars(formula)[1]
+  
+  data %>% 
+    group_by(!!!syms(rhs)) %>% 
+    nest() %>% 
+    mutate(ecdf = map(.data$data, ~ecdf(.[[lhs]])),
+           nd   = map(.data$data, ~c(-Inf, sort(c(unique(.[[lhs]]), cuts)), Inf)),
+           ecdf = map2(.data$ecdf,.data$ nd, ~.x(.y))) %>% 
+    select(-.data$data) 
+}
+
+
+#' Pairs empirical cummulative distribution functions for all groups
+#' supplied by the formula.
+#' @inheritParams ecdf_fun
+#' @keywords internal
+
+paired_ecdf <- function(data, formula, cuts = NULL) {
+  ecdf_fun(data, formula, cuts) %>% 
+    mutate(nd = map2(.data$nd, .data$ecdf, ~data.frame(x = .x, y = .y))) %>% 
+    select(-.data$ecdf) %>% 
+    crossing(., .) %>% 
+    filter(!map2_lgl(.data$nd, .data$nd1, ~identical(.x, .y))) %>% 
+    mutate(matched = map2(.data$nd, .data$nd1,
+                          ~data.frame(x = sort(unique(.x$x, .y$x))) %>% 
+                            left_join(.x, by = "x") %>% 
+                            left_join(.y, 
+                                      by = "x",
+                                      suffix = c("_ref", "_foc")) %>% 
+                            fill(names(.)))) %>% 
+    select(-.data$nd, -.data$nd1)
+}
+
+#' Compute the Area Under the \link{pp_plot} Curve
+#' Calculates the area under the \code{pp} curve. The area under the curve is 
+#' also a useful effect-size like statistic, representing the probability that 
+#' a randomly selected individual from the \code{x} distribution will have a 
+#' higher value than a randomly selected individual from the \code{y} 
+#' distribution.
+#' @inheritParams coh_d
+#' @param rename Used primarily for internal purposes. Should the column 
+#' names be renamed to reference the focal and reference groups? Defaults to
+#' \code{TRUE}.
+#' @return By default the area under the curve for all possible pairings of
+#' the grouping factor are returned. 
+#' @export
+#' @examples
+#' 
+#' # Calculate AUC for all pairwise comparisons
+#' auc(star, reading ~ condition) 
+#' 
+#' # Report only relative to regular-sized classrooms
+#' auc(star, 
+#'     reading ~ condition, 
+#'     ref_group = "reg")
+#' 
+#' # Report by ELL and FRL groups for each season, compare to non-ELL students
+#' # who were not eligible for free or reduced price lunch in the fall (using
+#' # the formula interface for reference group referencing).
+#' 
+#' auc(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+#' 
+#' # Same thing but with character vector supplied, rather than a formula
+#' auc(esvis::benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+
+auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
+  rhs <- labels(terms(formula))
+  
+  d <- paired_ecdf(data, formula) %>% 
+    mutate(auc = map_dbl(.data$matched, ~integrate.xy(.$y_ref, .$y_foc))) %>% 
+    select(-.data$matched)
+  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  if(rename) d <- rename_ref_foc(d, formula)
+  d
+}
+
+#' Calculate the V effect size statistic
+#' 
+#' This function calculates the effect size V, as discussed by 
+#' \href{http://www.jstor.org/stable/40263526}{Ho, 2009}. The V
+#' statistic is a transformation of \code{\link{auc}}, interpreted as the 
+#' average difference between the distributions in standard deviation units.
+#' @inheritParams coh_d
+#' @return By default the V statistic for all possible pairings of
+#'  the grouping factor are returned as a tidy data frame. Alternatively, a 
+#' vector can be returned, and/or only the V corresponding to a specific
+#' reference group can be returned.
+#' @export
+#' @examples 
+#' 
+#' # Calculate V for all pairwise comparisons
+#' v(star, reading ~ condition) 
+#' 
+#' # Report only relative to regular-sized classrooms
+#' v(star, 
+#'     reading ~ condition, 
+#'     ref_group = "reg")
+#' 
+#' # Report by ELL and FRL groups for each season, compare to non-ELL students
+#' # who were not eligible for free or reduced price lunch in the fall (using
+#' # the formula interface for reference group referencing).
+#' 
+#' v(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+#' 
+#' # Same thing but with character vector supplied, rather than a formula
+#' v(benchmarks, 
+#'       math ~ ell + frl + season,
+#'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+
+v <- function(data, formula, ref_group = NULL) {
+  d <- auc(data, formula, rename = FALSE) %>% 
+    mutate(v = sqrt(2)*qnorm(auc)) %>% 
+    select(-auc)
+  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  rename_ref_foc(d, formula)
+}
+
 
 #' Compute the proportion above a specific cut location
 #' 
@@ -428,139 +598,3 @@ tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE,
 	}
 td
 }
-
-#' Calculate the area under the curve
-#' 
-#' This function is used within \code{\link{pp_plot}} to calculate the area 
-#' under the \code{pp} curve. The area under the curve is also a useful 
-#' effect-size like statistic, representing the probability that a randomly 
-#' selected individual from distribution a will have a higher value than a 
-#' randomly selected individual from distribution b.
-#' 
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
-#'  false, effect sizes returned as a vector.
-#' @return By default the area under the curve for all possible pairings of
-#' the grouping factor are returned as a tidy data frame. Alternatively, a 
-#' vector can be returned, and/or only the auc corresponding to a specific
-#' reference group can be returned.
-#' @examples
-#' free_reduced <- rnorm(800, 80, 20)
-#' pay <- rnorm(500, 100, 10)
-#' d <- data.frame(score = c(free_reduced, pay), 
-#' 				frl = c(rep("free_reduced", 800),  
-#' 						rep("pay", 500)))
-#' 
-#' auc(score ~ frl, d)
-#' @export
-#' @examples
-#' # Compute AUC for all pairwise comparisons
-#' auc(reading ~ condition, star)
-#' 
-#' # Specify regular-sized classrooms as the reference group
-#' auc(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg")
-#' 
-#' # Return a vector instead of a data frame
-#' auc(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg", 
-#' 		tidy = FALSE)
-
-auc <- function(formula, data, ref_group = NULL, tidy = TRUE) {
-	ps <- probs(formula, data)
-	
-	auc_fun <- function(v) sfsmisc::integrate.xy(ps[ ,v[1]], ps[ ,v[2]])	
-	
-	if(tidy == FALSE) {
-		vec <- create_vec(colnames(ps), auc_fun)
-		if(!is.null(ref_group)) {
-			vec <- vec[grep(paste0("^", ref_group), names(vec))]
-		}
-	return(vec)
-	}
-	
-	if(tidy == TRUE) {
-		td <- tidy_out(colnames(ps), auc_fun)
-		if(!is.null(ref_group)) {
-			td <- td[td$ref_group == ref_group, ]
-		}	
-	}
-td
-} 
-
-#' Calculate the V effect size statistic
-#' 
-#' This function calculates the effect size V, as discussed by Ho, 2009. The V
-#' statistic is a transformation of \code{\link{auc}}, interpreted as the 
-#' average difference between the distributions in standard deviation units.
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
-#'  false, effect sizes returned as a vector.
-#' @return By default the V statistic for all possible pairings of
-#'  the grouping factor are returned as a tidy data frame. Alternatively, a 
-#' vector can be returned, and/or only the V corresponding to a specific
-#' reference group can be returned.
-#' @importFrom stats qnorm
-#' @examples
-#' free_reduced <- rnorm(800, 80, 20)
-#' pay <- rnorm(500, 100, 10)
-#' d <- data.frame(score = c(free_reduced, pay), 
-#' 				frl = c(rep("free_reduced", 800),  
-#' 						rep("pay", 500)))
-#' 
-#' v(score ~ frl, d)
-#' @export
-#' @examples
-#' # Compute V for all pairwise comparisons
-#' v(reading ~ condition, star)
-#' 
-#' # Specify regular-sized classrooms as the reference group
-#' v(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg")
-#' 
-#' # Return a vector instead of a data frame
-#' v(reading ~ condition, 
-#' 		star, 
-#' 		ref_group = "reg", 
-#' 		tidy = FALSE)
-
-v <- function(formula, data, ref_group = NULL, tidy = TRUE) {
-	ps <- probs(formula, data)
-
-	v_fun <- function(v) {
-		sqrt(2)*qnorm(sfsmisc::integrate.xy(ps[ ,v[2]], ps[ ,v[1]]))
-	}
-	
-	if(tidy == FALSE) {
-		vec <- create_vec(colnames(ps), v_fun)
-		if(!is.null(ref_group)) {
-			vec <- vec[grep(paste0("^", ref_group), names(vec))]
-		}
-	return(vec)
-	}
-	
-	if(tidy == TRUE) {
-		td <- tidy_out(colnames(ps), v_fun)
-		if(!is.null(ref_group)) {
-			td <- td[td$ref_group == ref_group, ]
-		}	
-	}
-td	
-} 

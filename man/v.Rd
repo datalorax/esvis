@@ -4,22 +4,26 @@
 \alias{v}
 \title{Calculate the V effect size statistic}
 \usage{
-v(formula, data, ref_group = NULL, tidy = TRUE)
+v(data, formula, ref_group = NULL)
 }
 \arguments{
+\item{data}{The data frame to be plotted}
+
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
-variable can include any arbitrary number of groups.}
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate plots by the secondary or
+tertiary variable of interest (e.g., \code{out ~ group + characteristic1 + 
+characteristic2}). No more than two additional characteristics can be 
+supplied at this time.}
 
-\item{data}{The data frame that the data in the formula come from.}
-
-\item{ref_group}{Optional. If the name of the reference group is provided
-(must be character and match the grouping level exactly), only the
-estimates corresponding to the given reference group will be returned.}
-
-\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
- false, effect sizes returned as a vector.}
+\item{ref_group}{Optional. A character vector or forumla listing the 
+reference group levels for each variable on the right hand side of the 
+formula, supplied in the same order as the formula. Note that if using the
+formula version, levels with hyphens, spaces, etc., should be wrapped in 
+back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
+it is safest to use the back ticks, as they will not interfere with anything
+if they are not needed. See examples below for more details.}
 }
 \value{
 By default the V statistic for all possible pairings of
@@ -28,29 +32,31 @@ vector can be returned, and/or only the V corresponding to a specific
 reference group can be returned.
 }
 \description{
-This function calculates the effect size V, as discussed by Ho, 2009. The V
+This function calculates the effect size V, as discussed by 
+\href{http://www.jstor.org/stable/40263526}{Ho, 2009}. The V
 statistic is a transformation of \code{\link{auc}}, interpreted as the 
 average difference between the distributions in standard deviation units.
 }
 \examples{
-free_reduced <- rnorm(800, 80, 20)
-pay <- rnorm(500, 100, 10)
-d <- data.frame(score = c(free_reduced, pay), 
-				frl = c(rep("free_reduced", 800),  
-						rep("pay", 500)))
 
-v(score ~ frl, d)
-# Compute V for all pairwise comparisons
-v(reading ~ condition, star)
+# Calculate V for all pairwise comparisons
+v(star, reading ~ condition) 
 
-# Specify regular-sized classrooms as the reference group
-v(reading ~ condition, 
-		star, 
-		ref_group = "reg")
+# Report only relative to regular-sized classrooms
+v(star, 
+    reading ~ condition, 
+    ref_group = "reg")
 
-# Return a vector instead of a data frame
-v(reading ~ condition, 
-		star, 
-		ref_group = "reg", 
-		tidy = FALSE)
+# Report by ELL and FRL groups for each season, compare to non-ELL students
+# who were not eligible for free or reduced price lunch in the fall (using
+# the formula interface for reference group referencing).
+
+v(benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+
+# Same thing but with character vector supplied, rather than a formula
+v(benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 }

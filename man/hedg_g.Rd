@@ -11,25 +11,29 @@ for a discussion on different types of effect sizes and their
 interpretation. Note that missing data are removed from the calculations of 
 the means and standard deviations.}
 \usage{
-hedg_g(formula, data, ref_group = NULL, tidy = TRUE)
+hedg_g(data, formula, ref_group = NULL)
 }
 \arguments{
+\item{data}{The data frame to be plotted}
+
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
-variable can include any arbitrary number of groups.}
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate plots by the secondary or
+tertiary variable of interest (e.g., \code{out ~ group + characteristic1 + 
+characteristic2}). No more than two additional characteristics can be 
+supplied at this time.}
 
-\item{data}{The data frame that the data in the formula come from.}
-
-\item{ref_group}{Optional. If the name of the reference group is provided
-(must be character and match the grouping level exactly), only the
-estimates corresponding to the given reference group will be returned.}
-
-\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Wickham, 2014}). 
-If false, effect sizes returned as a vector.}
+\item{ref_group}{Optional. A character vector or forumla listing the 
+reference group levels for each variable on the right hand side of the 
+formula, supplied in the same order as the formula. Note that if using the
+formula version, levels with hyphens, spaces, etc., should be wrapped in 
+back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
+it is safest to use the back ticks, as they will not interfere with anything
+if they are not needed. See examples below for more details.}
 }
 \value{
-By default the Hedges' \emph{d} for all possible pairings of
+By default the Hedges' \emph{g} for all possible pairings of
  the grouping factor are returned as a tidy data frame.
 }
 \description{
@@ -45,16 +49,23 @@ the means and standard deviations.
 \examples{
 
 # Calculate Hedges' g for all pairwise comparisons
-hedg_g(reading ~ condition, star) 
+hedg_g(star, reading ~ condition) 
 
 # Report only relative to regular-sized classrooms
-hedg_g(reading ~ condition, 
-		star, 
-		ref_group = "reg")
+hedg_g(star, 
+       reading ~ condition, 
+       ref_group = "reg")
 
-# Return a vector instead of a data frame
-hedg_g(reading ~ condition, 
-		star, 
-		ref_group = "reg", 
-		tidy = FALSE)
+# Report by ELL and FRL groups for each season, compare to non-ELL students
+# who were not eligible for free or reduced price lunch in the fall (using
+# the formula interface for reference group referencing).
+
+hedg_g(benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+
+# Same thing but with character vector supplied, rather than a formula
+hedg_g(benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 }

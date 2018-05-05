@@ -2,57 +2,70 @@
 % Please edit documentation in R/es_calcs.R
 \name{auc}
 \alias{auc}
-\title{Calculate the area under the curve}
+\title{Compute the Area Under the \link{pp_plot} Curve
+Calculates the area under the \code{pp} curve. The area under the curve is 
+also a useful effect-size like statistic, representing the probability that 
+a randomly selected individual from the \code{x} distribution will have a 
+higher value than a randomly selected individual from the \code{y} 
+distribution.}
 \usage{
-auc(formula, data, ref_group = NULL, tidy = TRUE)
+auc(data, formula, ref_group = NULL, rename = TRUE)
 }
 \arguments{
+\item{data}{The data frame to be plotted}
+
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
-variable can include any arbitrary number of groups.}
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate plots by the secondary or
+tertiary variable of interest (e.g., \code{out ~ group + characteristic1 + 
+characteristic2}). No more than two additional characteristics can be 
+supplied at this time.}
 
-\item{data}{The data frame that the data in the formula come from.}
+\item{ref_group}{Optional. A character vector or forumla listing the 
+reference group levels for each variable on the right hand side of the 
+formula, supplied in the same order as the formula. Note that if using the
+formula version, levels with hyphens, spaces, etc., should be wrapped in 
+back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
+it is safest to use the back ticks, as they will not interfere with anything
+if they are not needed. See examples below for more details.}
 
-\item{ref_group}{Optional. If the name of the reference group is provided
-(must be character and match the grouping level exactly), only the
-estimates corresponding to the given reference group will be returned.}
-
-\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
- false, effect sizes returned as a vector.}
+\item{rename}{Used primarily for internal purposes. Should the column 
+names be renamed to reference the focal and reference groups? Defaults to
+\code{TRUE}.}
 }
 \value{
 By default the area under the curve for all possible pairings of
-the grouping factor are returned as a tidy data frame. Alternatively, a 
-vector can be returned, and/or only the auc corresponding to a specific
-reference group can be returned.
+the grouping factor are returned.
 }
 \description{
-This function is used within \code{\link{pp_plot}} to calculate the area 
-under the \code{pp} curve. The area under the curve is also a useful 
-effect-size like statistic, representing the probability that a randomly 
-selected individual from distribution a will have a higher value than a 
-randomly selected individual from distribution b.
+Compute the Area Under the \link{pp_plot} Curve
+Calculates the area under the \code{pp} curve. The area under the curve is 
+also a useful effect-size like statistic, representing the probability that 
+a randomly selected individual from the \code{x} distribution will have a 
+higher value than a randomly selected individual from the \code{y} 
+distribution.
 }
 \examples{
-free_reduced <- rnorm(800, 80, 20)
-pay <- rnorm(500, 100, 10)
-d <- data.frame(score = c(free_reduced, pay), 
-				frl = c(rep("free_reduced", 800),  
-						rep("pay", 500)))
 
-auc(score ~ frl, d)
-# Compute AUC for all pairwise comparisons
-auc(reading ~ condition, star)
+# Calculate AUC for all pairwise comparisons
+auc(star, reading ~ condition) 
 
-# Specify regular-sized classrooms as the reference group
-auc(reading ~ condition, 
-		star, 
-		ref_group = "reg")
+# Report only relative to regular-sized classrooms
+auc(star, 
+    reading ~ condition, 
+    ref_group = "reg")
 
-# Return a vector instead of a data frame
-auc(reading ~ condition, 
-		star, 
-		ref_group = "reg", 
-		tidy = FALSE)
+# Report by ELL and FRL groups for each season, compare to non-ELL students
+# who were not eligible for free or reduced price lunch in the fall (using
+# the formula interface for reference group referencing).
+
+auc(benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
+
+# Same thing but with character vector supplied, rather than a formula
+auc(esvis::benchmarks, 
+      math ~ ell + frl + season,
+      ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 }
