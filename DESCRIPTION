@@ -40,7 +40,8 @@ Imports:
     magrittr,
     dplyr,
     rlang,
-    tidyr
+    tidyr,
+    purrr
 URL: https://github.com/DJAnderson07/esvis
 BugReports: https://github.com/DJAnderson07/esvis/issues
 License: MIT + file LICENSE
