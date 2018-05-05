@@ -65,29 +65,29 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
   lhs  <- all.vars(formula)[1]
   rhs  <- labels(terms(formula))
   
-  data <- data %>% 
-    mutate_at(rhs, as.factor)
-  
   if(center) {
       data <- data %>% 
         select(vars) %>% 
         group_by_at(rhs) %>% 
         mutate(!!sym(lhs) := scale(!!sym(lhs), scale = FALSE))
   }
+  
+  d <- ecdf_fun(data, formula, cuts) %>% 
+    unnest()
 
-  p <- ggplot(data, aes_(as.name(vars[1])))
+  p <- ggplot(d, aes_(quote(nd), quote(ecdf)))
 
   if(length(rhs) == 2) {
-    p <- p + facet_wrap(as.formula(paste0("~", vars[3])))
+    p <- p + facet_wrap(as.formula(paste0("~", rhs[2])))
   }
   if(length(rhs) == 3) {
-    p <- p + facet_grid(as.formula(paste0(vars[4], "~", vars[3])))
+    p <- p + facet_grid(as.formula(paste0(rhs[3], "~", rhs[2])))
   }
   
   if(!is.null(cuts)) {
    p <- p + geom_vline(xintercept = cuts, 
-                       color = ref_line_cols,
-                       linetype = ref_linetype) 
+                       color      = ref_line_cols,
+                       linetype   = ref_linetype) 
    if(ref_rect) {
      ref_cut_d <- data %>%
        select(rhs) %>% 
@@ -101,11 +101,13 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
                             ymin = 0,
                             ymax = Inf),
                    ref_cut_d,
-                   fill = ref_rect_col, 
+                   fill  = ref_rect_col, 
                    alpha = ref_rect_alpha) 
     }
   }
-  p + stat_ecdf(aes_(color = as.name(vars[2])),
+  p + geom_step(aes_(color = as.name(rhs[1])),
                 size = linewidth) +
-    labs(y = "Proportion")
+    labs(x = lhs,
+         y = "Proportion")
 }
+
