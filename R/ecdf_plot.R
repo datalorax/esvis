@@ -61,13 +61,12 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
                       center = FALSE, ref_rect = TRUE,
                       ref_rect_col = "gray40", ref_rect_alpha = 0.15) {
   
-  vars <- all.vars(formula)
   lhs  <- all.vars(formula)[1]
   rhs  <- labels(terms(formula))
   
   if(center) {
       data <- data %>% 
-        select(vars) %>% 
+        select(lhs, rhs) %>% 
         group_by_at(rhs) %>% 
         mutate(!!sym(lhs) := scale(!!sym(lhs), scale = FALSE))
   }
@@ -75,7 +74,7 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
   d <- ecdf_fun(data, formula, cuts) %>% 
     unnest()
 
-  p <- ggplot(d, aes_(quote(nd), quote(ecdf)))
+  p <- ggplot(d, aes_(~nd, ~ecdf))
 
   if(length(rhs) == 2) {
     p <- p + facet_wrap(as.formula(paste0("~", rhs[2])))
@@ -89,20 +88,17 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
                        color      = ref_line_cols,
                        linetype   = ref_linetype) 
    if(ref_rect) {
-     ref_cut_d <- data %>%
-       select(rhs) %>% 
-       group_by_all() %>% 
-       distinct() %>% 
-       data.frame(., as.data.frame(t(cuts))) %>% 
-       gather("dis", "math", -rhs)
-    
-     p <- p + geom_rect(aes_(xmin = as.name(lhs),
+     ref_cut_d <- as.data.frame(t(cuts)) %>% 
+       gather("dis", "nd") 
+   
+     p <- p + geom_rect(aes_(xmin = ~nd,
                             xmax = Inf,
                             ymin = 0,
                             ymax = Inf),
-                   ref_cut_d,
-                   fill  = ref_rect_col, 
-                   alpha = ref_rect_alpha) 
+                        ref_cut_d,
+                        fill  = ref_rect_col, 
+                        alpha = ref_rect_alpha,
+                   inherit.aes = FALSE) 
     }
   }
   p + geom_step(aes_(color = as.name(rhs[1])),

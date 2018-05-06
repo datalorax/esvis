@@ -15,14 +15,14 @@ rename_ref_foc <- function(data, formula) {
   data
 }
 
-
-
 ref_subset <- function(out, formula, ref_group) {
   rhs  <- labels(terms(formula))
+  
   if(is.formula(ref_group)) {
     ref_group <- gsub("`", "", labels(terms(ref_group)))
   }
-  ref_join <- data.frame(as.list(ref_group), stringsAsFactors = FALSE)
+  ref_join <- data.frame(as.list(as.character(ref_group)), 
+                         stringsAsFactors = FALSE)
   names(ref_join) <- rhs[seq_along(ref_group)]
   
   suppressMessages(semi_join(out, ref_join))
@@ -43,6 +43,7 @@ descrip_stats <- function(data, formula) {
   lhs  <- all.vars(formula)[1]
  
   data %>% 
+    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>% 
     group_by(!!!syms(rhs)) %>% 
     summarize(n    = n(),
               mn = mean(!!sym(lhs), na.rm = TRUE),

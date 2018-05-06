@@ -25,10 +25,11 @@ supplied at this time.}
 \item{ref_group}{Optional. A character vector or forumla listing the 
 reference group levels for each variable on the right hand side of the 
 formula, supplied in the same order as the formula. Note that if using the
-formula version, levels with hyphens, spaces, etc., should be wrapped in 
-back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
-it is safest to use the back ticks, as they will not interfere with anything
-if they are not needed. See examples below for more details.}
+formula version, levels that are numbers, or include hyphens, spaces, etc., 
+should be wrapped in back ticks (e.g., 
+\code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
+in doubt, it is safest to use the back ticks, as they will not interfere 
+with anything if they are not needed. See examples below for more details.}
 
 \item{rename}{Used primarily for internal purposes. Should the column 
 names be renamed to reference the focal and reference groups? Defaults to
@@ -65,7 +66,7 @@ auc(benchmarks,
       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
 
 # Same thing but with character vector supplied, rather than a formula
-auc(esvis::benchmarks, 
+auc(benchmarks, 
       math ~ ell + frl + season,
       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 }

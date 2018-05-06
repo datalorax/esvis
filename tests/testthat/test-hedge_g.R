@@ -1,16 +1,45 @@
 set.seed(100)
-test_data1 <- data.frame(g = c(rep(1, 1e4), rep(2, 1e4)),
-						score = c(rnorm(1e4), rnorm(1e4)))
-test_data2 <- data.frame(g = c(rep(1, 1e4), rep(2, 1e4)),
-						score = c(rnorm(1e4), rnorm(1e4, 1)))
+test_data1 <- data.frame(g     = c(rep(1, 1e4), rep(2, 1e4)),
+                         score = c(round(rnorm(1e4), 5), 
+                                   round(rnorm(1e4), 5)))
+test_data2 <- data.frame(g     = c(rep(1, 1e4), rep(2, 1e4)),
+                         score = c(round(rnorm(1e4), 5), 
+                                   round(rnorm(1e4, 1), 5)))
 
-test_that("Area under the curve computes and outputs correctly", {
-	expect_true(round(hedg_g(score ~ g, test_data1, 1, tidy = FALSE), 1) == 0)
-	expect_true(round(hedg_g(score ~ g, test_data2, 1, tidy = FALSE), 1) == 1)
-	expect_output(str(hedg_g(score ~ g, test_data1)), "data.frame")
-	expect_output(str(hedg_g(score ~ g, test_data1, tidy = FALSE)), 
-		"Named num")
-	expect_equal(names(hedg_g(score ~ g, test_data1, tidy = FALSE)), 
-		c("1-2", "2-1"))
-	expect_equal(nrow(hedg_g(mean ~ grade, seda, 8)), 5)
+test_that("Hedges g computes and outputs correctly", {
+	expect_equal(hedg_g(test_data1, score ~ g)$hedg_g[1], 0, tolerance = 0.03)
+	expect_equal(hedg_g(test_data2, score ~ g)$hedg_g[1], -1, tolerance = 0.03)
+})
+
+# ((Levels 1 * Levels 2) * (Levels 1 * Levels 2)) - (Levels 1 * Levels 2) 
+test_that("Reference group subsetting works correctly", {
+  expect_equal(nrow(hedg_g(seda, mean ~ grade)), 6*5)
+  expect_equal(nrow(hedg_g(seda, mean ~ grade, ~`8`)), 5)
+  expect_equal(nrow(hedg_g(seda, mean ~ grade, "8")), 5)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season, "Fall")), 2)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season, ~Winter)), 2)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + ell)), 
+               ((3*3)*(3*3)) - (3*3))
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + ell, 
+                        ~Fall + `Non-ELL`)), 
+               (3*3) - 1)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + ell, 
+                        c("Fall", "Non-ELL"))), 
+               (3*3) - 1)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + ell, 
+                        ~Fall)), 
+               (3*3*3) - 3)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + ell, 
+                        c("Fall"))), 
+               (3*3*3) - 3)
+  
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + frl + ethnicity)), 
+               ((3*2*6)*(3*2*6)) - (3*2*6))
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + frl + ethnicity,
+                        ~Fall + `Non-FRL` + White)), 
+               (3*2*6) - 1)
+  expect_equal(nrow(hedg_g(benchmarks, math ~ season + frl + ethnicity,
+                        ~Fall + `Non-FRL`)), 
+               ((3*2*6)*6) - 6)
+               
 })

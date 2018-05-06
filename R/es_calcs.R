@@ -34,10 +34,11 @@ coh <- function(n1, n2, mn1, mn2, vr1, vr2) {
 #' @param ref_group Optional. A character vector or forumla listing the 
 #' reference group levels for each variable on the right hand side of the 
 #' formula, supplied in the same order as the formula. Note that if using the
-#' formula version, levels with hyphens, spaces, etc., should be wrapped in 
-#' back ticks (e.g., \code{ref_group = ~ Active + `Non-FRL`}). When in doubt,
-#' it is safest to use the back ticks, as they will not interfere with anything
-#' if they are not needed. See examples below for more details.
+#' formula version, levels that are numbers, or include hyphens, spaces, etc., 
+#' should be wrapped in back ticks (e.g., 
+#' \code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
+#' in doubt, it is safest to use the back ticks, as they will not interfere 
+#' with anything if they are not needed. See examples below for more details.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
 #'  the grouping factor(s) are returned.
 #' @export
@@ -169,6 +170,7 @@ ecdf_fun <- function(data, formula, cuts = NULL) {
   lhs  <- all.vars(formula)[1]
   
   data %>% 
+    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>% 
     group_by(!!!syms(rhs)) %>% 
     nest() %>% 
     mutate(ecdf = map(.data$data, ~ecdf(.[[lhs]])),
@@ -231,9 +233,10 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
 #'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
 #' 
 #' # Same thing but with character vector supplied, rather than a formula
-#' auc(esvis::benchmarks, 
+#' auc(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+
 
 auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
   rhs <- labels(terms(formula))
