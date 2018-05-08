@@ -8,15 +8,15 @@ supplied by the formula.}
 paired_ecdf(data, formula, cuts = NULL)
 }
 \arguments{
-\item{data}{The data frame to be plotted}
+\item{data}{The data frame used for estimation - ideally structured in a tidy 
+format.}
 
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
 variable can include any arbitrary number of groups. Additional variables 
-can be included with \code{+} to produce separate plots by the secondary or
-tertiary variable of interest (e.g., \code{out ~ group + characteristic1 + 
-characteristic2}). No more than two additional characteristics can be 
-supplied at this time.}
+can be included with \code{+} to produce separate estimates by the secondary 
+or tertiary variables of interest (e.g., \code{out ~ group + characteristic1 
++ characteristic2}).}
 
 \item{cuts}{Optional vector of cut scores. If supplied, the ECDF will be
 guaranteed to include these points. Otherwise, there could be gaps in the 
