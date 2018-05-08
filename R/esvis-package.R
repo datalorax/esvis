@@ -4,16 +4,16 @@
 #'   geom_abline geom_rect 
 #' @importFrom dplyr mutate mutate_at select group_by_at arrange distinct 
 #'   filter matches group_by_all group_by summarize n left_join semi_join
-#'   vars funs
-#' @importFrom tidyr spread fill gather separate crossing nest unnest
-#' @importFrom purrr map map_dbl map2 map2_lgl
+#'   vars funs ends_with rename tbl_df
+#' @importFrom tidyr spread fill gather separate crossing nest unnest 
+#' @importFrom purrr map map_dbl map2 map2_lgl map2_df
 #' @importFrom rlang := sym syms quo .data
 #' @importFrom magrittr %>%
 #' @importFrom graphics par layout lines segments rect polygon
 #' @importFrom utils installed.packages
 #' @importFrom grDevices adjustcolor
 #' @importFrom sfsmisc integrate.xy
-#' @importFrom stats as.formula terms setNames ecdf
+#' @importFrom stats as.formula terms setNames ecdf qnorm
 "_PACKAGE"
 
 if(getRversion() >= "2.15.1")  utils::globalVariables(c("."))
