@@ -2,17 +2,19 @@ is.formula <- function(x){
    inherits(x,"formula")
 }
 
-rename_ref_foc <- function(data, formula) {
+rename_ref_foc <- function(out, formula) {
    rhs  <- labels(terms(formula))
    
-   nms_ref <- names(data)[names(data) %in% rhs]
-   nms_ref <- paste0(nms_ref,"_ref")
-  
-   nms_foc <- names(data)[grepl("\\d$", names(data))]
-   nms_foc <- gsub("\\d", "_foc", nms_foc)
+   ref <- names(out) %in% rhs
+   foc <- grepl(paste0(rhs, "\\d$", collapse = "|"), names(out))
    
-   names(data)[seq_along(c(nms_ref, nms_foc))] <- c(nms_ref, nms_foc)
-  data
+   nms_ref <- paste0(names(out)[ref],"_ref")
+   nms_foc <- gsub("\\d", "_foc", names(out)[foc])
+   
+   names(out)[ref] <- nms_ref
+   names(out)[foc] <- nms_foc
+   
+   out
 }
 
 ref_subset <- function(out, formula, ref_group) {
