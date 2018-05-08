@@ -4,64 +4,55 @@
 \alias{pac}
 \title{Compute the proportion above a specific cut location}
 \usage{
-pac(formula, data, cut, ref_group = NULL, diff = TRUE, tidy = TRUE)
+pac(data, formula, cuts, ref_group = NULL)
 }
 \arguments{
+\item{data}{The data frame used for estimation - ideally structured in a tidy 
+format.}
+
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
 the outcome variable and \code{group} is the grouping variable. Note this
-variable can include any arbitrary number of groups.}
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate estimates by the secondary 
+or tertiary variables of interest (e.g., \code{out ~ group + characteristic1 
++ characteristic2}).}
 
-\item{data}{The data frame that the data in the formula come from.}
+\item{cuts}{Optional vector of cut scores. If supplied, the ECDF will be
+guaranteed to include these points. Otherwise, there could be gaps in the 
+ECDF at those particular points (used in plotting the cut scores).}
 
-\item{cut}{The point(s) at the scale from which the proportion above should
-be calculated from.}
-
-\item{ref_group}{Optional. If the name of the reference group is provided
-(must be character and match the grouping level exactly), only the
-estimates corresponding to the given reference group will be returned.}
-
-\item{diff}{Logical, defaults to \code{TRUE}. Should the difference between
-the groups be returned? If \code{FALSE} the raw proportion above
-the cut is returned for each group.}
-
-\item{tidy}{Logical. Should the data be returned in a tidy data frame? (see
-\href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
- false, effect sizes returned as a vector.}
+\item{ref_group}{Optional. A character vector or forumla listing the 
+reference group levels for each variable on the right hand side of the 
+formula, supplied in the same order as the formula. Note that if using the
+formula version, levels that are numbers, or include hyphens, spaces, etc., 
+should be wrapped in back ticks (e.g., 
+\code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
+in doubt, it is safest to use the back ticks, as they will not interfere 
+with anything if they are not needed. See examples below for more details.}
 }
 \value{
-Tidy data frame (or vector) of the proportion above the cutoff for 
+Tidy data frame of the proportion above the cutoff for 
 each (or selected) groups.
 }
 \description{
-This rather simple function  calls \link{cdfs}, to compute the
-empirical cumulative distribution function for all levels of the grouping 
-factor, and then calculates the proportion of the sample above any generic
-point on the scale for all groups. Alternatively only specific proportions
-can be returned.
+Computes the proportion of the corresponding group, as specified by the
+\code{formula}, scoring above the specified \code{cuts}.
 }
 \examples{
 # Compute differences for all pairwise comparisons for each of three cuts
-pac(reading ~ condition, 
-		star, 
-		cut = c(450, 500, 550)) 
+pac(star,
+    reading ~ condition, 
+		 cut = c(450, 500, 550)) 
+		 
+pac(star,
+    reading ~ condition + freelunch + race, 
+		 cut = c(450, 500))
 
-# Report raw PAC, instead of differences in PAC
-pac(reading ~ condition, 
-		star, 
-		cut = c(450, 500, 550), 
-		diff = FALSE) 
-
-# Report differences with regular-sized classrooms as the reference group
-pac(reading ~ condition, 
-		star, 
-		cut = c(450, 500, 550), 
-		ref_group = "reg") 
-
-# Return a matrix instead of a data frame 
-# (returns a vector if only one cut is provided)
-pac(reading ~ condition, 
-		star, 
-		cut = c(450, 500, 550), 
-		ref_group = "reg",
-		tidy = FALSE) 
+pac(star,
+    reading ~ condition + freelunch + race, 
+		 cut = c(450, 500),
+		 ref_group = ~small + no + white) 
+}
+\seealso{
+[esvis::pac_compare(), esvis::tpac(), esvis::tpac_diff()]
 }

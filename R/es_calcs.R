@@ -30,7 +30,14 @@ coh <- function(n1, n2, mn1, mn2, vr1, vr2) {
 #' for a discussion on different types of effect sizes and their
 #' interpretation. Note that missing data are removed from the calculations of 
 #' the means and standard deviations.
-#' @inheritParams pp_plot 
+#' @param data The data frame used for estimation - ideally structured in a tidy 
+#' format.
+#' @param formula A formula of the type \code{out ~ group} where \code{out} is
+#' the outcome variable and \code{group} is the grouping variable. Note this
+#' variable can include any arbitrary number of groups. Additional variables 
+#' can be included with \code{+} to produce separate estimates by the secondary 
+#' or tertiary variables of interest (e.g., \code{out ~ group + characteristic1 
+#' + characteristic2}). 
 #' @param ref_group Optional. A character vector or forumla listing the 
 #' reference group levels for each variable on the right hand side of the 
 #' formula, supplied in the same order as the formula. Note that if using the
@@ -179,7 +186,6 @@ ecdf_fun <- function(data, formula, cuts = NULL) {
     select(-.data$data) 
 }
 
-
 #' Pairs empirical cummulative distribution functions for all groups
 #' supplied by the formula.
 #' @inheritParams ecdf_fun
@@ -236,7 +242,6 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
 #' auc(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
-
 
 auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
   rhs <- labels(terms(formula))
@@ -298,136 +303,107 @@ v <- function(data, formula, ref_group = NULL) {
   rename_ref_foc(d, formula)
 }
 
-
 #' Compute the proportion above a specific cut location
 #' 
-#' This rather simple function  calls \link{cdfs}, to compute the
-#' empirical cumulative distribution function for all levels of the grouping 
-#' factor, and then calculates the proportion of the sample above any generic
-#' point on the scale for all groups. Alternatively only specific proportions
-#' can be returned.
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param cut The point(s) at the scale from which the proportion above should
-#' be calculated from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param diff Logical, defaults to \code{TRUE}. Should the difference between
-#' the groups be returned? If \code{FALSE} the raw proportion above
-#' the cut is returned for each group.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
-#'  false, effect sizes returned as a vector.
-#' @return Tidy data frame (or vector) of the proportion above the cutoff for 
+#' Computes the proportion of the corresponding group, as specified by the
+#' \code{formula}, scoring above the specified \code{cuts}.
+#' @inheritParams ecdf_fun
+#' @inheritParams coh_d
+#' @return Tidy data frame of the proportion above the cutoff for 
 #' each (or selected) groups.
+#' @seealso [esvis::pac_compare(), esvis::tpac(), esvis::tpac_diff()]
 #' @export 
 #' @examples
 #' # Compute differences for all pairwise comparisons for each of three cuts
-#' pac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550)) 
+#' pac(star,
+#'     reading ~ condition, 
+#' 		 cut = c(450, 500, 550)) 
+#' 		 
+#' pac(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500))
 #' 
-#' # Report raw PAC, instead of differences in PAC
-#' pac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		diff = FALSE) 
+#' pac(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500),
+#' 		 ref_group = ~small + no + white) 
+
+pac <- function(data, formula, cuts, ref_group = NULL) {
+  d <- ecdf_fun(data, formula, cuts) %>% 
+    cbind(., data.frame(t(cuts))) %>% 
+    tbl_df() 
+  
+  if(length(cuts) == 1) {
+    d <- d %>% 
+      rename("cuts" = "t.cuts.") %>% 
+      unnest()
+  }
+  if(length(cuts) > 1) {
+    d <- d %>% 
+      gather("dis", "cut", matches("^X\\d")) %>% 
+      unnest() %>% 
+      filter(.data$nd == .data$cut)
+  }  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  d %>% 
+    mutate(pac = 1 - .data$ecdf) %>% 
+    distinct() %>% 
+    select(-.data$ecdf, -.data$nd, -.data$dis)
+}
+
+#' Compute the difference in the proportion above a specific cut location
 #' 
-#' # Report differences with regular-sized classrooms as the reference group
-#' pac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		ref_group = "reg") 
+#' Computes the difference in the proportion above the specified \code{cuts} 
+#' for all possible pairwise comparisons of the groups specified by the 
+#' \code{formula}.
+#' @inheritParams ecdf_fun
+#' @inheritParams coh_d
+#' @return Tidy data frame of the proportion above the cutoff for 
+#' each (or selected) groups.
+#' @seealso [esvis::pac(), esvis::tpac(), esvis::tpac_diff()]
+#' @export 
+#' @examples
+#' # Compute differences for all pairwise comparisons for each of three cuts
+#' pac_compare(star,
+#'     reading ~ condition, 
+#' 		 cut = c(450, 500, 550)) 
+#' 		 
+#' pac_compare(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500))
 #' 
-#' # Return a matrix instead of a data frame 
-#' # (returns a vector if only one cut is provided)
-#' pac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		ref_group = "reg",
-#' 		tidy = FALSE) 
+#' pac_compare(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500),
+#' 		 ref_group = ~small + no + white) 
 
-pac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
-			tidy = TRUE) {
-
-	ecdfs <- cdfs(formula, data)
-	pacs <- vapply(ecdfs, function(f) 1 - f(cut), numeric(length(cut)))
-
-	if(diff == FALSE) {
-		if(is.null(dim(pacs))) {
-			if(tidy == TRUE) {
-				td <- data.frame(group = names(pacs), 
-								 estimate = pacs)
-				rownames(td) <- NULL
-			}
-			if(tidy == FALSE) {
-				if(!is.null(ref_group)) {
-					pacs <- pacs[as.character(ref_group)]
-				}
-				return(pacs)
-			}
-		}
-		else {
-			if(tidy == TRUE) {
-				td <- data.frame(group = rep(colnames(pacs), 
-												each = nrow(pacs)),
-								cut = rep(cut, ncol(pacs)))
-				dim(pacs) <- NULL
-				td$estimate <- pacs
-				
-				if(!is.null(ref_group)) {
-					td <- td[td$group == ref_group, ]
-				}
-			return(td)
-			}
-			if(tidy == FALSE) {
-				rownames(pacs) <- cut
-			return(pacs)
-			}	
-		}
-	}
-	if(diff == TRUE) {
-		if(is.null(dim(pacs))) {
-			diff_pac <- function(v) pacs[[ v[1] ]] - pacs[[ v[2] ]]	
-			if(tidy == TRUE) {
-				td <- tidy_out(names(pacs), diff_pac)
-			}
-
-			if(tidy == FALSE) {
-				vec <- create_vec(names(pacs), diff_pac)
-				if(!is.null(ref_group)) {
-					vec <- vec[grep(paste0("^", ref_group), names(vec))]
-				}
-				return(vec)
-			}
-		}
-		else {
-			diff_pac <- function(v) pacs[ ,v[1]] - pacs[ ,v[2]]
-			rownames(pacs) <- cut
-			td <- tidy_out(colnames(pacs), diff_pac)
-			
-			if(tidy == FALSE) {
-				splt_td <- split(td$estimate, td$cut)
-				
-				nms <- subset(td, cut == cut[1], select = c(1, 2))
-				nms <- apply(nms, 1, paste, collapse = "-")
-
-				splt_td <- lapply(splt_td, function(x) {
-					names(x) <- nms
-					return(x)
-				})
-				mat <- do.call("rbind", splt_td)
-			return(mat)
-			}			
-		}
-	}
-	if(!is.null(ref_group)) {
-		td <- td[td$ref_group == ref_group, ]
-	}
-td
+pac_compare <- function(data, formula, cuts, ref_group = NULL) {
+  rhs <- labels(terms(formula))
+  d <- pac(data, formula, cuts) %>% 
+    crossing(., .) %>% 
+    filter(cut == .data$cut1) %>% 
+    mutate(pac_diff = .data$pac - .data$pac1) 
+  
+  d <- map2_df(rhs, 
+          paste0(rhs, 1), 
+          ~filter(d, !!sym(.x) != !!sym(.y)))
+  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  d <- rename_ref_foc(d, formula)
+  
+  d %>%
+     rename("pac_ref" = "pac",
+            "pac_foc" = "pac1") %>%
+     select(.data$cut,
+            ends_with("_ref"),
+            ends_with("_foc"),
+            .data$pac_diff, 
+            -.data$cut1)
+    
 }
 
 #' Transformed proportion above the cut
@@ -437,167 +413,68 @@ td
 #' common variances. See 
 #' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
 #'  Reardon, 2012}
-#' @param formula A formula of the type \code{out ~ group} where \code{out} is
-#' the outcome variable and \code{group} is the grouping variable. Note this
-#' variable can include any arbitrary number of groups.
-#' @param data The data frame that the data in the formula come from.
-#' @param cut The point at the scale from which the proportion above should
-#' be calculated from.
-#' @param ref_group Optional. If the name of the reference group is provided
-#' (must be character and match the grouping level exactly), only the
-#' estimates corresponding to the given reference group will be returned.
-#' @param diff Logical, defaults to \code{TRUE}. Should the difference between
-#' the groups be returned? If \code{FALSE} the raw proportion above
-#' the cut is returned for each group.
-#' @param tidy Logical. Should the data be returned in a tidy data frame? (see
-#' \href{https://www.jstatsoft.org/article/view/v059i10}{Wickham, 2014}). If
-#' false, effect sizes returned as a matrix or vector (depending on other
-#' arguments passed).
-#' @return A tidy data frame (or vector) of the transformed proportion above
-#' the cutoff. Optionally (and by default) all pairwise comparisons are 
-#' calculated and returned.
-#' @importFrom stats qnorm
+#' @inheritParams ecdf_fun
+#' @inheritParams coh_d
+#' @return Tidy data frame of the proportion above the cutoff for 
+#' each (or selected) groups.
+#' @seealso [esvis::pac(), esvis::pac_diff(), esvis::tpac_compare()]
 #' @export 
 #' @examples
-#' # Compute transformed PAC differences for all pairwise comparisons 
-#' # for each of three cuts
-#' tpac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550)) 
+#' # Compute differences for all pairwise comparisons for each of three cuts
+#' tpac(star,
+#'     reading ~ condition, 
+#' 		 cut = c(450, 500, 550)) 
+#' 		 
+#' tpac(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500))
 #' 
-#' # Report raw transformed PAC, instead of differences in transformed PAC
-#' tpac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		diff = FALSE) 
+#' tpac(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500),
+#' 		 ref_group = ~small + no + white)  
+
+tpac <- function(data, formula, cuts, ref_group = NULL) {
+  pac(data, formula, cuts, ref_group) %>% 
+    mutate(pac = qnorm(.data$pac)) %>% 
+    rename("tpac" = "pac")
+}
+
+#' Compare Transformed Proportion Above the Cut
 #' 
-#' # Report transformed differences with regular-sized classrooms as the
-#' # reference group
-#' tpac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		ref_group = "reg") 
+#' This function compares all possible pairwise comparisons, as supplied by 
+#' \code{formula}, in terms of the transformed proportion above the cut. This
+#' is an effect-size like measure of the differences between two groups as the
+#' cut point(s) in the distribution. See 
+#' \href{http://journals.sagepub.com/doi/abs/10.3102/1076998611411918}{Ho &
+#'  Reardon, 2012}
+#' @inheritParams ecdf_fun
+#' @inheritParams coh_d
+#' @return Tidy data frame of the proportion above the cutoff for 
+#' each (or selected) groups.
+#' @seealso [esvis::pac(), esvis::pac_diff(), esvis::tpac()]
+#' @export 
+#' @examples
+#' # Compute differences for all pairwise comparisons for each of three cuts
+#' tpac_compare(star,
+#'     reading ~ condition, 
+#' 		 cut = c(450, 500, 550)) 
+#' 		 
+#' tpac_compare(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500))
 #' 
-#' # Return a matrix instead of a data frame 
-#' # (returns a vector if only one cut is provided)
-#' tpac(reading ~ condition, 
-#' 		star, 
-#' 		cut = c(450, 500, 550), 
-#' 		ref_group = "reg",
-#' 		tidy = FALSE) 
+#' tpac_compare(star,
+#'     reading ~ condition + freelunch + race, 
+#' 		 cut = c(450, 500),
+#' 		 ref_group = ~small + no + white)  
 
-
-tpac <- function(formula, data, cut, ref_group = NULL, diff = TRUE, 
-			tidy = TRUE) {
-	pacs <- pac(formula, data, cut, diff = FALSE, tidy = FALSE)
-	tpacs <- qnorm(pacs)
-	
-	if(any(tpacs == Inf|tpacs == -Inf)) {
-				warning(
-					paste("100% or 0% of the sample (for one or more groups)",
-						"scored above/below this cut point. Cannot transform",
-						"to normal scale.")
-					)
-	}
-	
-	if(diff == FALSE) {
-		if(tidy) {
-			if(is.null(dim(tpacs))) {
-				td <- data.frame(group = names(tpacs), 
-							 estimate = tpacs)
-				rownames(td) <- NULL
-			}
-			else {
-				td <- data.frame(group = rep(colnames(tpacs), 
-												each = nrow(tpacs)),
-								cut = rep(cut, ncol(tpacs)))
-				dim(tpacs) <- NULL
-				td$estimate <- tpacs
-				if(!is.null(ref_group)) {
-					td <- td[td$group == ref_group, ]
-				}
-			return(td)
-			}
-		}
-		if(tidy == FALSE) {
-			return(tpacs)	
-		}
-	}
-	
-	if(length(tpacs) == 1 & diff == TRUE) {
-		warning(
-			paste("Only one group specified with `diff = TRUE`.", 
-				  "Call to `diff` will be ignored")
-			)
-		return(tpacs)
-	}
-
-	if(diff == TRUE) {
-		if(is.null(dim(tpacs))) {
-			diff_tpac <- function(v) tpacs[[ v[1] ]] - tpacs[[ v[2] ]]
-
-			if(tidy == FALSE) {
-				vec <- create_vec(names(tpacs), diff_tpac)
-				
-				if(!is.null(ref_group)) {
-					vec <- vec[grep(paste0("^", ref_group), names(vec))]
-				}
-			return(vec)
-			}
-			if(tidy == TRUE) {
-				td <- tidy_out(names(tpacs), diff_tpac)
-				if(!is.null(ref_group)) {
-					td <- td[td$ref_group == ref_group, ]
-				}
-			}
-		}
-		else {
-			diffs_1 <- Map(function(i) 
-								apply(combn(tpacs[i, ], 2), 2, diff), 
-					   	   seq_len(nrow(tpacs)))
-
-			diffs_1 <- lapply(diffs_1, function(x) {
-				names(x) <- apply(
-					combn(colnames(tpacs), 2), 
-					2, 
-					paste, collapse = "-")
-				x
-			})
-			names(diffs_1) <- rownames(tpacs)
-			diffs_1 <- do.call(rbind, diffs_1)
-	
-			diffs_2 <- Map(function(i) 
-								apply(combn(rev(tpacs[i, ]), 2), 2, diff), 
-							seq_len(nrow(tpacs)))
-			diffs_2 <- lapply(diffs_2, function(x) {
-				names(x) <- apply(
-					combn(rev(colnames(tpacs)), 2), 
-					2, 
-					paste, collapse = "-")
-				x
-			})
-			names(diffs_2) <- rownames(tpacs)
-			diffs_2 <- do.call(rbind, diffs_2)
-			
-			if(tidy == FALSE) {
-				m <- cbind(diffs_1, diffs_2)
-			return(m)
-			}
-			else {
-				one <- as.data.frame.table(diffs_1, responseName = "estimate")
-				two <- as.data.frame.table(diffs_2, responseName = "estimate")	
-				td <- rbind(one, two)
-				vars <- strsplit(as.character(td$Var2), "-")
-				td$ref_group <- vapply(vars, function(x) x[1], character(1))
-				td$foc_group <- vapply(vars, function(x) x[2], character(1))
-				names(td)[1] <- "cut"
-				td <- td[order(td$ref_group), c(4:5, 1, 3)]
-				rownames(td) <- NULL
-				if(!is.null(ref_group)) {
-					td <- td[td$ref_group == ref_group, ]
-				}
-			}
-		}
-	}
-td
+tpac_compare <- function(data, formula, cuts, ref_group = NULL) {
+  pac_compare(data, formula, cuts, ref_group) %>% 
+    mutate(pac_ref = qnorm(.data$pac_ref),
+           pac_foc = qnorm(.data$pac_foc),
+           tpac_diff = .data$pac_ref - .data$pac_foc) %>% 
+    rename("tpac_ref" = "pac_ref",
+           "tpac_foc" = "pac_foc") %>% 
+    select(-.data$pac_diff)
 }
