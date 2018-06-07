@@ -11,7 +11,7 @@ for a discussion on different types of effect sizes and their
 interpretation. Note that missing data are removed from the calculations of 
 the means and standard deviations.}
 \usage{
-hedg_g(data, formula, ref_group = NULL)
+hedg_g(data, formula, ref_group = NULL, keep_d = TRUE)
 }
 \arguments{
 \item{data}{The data frame used for estimation - ideally structured in a tidy 
