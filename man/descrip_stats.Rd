@@ -4,7 +4,7 @@
 \alias{descrip_stats}
 \title{Report descriptive stats for all possible pairings on the rhs of the formula.}
 \usage{
-descrip_stats(data, formula)
+descrip_stats(data, formula, ..., qtile_groups = NULL)
 }
 \arguments{
 \item{formula}{A formula of the type \code{out ~ group} where \code{out} is
