@@ -1,3 +1,20 @@
+#' Pooled Standard Deviation
+#' 
+#' The denominator for Cohen's d
+#' @keywords internal
+#' @param n1 The sample size for group 1
+#' @param n2 The sample size for group 2
+#' @param vr1 The variance for group 1
+#' @param vr2 The variance for group 2
+#' 
+psd <- function(n1, n2, vr1, vr2) {
+		dnum1 <- (n1 - 1)*vr1
+    dnum2 <- (n2 - 1)*vr2
+    ddnom  <- n1 + n2 - 2
+    
+    sqrt((dnum1 + dnum2) / ddnom)
+}
+
 #' Cohen's d 
 #' 
 #' Wraps the equation into a function
@@ -10,15 +27,11 @@
 #' @param vr2 The variance for group 2
 
 coh <- function(n1, n2, mn1, mn2, vr1, vr2) {
-		num   <- mn1 - mn2 
-    
-		dnum1 <- (n1 - 1)*vr1
-    dnum2 <- (n2 - 1)*vr2
-    ddnom  <- n1 + n2 - 2
-    
-    denom <- sqrt((dnum1 + dnum2) / ddnom)
-    
-    num / denom
+	(mn1 - mn2) / psd(n1, n2, vr1, vr2)
+}
+
+coh_se <- function(n1, n2, d) {
+  sqrt((n1 + n2)/(n1*n2) + d^2/(2*((n1 + n2))))
 }
 
 #' Compute Cohen's \emph{d}
@@ -72,32 +85,37 @@ coh <- function(n1, n2, mn1, mn2, vr1, vr2) {
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 
-coh_d <- function(data, formula, ref_group = NULL) {
+coh_d <- function(data, formula, ref_group = NULL, se = TRUE) {
   rhs  <- labels(terms(formula))
 
-  stats <- descrip_stats(data, formula)
+  stats <- descrip_cross(data, formula, length, mean, var) %>% 
+    mutate_if(is.integer, as.double)
   
   d <- stats %>% 
-    mutate(coh_d = coh(.data$n, 
-                       .data$n1, 
-                       .data$mn, 
-                       .data$mn1, 
-                       .data$vr, 
-                       .data$vr1)) %>% 
-    select(-.data$n, 
-           -.data$n1, 
-           -.data$mn, 
-           -.data$mn1, 
-           -.data$vr, 
-           -.data$vr1) 
+    mutate(coh_d = coh(.data$length1, 
+                       .data$length, 
+                       .data$mean1, 
+                       .data$mean, 
+                       .data$var1, 
+                       .data$var),
+           coh_se = coh_se(.data$length1,
+                           .data$length,
+                           .data$coh_d)) %>% 
+    select(-.data$length, 
+           -.data$length1, 
+           -.data$mean, 
+           -.data$mean1, 
+           -.data$var, 
+           -.data$var1) %>% 
+    ungroup()
   
   if(!is.null(ref_group)) {
     d <- ref_subset(d, formula, ref_group)
   }
   rename_ref_foc(d, formula)
 }
-
-#' Hedge's d 
+ 
+#' Hedge's g 
 #' 
 #' Wraps the equation into a function
 #' @keywords internal
@@ -144,23 +162,63 @@ hedg <- function(n1, n2, d) {
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
 
-hedg_g <- function(data, formula, ref_group = NULL) {
-  stats <- descrip_stats(data, formula)
+hedg_g <- function(data, formula, ref_group = NULL,
+                   keep_d = TRUE) {
+  stats <- descrip_cross(data, formula,
+                         length, mean, var)
   
   g <- stats %>% 
-    mutate(coh_d  = coh(.data$n, .data$n1, 
-                        .data$mn, .data$mn1, 
-                        .data$vr, .data$vr1),
-           hedg_g = hedg(.data$n, .data$n1, .data$coh_d)) %>% 
-    select(-.data$n, -.data$n1, 
-           -.data$mn, -.data$mn1, 
-           -.data$vr, -.data$vr1, 
-           -.data$coh_d)
+    mutate(coh_d  = coh(.data$length, .data$length1, 
+                        .data$mean, .data$mean1, 
+                        .data$var, .data$var1),
+           hedg_g = hedg(.data$length, .data$length1, .data$coh_d)) %>% 
+    select(-.data$length, -.data$length1, 
+           -.data$mean, -.data$mean1, 
+           -.data$var, -.data$var1)
+  
+  if(!keep_d) g <- select(g, -.data$coh_d)
   
   if(!is.null(ref_group)) {
     g <- ref_subset(g, formula, ref_group)
   }
   rename_ref_foc(g, formula)
+}
+
+mean_diff <- function(data, formula, ref_group, qtile_groups = NULL) {
+  descrip_cross(data, formula, mean, qtile_groups = qtile_groups) %>% 
+    mutate(mean_diff = mean1 - mean) %>% 
+    select(-.data$mean, -.data$mean1)
+}
+
+pooled_sd <- function(data, formula, ref_group, keep_n = FALSE) {
+  out <- descrip_cross(data, formula, length, var) %>% 
+    mutate(psd = psd(length, length1, var, var1)) %>% 
+    select(-.data$var, -.data$var1)
+  
+  if(!keep_n) {
+    out <- select(out, -.data$length, -.data$length1)
+  }
+  out
+}
+
+binned_es <- function(data, formula, ref_group = NULL, qtile_groups = 3,
+                      es = "g", rename = TRUE) {
+  mn_diff <- mean_diff(data, formula, qtile_groups = qtile_groups)  
+  p_sd <- pooled_sd(data, formula, keep_n = TRUE)
+  
+  d <- suppressMessages(left_join(mn_diff, p_sd)) %>% 
+    mutate(es    = mean_diff/psd,
+           es_se = coh_se(length, length1, es))
+    
+  if(es == "g") {
+    d <- mutate(d, es = hedg(length, length1, es)) 
+  }
+  
+  if(!is.null(ref_group)) {
+    d <- ref_subset(d, formula, ref_group)
+  }
+  if(rename) d <- rename_ref_foc(d, formula)
+  d
 }
 
 #' Computes the empirical cummulative distribution function for all groups
