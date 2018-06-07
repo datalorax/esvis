@@ -4,7 +4,7 @@
 \alias{coh_d}
 \title{Compute Cohen's \emph{d}}
 \usage{
-coh_d(data, formula, ref_group = NULL)
+coh_d(data, formula, ref_group = NULL, se = TRUE)
 }
 \arguments{
 \item{data}{The data frame used for estimation - ideally structured in a tidy 
