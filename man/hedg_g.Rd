@@ -32,6 +32,9 @@ should be wrapped in back ticks (e.g.,
 \code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
 in doubt, it is safest to use the back ticks, as they will not interfere 
 with anything if they are not needed. See examples below for more details.}
+
+\item{keep_d}{Logical. Should Cohen's \emph{d} be reported along with 
+Hedge's \code{g}? Defaults to \code{TRUE}.}
 }
 \value{
 By default the Hedges' \emph{g} for all possible pairings of
