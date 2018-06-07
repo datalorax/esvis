@@ -4,7 +4,7 @@
 #'   geom_segment labs geom_abline geom_rect 
 #' @importFrom dplyr mutate mutate_at select group_by_at arrange distinct 
 #'   filter matches group_by_all group_by summarize summarize_at n left_join 
-#'   semi_join vars funs ends_with rename tbl_df ungroup everything
+#'   semi_join vars funs ends_with rename tbl_df ungroup everything mutate_if
 #' @importFrom tidyr spread fill gather separate crossing nest unnest 
 #' @importFrom purrr map map_dbl map2 map2_lgl map2_df
 #' @importFrom rlang := sym syms quo quos .data parse_quo
