@@ -25,6 +25,10 @@ should be wrapped in back ticks (e.g.,
 \code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
 in doubt, it is safest to use the back ticks, as they will not interfere 
 with anything if they are not needed. See examples below for more details.}
+
+\item{se}{Logical. Should the standard error of the effect size be 
+estimated and returned in the resulting data frame? Defaults to 
+\code{TRUE}.}
 }
 \value{
 By default the Cohen's \emph{d} for all possible pairings of
