@@ -168,5 +168,3 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
 p + labs(x = "Focal Group",
          y = ref_group) 
 }
-
-
