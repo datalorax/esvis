@@ -23,8 +23,11 @@
 #' Defaults to 0.40.
 #' @param refline Logical. Defaults to \code{TRUE}. Should a diagonal
 #' reference line, representing the point of equal probabilities, be plotted?
-#' @param refline_lty Line type of the reference line. Defaults to \code{2}.
-#' @param refline_lwd Line width of the reference line. Defaults to \code{2}.
+#' @param refline_col The color of the reference line. Defaults to 
+#'   \code{"gray40"}
+#' @param refline_lty Line type of the reference line. Defaults to
+#'   \code{"solid"}.
+#' @param refline_lwd Line width of the reference line. Defaults to \code{1.1}.
 #' @param rects Logical. Should semi-transparent rectangles be plotted in the 
 #' background to show the binning? Defaults to \code{TRUE}.
 #' @param rect_fill Color fill of rectangles to be plotted in the background, if
@@ -77,7 +80,8 @@ binned_plot <- function(data, formula, ref_group = NULL, qtile_groups = 3,
                         es = "g", lines = TRUE, points = TRUE, 
                         shade = TRUE, shade_alpha = 0.40,
                         rects = TRUE, rect_fill = "gray20", rect_alpha = 0.35,
-                        refline = TRUE, ref_line_col = "gray40") {
+                        refline = TRUE, refline_col = "gray40", 
+                        refline_lty = "solid", refline_lwd = 1.1) {
   rhs  <- labels(terms(formula))
   lhs  <- all.vars(formula)[1]
   
@@ -133,7 +137,12 @@ binned_plot <- function(data, formula, ref_group = NULL, qtile_groups = 3,
                               fill = as.name(paste0(rhs[1], 1))),
                     alpha = shade_alpha)
   }
-  if(refline) p <- p + geom_hline(yintercept = 0, color = ref_line_col)
+  if(refline) {
+    p <- p + geom_hline(yintercept = 0, 
+                        color = refline_col,
+                        lty   = refline_lty,
+                        lwd   = refline_lwd)
+  }
   if(lines)   p <- p + geom_line(aes_(color = as.name(paste0(rhs[1], 1))))
   if(points)  p <- p + geom_point(aes_(color = as.name(paste0(rhs[1], 1))))
     
