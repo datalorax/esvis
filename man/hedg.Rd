@@ -2,7 +2,7 @@
 % Please edit documentation in R/es_calcs.R
 \name{hedg}
 \alias{hedg}
-\title{Hedge's d}
+\title{Hedge's g}
 \usage{
 hedg(n1, n2, d)
 }
