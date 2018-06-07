@@ -97,8 +97,8 @@ descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
   if(!is.null(qtile_groups)) {
     d <- d %>%
       filter(.data$q == .data$q1) %>%
-      mutate(qtile_ub = q / max(q),
-         qtile_lb = qtile_ub - min(qtile_ub)) %>%
+      mutate(qtile_ub = .data$q / max(.data$q),
+             qtile_lb = .data$qtile_ub - min(.data$qtile_ub)) %>%
       ungroup() %>%
       select(.data$q,
              .data$qtile_lb,
