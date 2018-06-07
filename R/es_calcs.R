@@ -59,6 +59,9 @@ coh_se <- function(n1, n2, d) {
 #' \code{ref_group = ~ Active + `Non-FRL`}, or \code{ref_group = ~`8`}). When 
 #' in doubt, it is safest to use the back ticks, as they will not interfere 
 #' with anything if they are not needed. See examples below for more details.
+#' @param se Logical. Should the standard error of the effect size be 
+#'   estimated and returned in the resulting data frame? Defaults to 
+#'   \code{TRUE}.
 #' @return By default the Cohen's \emph{d} for all possible pairings of
 #'  the grouping factor(s) are returned.
 #' @export
@@ -136,6 +139,8 @@ hedg <- function(n1, n2, d) {
 #' interpretation. Note that missing data are removed from the calculations of 
 #' the means and standard deviations.
 #' @inheritParams coh_d 
+#' @param keep_d Logical. Should Cohen's \emph{d} be reported along with 
+#'   Hedge's \code{g}? Defaults to \code{TRUE}.
 #' @return By default the Hedges' \emph{g} for all possible pairings of
 #'  the grouping factor are returned as a tidy data frame.
 #' @export
@@ -186,13 +191,13 @@ hedg_g <- function(data, formula, ref_group = NULL,
 
 mean_diff <- function(data, formula, ref_group, qtile_groups = NULL) {
   descrip_cross(data, formula, mean, qtile_groups = qtile_groups) %>% 
-    mutate(mean_diff = mean1 - mean) %>% 
+    mutate(mean_diff = .data$mean1 - .data$mean) %>% 
     select(-.data$mean, -.data$mean1)
 }
 
 pooled_sd <- function(data, formula, ref_group, keep_n = FALSE) {
   out <- descrip_cross(data, formula, length, var) %>% 
-    mutate(psd = psd(length, length1, var, var1)) %>% 
+    mutate(psd = psd(.data$length, .data$length1, .data$var, .data$var1)) %>% 
     select(-.data$var, -.data$var1)
   
   if(!keep_n) {
@@ -201,17 +206,30 @@ pooled_sd <- function(data, formula, ref_group, keep_n = FALSE) {
   out
 }
 
+#' Calculate binned effect sizes
+#' @inheritParams coh_d
+#' @param qtile_groups The number of quantile bins to split the data by and 
+#'   calculate effect sizes. Defaults to 3 bins (lower, middle, upper).
+#' @param es The effect size to calculate. Currently the only options are 
+#'   "d" or "g".
+#' @param rename Logical. Should the column names be relabeled according to
+#'   the reference and focal groups. Defaults to \code{TRUE}.
+#' @return A data frame with the corresponding effect sizes.
+#' @export
+
 binned_es <- function(data, formula, ref_group = NULL, qtile_groups = 3,
                       es = "g", rename = TRUE) {
   mn_diff <- mean_diff(data, formula, qtile_groups = qtile_groups)  
   p_sd <- pooled_sd(data, formula, keep_n = TRUE)
   
+  if(es != "g" & es != "d") stop("es must be one of `'g'` or `'d'`.")
+
   d <- suppressMessages(left_join(mn_diff, p_sd)) %>% 
-    mutate(es    = mean_diff/psd,
-           es_se = coh_se(length, length1, es))
+    mutate(es    = .data$mean_diff/.data$psd,
+           es_se = coh_se(.data$length, .data$length1, .data$es))
     
   if(es == "g") {
-    d <- mutate(d, es = hedg(length, length1, es)) 
+    d <- mutate(d, es = hedg(.data$length, .data$length1, .data$es)) 
   }
   
   if(!is.null(ref_group)) {
