@@ -52,14 +52,14 @@ theme_set(theme_minimal())
 ```
 
 
-```{r, binned_plot1, fig.width = 8, eval = FALSE}
+```{r, binned_plot1, fig.width = 8}
 library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 
 Note that in this plot one can clearly see that the magnitude of the differences between the groups depends upon scale location, as evidence by the reversal of the effect (negative to positive) for the Non-ELL (non-English Language Learners) group. We could also change the reference group, change the level of quantile binning, and evaluate the effect within other factors. For example, we can look by season eligibility for free or reduced price lunch, with quintiles binning, and non-ELL students as the reference group with 
 
-```{r, binned_plot2, fig.width = 8, eval = FALSE}
+```{r, binned_plot2, fig.width = 8}
 binned_plot(benchmarks, 
             math ~ ell + frl + season, 
             ref_group = "Non-ELL",
@@ -71,7 +71,7 @@ The `ref_group` argument can also supplied as a formula.
 ### PP Plots
 Probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in reading achievement by race/ethnicity by season. 
 
-```{r, pp_plot1, fig.width = 8, eval = FALSE}
+```{r, pp_plot1, fig.width = 8}
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
 
@@ -82,7 +82,7 @@ By default, the area under the curve is shaded, which itself is an effect-size l
 ### ECDF Plot
 Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments. Below, I have included the optional `hor_ref = TRUE` argument such that horizontal reference lines appear, relative to the cuts provided.
 
-```{r, ecdf_plot, fig.width = 8, eval = FALSE}
+```{r, ecdf_plot, fig.width = 8}
 ecdf_plot(benchmarks, math ~ season, 
 	cuts = c(190, 200, 215))
 ```
@@ -91,10 +91,6 @@ These are the curves that go into the PP-Plot, but occasionally can be useful on
 
 ## Estimation Methods
 Compute effect sizes for all possible pairwise comparisons.
-
-```{r load_package, include = FALSE}
-library(esvis)
-```
 
 ```{r, coh_d1} 
 coh_d(benchmarks, math ~ season + frl)

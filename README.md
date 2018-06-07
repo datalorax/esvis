@@ -63,6 +63,8 @@ library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 
+![](README-binned_plot1-1.png)<!-- -->
+
 Note that in this plot one can clearly see that the magnitude of the
 differences between the groups depends upon scale location, as evidence
 by the reversal of the effect (negative to positive) for the Non-ELL
@@ -79,6 +81,8 @@ binned_plot(benchmarks,
             qtile_groups = 5)
 ```
 
+![](README-binned_plot2-1.png)<!-- -->
+
 The `ref_group` argument can also supplied as a formula.
 
 ### PP Plots
@@ -90,6 +94,8 @@ the difference in reading achievement by race/ethnicity by season.
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
+
+![](README-pp_plot1-1.png)<!-- -->
 
 Essentially, the empirical cummulative distribution function (ECDF) for
 the reference group (by default, the highest performing group) is mapped
@@ -114,6 +120,8 @@ ecdf_plot(benchmarks, math ~ season,
     cuts = c(190, 200, 215))
 ```
 
+![](README-ecdf_plot-1.png)<!-- -->
+
 These are the curves that go into the PP-Plot, but occasionally can be
 useful on their own.
 
@@ -126,16 +134,16 @@ coh_d(benchmarks, math ~ season + frl)
 #> # A tibble: 30 x 6
 #>    season_ref frl_ref season_foc frl_foc  coh_d coh_se
 #>    <chr>      <chr>   <chr>      <chr>    <dbl>  <dbl>
-#>  1 Fall       FRL     Fall       Non-FRL -0.744 0.0706
-#>  2 Fall       FRL     Spring     FRL     -1.32  0.0496
-#>  3 Fall       FRL     Spring     Non-FRL -2.01  0.0787
-#>  4 Fall       FRL     Winter     FRL     -0.625 0.0472
-#>  5 Fall       FRL     Winter     Non-FRL -1.30  0.0733
-#>  6 Fall       Non-FRL Fall       FRL      0.744 0.0706
-#>  7 Fall       Non-FRL Spring     FRL     -0.550 0.0694
-#>  8 Fall       Non-FRL Spring     Non-FRL -1.14  0.0919
-#>  9 Fall       Non-FRL Winter     FRL      0.127 0.0693
-#> 10 Fall       Non-FRL Winter     Non-FRL -0.501 0.0872
+#>  1 Fall       FRL     Fall       Non-FRL  0.744 0.0706
+#>  2 Fall       FRL     Spring     FRL      1.32  0.0496
+#>  3 Fall       FRL     Spring     Non-FRL  2.01  0.0787
+#>  4 Fall       FRL     Winter     FRL      0.625 0.0472
+#>  5 Fall       FRL     Winter     Non-FRL  1.30  0.0733
+#>  6 Fall       Non-FRL Fall       FRL     -0.744 0.0706
+#>  7 Fall       Non-FRL Spring     FRL      0.550 0.0694
+#>  8 Fall       Non-FRL Spring     Non-FRL  1.14  0.0919
+#>  9 Fall       Non-FRL Winter     FRL     -0.127 0.0693
+#> 10 Fall       Non-FRL Winter     Non-FRL  0.501 0.0872
 #> # ... with 20 more rows
 ```
 
@@ -150,11 +158,11 @@ coh_d(benchmarks,
 #> # A tibble: 5 x 6
 #>   season_ref frl_ref season_foc frl_foc  coh_d coh_se
 #>   <chr>      <chr>   <chr>      <chr>    <dbl>  <dbl>
-#> 1 Fall       Non-FRL Fall       FRL      0.744 0.0706
-#> 2 Fall       Non-FRL Spring     FRL     -0.550 0.0694
-#> 3 Fall       Non-FRL Spring     Non-FRL -1.14  0.0919
-#> 4 Fall       Non-FRL Winter     FRL      0.127 0.0693
-#> 5 Fall       Non-FRL Winter     Non-FRL -0.501 0.0872
+#> 1 Fall       Non-FRL Fall       FRL     -0.744 0.0706
+#> 2 Fall       Non-FRL Spring     FRL      0.550 0.0694
+#> 3 Fall       Non-FRL Spring     Non-FRL  1.14  0.0919
+#> 4 Fall       Non-FRL Winter     FRL     -0.127 0.0693
+#> 5 Fall       Non-FRL Winter     Non-FRL  0.501 0.0872
 ```
 
 Notice that the reference to Non-FRL is wrapped in back-ticks, which
