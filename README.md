@@ -63,8 +63,7 @@ library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 
-![](README-binned_plot1-1.png)<!-- -->
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the
 differences between the groups depends upon scale location, as evidence
 by the reversal of the effect (negative to positive) for the Non-ELL
@@ -81,21 +80,21 @@ binned_plot(benchmarks,
             qtile_groups = 5)
 ```
 
-![](README-binned_plot2-1.png)<!-- -->
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot2-1.png)
 The `ref_group` argument can also supplied as a formula.
 
 ### PP Plots
 
 Probability-probability plot can be produced with a call to `pp_plot`
 and an equivalent argument structure. In this case, we’re visualizing
-the difference in reading achievement by race/ethnicity by season.
+the difference in reading achievement by race/ethnicity by
+season.
 
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
 
-![](README-pp_plot1-1.png)<!-- -->
+![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
 
 Essentially, the empirical cummulative distribution function (ECDF) for
 the reference group (by default, the highest performing group) is mapped
@@ -120,8 +119,7 @@ ecdf_plot(benchmarks, math ~ season,
     cuts = c(190, 200, 215))
 ```
 
-![](README-ecdf_plot-1.png)<!-- -->
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-ecdf_plot-1.png)
 These are the curves that go into the PP-Plot, but occasionally can be
 useful on their own.
 

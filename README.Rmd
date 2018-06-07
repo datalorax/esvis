@@ -48,32 +48,34 @@ At present, the binned effect size plot can only be produced with Cohen's *d*, a
 
 ```{r theme_set, include = FALSE}
 library(ggplot2)
+library(esvis)
 theme_set(theme_minimal())
 ```
 
 
-```{r, binned_plot1, fig.width = 8}
+```{r, binned_plot1, fig.width = 8, eval = FALSE}
 library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the differences between the groups depends upon scale location, as evidence by the reversal of the effect (negative to positive) for the Non-ELL (non-English Language Learners) group. We could also change the reference group, change the level of quantile binning, and evaluate the effect within other factors. For example, we can look by season eligibility for free or reduced price lunch, with quintiles binning, and non-ELL students as the reference group with 
 
-```{r, binned_plot2, fig.width = 8}
+```{r, binned_plot2, fig.width = 8, eval = FALSE}
 binned_plot(benchmarks, 
             math ~ ell + frl + season, 
             ref_group = "Non-ELL",
             qtile_groups = 5)
 ```
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot2-1.png)
 The `ref_group` argument can also supplied as a formula.
 
 ### PP Plots
 Probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in reading achievement by race/ethnicity by season. 
 
-```{r, pp_plot1, fig.width = 8}
+```{r, pp_plot1, fig.width = 8, eval = FALSE}
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
+![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
 
 Essentially, the empirical cummulative distribution function (ECDF) for the reference group (by default, the highest performing group) is mapped against the ECDF for each corresponding group. The magnitude of the achievement gap is then displayed by the distance from the diagonal reference line, representing, essentially, the ECDF for the reference group. 
 
@@ -82,11 +84,11 @@ By default, the area under the curve is shaded, which itself is an effect-size l
 ### ECDF Plot
 Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments. Below, I have included the optional `hor_ref = TRUE` argument such that horizontal reference lines appear, relative to the cuts provided.
 
-```{r, ecdf_plot, fig.width = 8}
+```{r, ecdf_plot, fig.width = 8, eval = FALSE}
 ecdf_plot(benchmarks, math ~ season, 
 	cuts = c(190, 200, 215))
 ```
-
+![](https://github.com/datalorax/esvis/raw/master/docs/README-ecdf_plot-1.png)
 These are the curves that go into the PP-Plot, but occasionally can be useful on their own.
 
 ## Estimation Methods
