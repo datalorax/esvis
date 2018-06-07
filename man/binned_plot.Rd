@@ -6,8 +6,8 @@
 \usage{
 binned_plot(data, formula, ref_group = NULL, qtile_groups = 3, es = "g",
   lines = TRUE, points = TRUE, shade = TRUE, shade_alpha = 0.4,
-  rects = TRUE, rect_fill = "gray40", rect_alpha = 0.15, refline = TRUE,
-  ref_line_col = "gray40")
+  rects = TRUE, rect_fill = "gray20", rect_alpha = 0.35, refline = TRUE,
+  refline_col = "gray40", refline_lty = "solid", refline_lwd = 1.1)
 }
 \arguments{
 \item{data}{The data frame to be plotted}
@@ -47,17 +47,21 @@ Defaults to 0.40.}
 background to show the binning? Defaults to \code{TRUE}.}
 
 \item{rect_fill}{Color fill of rectangles to be plotted in the background, if
-\code{rects == TRUE}. Defaults to "gray40".}
+\code{rects == TRUE}. Defaults to "gray20".}
 
 \item{rect_alpha}{Transparency level of the rectangles in the background when
-\code{rects == TRUE}.}
+\code{rects == TRUE}. Defaults to 0.35.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be plotted?}
 
-\item{refline_lty}{Line type of the reference line. Defaults to \code{2}.}
+\item{refline_col}{The color of the reference line. Defaults to 
+\code{"gray40"}}
 
-\item{refline_lwd}{Line width of the reference line. Defaults to \code{2}.}
+\item{refline_lty}{Line type of the reference line. Defaults to
+\code{"solid"}.}
+
+\item{refline_lwd}{Line width of the reference line. Defaults to \code{1.1}.}
 }
 \description{
 Plots the effect size between focal and reference groups by matched (binned) 
