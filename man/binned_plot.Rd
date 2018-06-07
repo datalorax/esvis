@@ -4,58 +4,53 @@
 \alias{binned_plot}
 \title{Quantile-binned effect size plot}
 \usage{
-binned_plot(formula, data, ref_group = NULL, qtiles = seq(0, 1, 0.3333),
-  scheme = "ggplot2", se = TRUE, shade_col = NULL, shade_alpha = 0.3,
-  annotate = FALSE, refline = TRUE, refline_lty = 2, refline_lwd = 2,
-  rects = TRUE, rect_colors = c(rgb(0.2, 0.2, 0.2, 0.1), rgb(0.2, 0.2, 0.2,
-  0)), lines = TRUE, points = TRUE, legend = NULL, theme = "standard",
-  ...)
+binned_plot(data, formula, ref_group = NULL, qtile_groups = 3, es = "g",
+  lines = TRUE, points = TRUE, shade = TRUE, shade_alpha = 0.4,
+  rects = TRUE, rect_fill = "gray40", rect_alpha = 0.15, refline = TRUE,
+  ref_line_col = "gray40")
 }
 \arguments{
-\item{formula}{A formula of the type \code{out ~ group} where \code{out} is
-the outcome variable and \code{group} is the grouping variable. Note the
-grouping variable must only include only two groups.}
+\item{data}{The data frame to be plotted}
 
-\item{data}{The data frame that the data in the formula come from.}
+\item{formula}{A formula of the type \code{out ~ group} where \code{out} is
+the outcome variable and \code{group} is the grouping variable. Note this
+variable can include any arbitrary number of groups. Additional variables 
+can be included with \code{+} to produce separate plots by the secondary or
+tertiary variable of interest (e.g., \code{out ~ group + characteristic1 + 
+characteristic2}). No more than two additional characteristics can be 
+supplied at this time.}
 
 \item{ref_group}{Optional character vector (of length 1) naming the
-reference group to be plotted on the x-axis. Defaults to the highest
-scoring group.}
+reference group. Defaults to the group with the highest mean score.}
 
-\item{qtiles}{The quantile bins to split the data by and calculate effect 
-sizes. This argument is passed directly to \link{qtile_es}. 
-Essentially, this is the binning argument. Defaults to \code{seq(0, 1, .33)}
-which splits the distribution into thirds (lower, middle, upper). Any 
-sequence is valid, but it is recommended the bins be even. For example
-\code{seq(0, 1, .1)} would split the distributions into deciles.}
+\item{qtile_groups}{The number of quantile bins to split the data by and 
+calculate effect sizes. Defaults to 3 bins (lower, middle, upper).}
 
-\item{scheme}{What color scheme should the lines follow? Defaults to 
-mimic the ggplot2 color scheme. Other options come from the 
-\href{https://CRAN.R-project.org/package=viridisLite}{viridisLite}
-package, and must be installed first. These are the same options available
-in the package: "viridis", "magma", "inferno", and "plasma". These color 
-schemes work well for color blindness and print well in black and white.
-Alternatively, colors can be supplied manually through a call to \code{col}
-(through \code{...}).}
+\item{es}{The effect size to plot. Defaults to \code{"g"}, in which case 
+Hedge's g is plotted, which is better for small samples. At present, the 
+only other option is \code{"d"} for Cohen's D.}
 
-\item{se}{Logical. Should the standard errors around the effect size point
+\item{lines}{Logical. Should the PP Lines be plotted? Defaults to 
+\code{TRUE}.}
+
+\item{points}{Logical. Should points be plotted for each \code{qtiles} be 
+plotted? Defaults to \code{TRUE}.}
+
+\item{shade}{Logical. Should the standard errors around the effect size point
 estimates be displayed? Defaults to \code{TRUE}, with the uncertainty 
 displayed with shading.}
 
-\item{shade_col}{Color of the standard error shading, if \code{se == TRUE}.
-Defaults to the same color as the lines.}
-
 \item{shade_alpha}{Transparency level of the standard error shading.
-Defaults to 0.3.}
+Defaults to 0.40.}
 
-\item{annotate}{Logical. Defaults to \code{FALSE}. When \code{TRUE} and 
-\code{legend == "side"} the plot is rendered such that additional
-annotations can be made on the plot using low level base plotting functions
-(e.g., \link[graphics]{arrows}). However, if set to \code{TRUE}, 
-\link[grDevices]{dev.off} must be called before a new plot is rendered 
-(i.e., close the current plotting window). Otherwise the plot will be
-attempted to be rendered in the region designated for the legend). Argument
-is ignored when \code{legend != "side"}.}
+\item{rects}{Logical. Should semi-transparent rectangles be plotted in the 
+background to show the binning? Defaults to \code{TRUE}.}
+
+\item{rect_fill}{Color fill of rectangles to be plotted in the background, if
+\code{rects == TRUE}. Defaults to "gray40".}
+
+\item{rect_alpha}{Transparency level of the rectangles in the background when
+\code{rects == TRUE}.}
 
 \item{refline}{Logical. Defaults to \code{TRUE}. Should a diagonal
 reference line, representing the point of equal probabilities, be plotted?}
@@ -63,74 +58,54 @@ reference line, representing the point of equal probabilities, be plotted?}
 \item{refline_lty}{Line type of the reference line. Defaults to \code{2}.}
 
 \item{refline_lwd}{Line width of the reference line. Defaults to \code{2}.}
-
-\item{rects}{Logical. Should semi-transparent rectangles be plotted in the 
-background to show the binning? Defaults to \code{TRUE}.}
-
-\item{rect_colors}{Color of rectangles to be plotted in the background, if
-\code{rects == TRUE}. Defaults to alternating gray and transparent. 
-Currently not alterable when \code{theme == "dark"}, in which case the rects
-alternate a semi-transparent white and transparent.}
-
-\item{lines}{Logical. Should the points between effect sizes across 
-\code{qtiles} be connected via a line? Defaults to \code{TRUE}.}
-
-\item{points}{Logical. Should points be plotted for each \code{qtiles} be 
-plotted? Defaults to \code{TRUE}.}
-
-\item{legend}{The type of legend to be displayed, with possible values 
-\code{"base"}, \code{"side"}, or \code{"none"}. Defaults to \code{"side"}, 
-when there are more than two groups and \code{"none"} when only comparing
-two groups. If the option \code{"side"} is used the plot is split into two
-plots, via \link[graphics]{layout}, with the legend displayed in the second 
-plot. This scales better than the base legend (i.e., manually manipulating
-the size of the plot after it is rendered), but is not compatible with 
-multi-panel plotting (e.g., \code{par(mfrow = c(2, 2))} for a 2 by 2 plot).
-When producing multi-panel plots, use \code{"none"} or \code{"base"}, the
-latter of which produces the legend with the base \link[graphics]{legend}
-function.}
-
-\item{theme}{Visual properties of the plot. There are currently only two
-themes implemented - a standard plot and a dark theme. If \code{NULL} 
-(default), the theme will be produced with a standard white background. If
-\code{"dark"}, a dark gray background will be used with white text and axes.}
-
-\item{...}{Additional arguments passed to \link[graphics]{plot}. Note that
-it is best to use the full argument rather than partial matching, given the
-method used to call the plot. While some partial matching is supported 
-(e.g., \code{m} for \code{main}, it is generally safest to supply the full
-argument).}
 }
 \description{
-Plots the effect size between two groups by matched (binned) quantiles 
-(i.e., the results from \link{qtile_es}), with the matched
+Plots the effect size between focal and reference groups by matched (binned) 
+quantiles (i.e., the results from \link{binned_es}), with the matched
 quantiles plotted along the x-axis and the effect size plotted along the 
 y-axis. The intent is to examine how (if) the magnitude of the effect size
-varies at different points of the distributions.
+varies at different points of the distributions. The mean differences within
+each quantile bin are divided by the overall pooled standard deviation for 
+the two groups being compared.
 }
 \examples{
+# Binned Effect Size Plot: Defaults to Hedges' G
+binned_plot(star, math ~ condition)
+ 
+# Same plot, separated by sex
+binned_plot(star, math ~ condition + sex)
 
-# Default binned effect size plot
-binned_plot(math ~ condition, star)
+# Same plot by sex and race
+pp_plot(star, math ~ condition + sex + race)
 
-# Change the reference group to regular sized classrooms
-binned_plot(math ~ condition, 
-		star,
-		ref_group = "reg")
+## Evaluate with simulated data: Plot is most interesting when variance
+# in the distributions being compared differ.
 
-# Change binning to deciles
-binned_plot(math ~ condition, 
-		star,
-		ref_group = "reg",
-		qtiles = seq(0, 1, .1))
+library(tidyr)
+library(ggplot2)
 
-# Suppress the standard error shading
-binned_plot(math ~ condition, 
-		star,
-		se = FALSE)
+# simulate data with different variances
+set.seed(100)
+common_vars <- data.frame(low  = rnorm(1000, 10, 1),
+                        high = rnorm(1000, 12, 1),
+                        vars = "common")
+diff_vars <- data.frame(low  = rnorm(1000, 10, 1),
+                      high = rnorm(1000, 12, 2),
+                      vars = "diff")
+d <- rbind(common_vars, diff_vars)
 
-# Change to dark theme
-binned_plot(math ~ condition, 
-		star,
-		theme = "dark")
+# Plot distributions 
+d <- d \%>\% 
+gather(group, value, -vars) 
+
+ggplot(d, aes(value, color = group)) +
+ geom_density() +
+ facet_wrap(~vars)
+
+# Note that the difference between the distributions depends on where you're 
+# evaluating from on the x-axis. The binned plot helps us visualize this. 
+# The below shows the binned plots when there is a common versus different
+# variance
+
+binned_plot(d, value ~ group + vars)   
 }
