@@ -40,18 +40,72 @@ ref_subset <- function(out, formula, ref_group) {
 #' or tertiary variable of interest (e.g., \code{out ~ group + characteristic1 
 #' + characteristic2}). 
 
-descrip_stats <- function(data, formula) {
+descrip_stats <- function(data, formula, ..., qtile_groups = NULL) {
   rhs  <- labels(terms(formula))
   lhs  <- all.vars(formula)[1]
- 
-  data %>% 
-    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>% 
-    group_by(!!!syms(rhs)) %>% 
-    summarize(n    = n(),
-              mn = mean(!!sym(lhs), na.rm = TRUE),
-              vr = var( !!sym(lhs), na.rm = TRUE)) %>% 
-    crossing(., .) %>% 
-    filter(!(.data$n == .data$n1 & 
-             .data$mn == .data$mn1 & 
-             .data$vr == .data$vr1))
+  f <- quos(...)
+  
+  if(length(f) == 0) {
+    stop("No function supplied to ...")
+  }
+  
+  d <- data %>%
+    select(rhs, lhs) %>% 
+    na.omit() %>% 
+    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>%
+    group_by(!!!syms(rhs)) 
+  
+  if(!is.null(qtile_groups)) {
+    d <- d %>% 
+      group_by(!!!syms(rhs)) %>% 
+      nest() %>% 
+      mutate(q = map(data, ~as.numeric(cut2(.[[lhs]], g = qtile_groups)))) %>%  
+      unnest() %>%
+      group_by(!!!syms(rhs), .data$q)
+  }
+  d <- d %>%
+    summarize_at(lhs, funs(!!!f)) 
+  
+  if(length(f) == 1) {
+    names(d)[grep(lhs, names(d))] <- gsub("~", "", as.character(f))
+  }
+  d
 }
+
+descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
+  rhs  <- labels(terms(formula))
+  f <- quos(...)
+  
+  d <- descrip_stats(data, formula, ..., qtile_groups = qtile_groups) %>%
+    crossing(., .)
+
+  zero_group <- paste(rhs, "==", paste0(rhs, 1), collapse = " & ")
+  if(!is.null(qtile_groups)) zero_group <- paste0("q == q1 & ", zero_group)
+
+  test <- filter(d, !!parse_quo(zero_group, env = parent.frame()))
+  var <- as.character(f[[1]])[2]
+  
+  if(any((test[ ,var] - test[ ,paste0(var, 1)]) != 0)) {
+    stop("Reference Group Filtering failed. Use `all == TRUE` and
+         filter manually.")
+  }
+  filt_expr <- parse_quo(paste0("!(", zero_group, ")"),
+                         env = parent.frame())
+  d <- d %>%
+    filter(!!filt_expr)
+
+  if(!is.null(qtile_groups)) {
+    d <- d %>%
+      filter(.data$q == .data$q1) %>%
+      mutate(qtile_ub = q / max(q),
+         qtile_lb = qtile_ub - min(qtile_ub)) %>%
+      ungroup() %>%
+      select(.data$q,
+             .data$qtile_lb,
+             .data$qtile_ub,
+             everything(),
+             -.data$q1)
+  }
+ d
+}
+
