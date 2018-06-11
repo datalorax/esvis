@@ -17,7 +17,6 @@ knitr::opts_chunk$set(
 R Package for effect size visualization and estimation.
 
 [![Build Status](https://travis-ci.org/datalorax/esvis.svg?branch=master)](https://travis-ci.org/datalorax/esvis)
-
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) 
 [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
@@ -124,17 +123,5 @@ or *AUC* with
 auc(benchmarks, 
     math ~ season + frl, 
     ref_group = ~Fall + `Non-FRL`)
-```
-
-
-```{r include = FALSE}
-files <- list.files(pattern = "README-")
-file.copy(files, file.path("docs", files), overwrite = TRUE)
-
-rm <- glue::glue("sed -i -e 's/!\\[\\]({file})//g' README.md", 
-                file = files)
-purrr::walk(rm, system)
-
-file.remove(c(files, "README.md-e"))
 ```
 

@@ -7,7 +7,6 @@ R Package for effect size visualization and estimation.
 
 [![Build
 Status](https://travis-ci.org/datalorax/esvis.svg?branch=master)](https://travis-ci.org/datalorax/esvis)
-
 [![AppVeyor Build
 Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis)
 [![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
@@ -63,7 +62,7 @@ library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 
-![](README-binned_plot1-1.png)<!-- -->
+<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the
 differences between the groups depends upon scale location, as evidence
@@ -81,7 +80,7 @@ binned_plot(benchmarks,
             qtile_groups = 5)
 ```
 
-![](README-binned_plot2-1.png)<!-- -->
+<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot2-1.png)
 The `ref_group` argument can also supplied as a formula.
 
@@ -95,7 +94,7 @@ the difference in reading achievement by race/ethnicity by season.
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
 
-![](README-pp_plot1-1.png)<!-- -->
+<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
 
 Essentially, the empirical cummulative distribution function (ECDF) for
@@ -121,7 +120,7 @@ ecdf_plot(benchmarks, math ~ season,
     cuts = c(190, 200, 215))
 ```
 
-![](README-ecdf_plot-1.png)<!-- -->
+<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-ecdf_plot-1.png)
 These are the curves that go into the PP-Plot, but occasionally can be
 useful on their own.
