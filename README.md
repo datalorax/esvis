@@ -63,6 +63,7 @@ library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 
+![](README-binned_plot1-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the
 differences between the groups depends upon scale location, as evidence
@@ -80,6 +81,7 @@ binned_plot(benchmarks,
             qtile_groups = 5)
 ```
 
+![](README-binned_plot2-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot2-1.png)
 The `ref_group` argument can also supplied as a formula.
 
@@ -87,13 +89,13 @@ The `ref_group` argument can also supplied as a formula.
 
 Probability-probability plot can be produced with a call to `pp_plot`
 and an equivalent argument structure. In this case, we’re visualizing
-the difference in reading achievement by race/ethnicity by
-season.
+the difference in reading achievement by race/ethnicity by season.
 
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
 
+![](README-pp_plot1-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
 
 Essentially, the empirical cummulative distribution function (ECDF) for
@@ -119,6 +121,7 @@ ecdf_plot(benchmarks, math ~ season,
     cuts = c(190, 200, 215))
 ```
 
+![](README-ecdf_plot-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-ecdf_plot-1.png)
 These are the curves that go into the PP-Plot, but occasionally can be
 useful on their own.
@@ -178,11 +181,11 @@ v(benchmarks,
 #> # A tibble: 5 x 5
 #>   season_ref frl_ref season_foc frl_foc      v
 #>   <chr>      <chr>   <chr>      <chr>    <dbl>
-#> 1 Fall       Non-FRL Winter     Non-FRL -0.509
-#> 2 Fall       Non-FRL Spring     FRL     -0.547
-#> 3 Fall       Non-FRL Winter     FRL      0.110
-#> 4 Fall       Non-FRL Spring     Non-FRL -1.15 
-#> 5 Fall       Non-FRL Fall       FRL      0.702
+#> 1 Fall       Non-FRL Winter     Non-FRL  0.507
+#> 2 Fall       Non-FRL Spring     FRL      0.543
+#> 3 Fall       Non-FRL Winter     FRL     -0.112
+#> 4 Fall       Non-FRL Spring     Non-FRL  1.15 
+#> 5 Fall       Non-FRL Fall       FRL     -0.705
 ```
 
 or *AUC* with
@@ -194,9 +197,9 @@ auc(benchmarks,
 #> # A tibble: 5 x 5
 #>   season_ref frl_ref season_foc frl_foc   auc
 #>   <chr>      <chr>   <chr>      <chr>   <dbl>
-#> 1 Fall       Non-FRL Winter     Non-FRL 0.360
-#> 2 Fall       Non-FRL Spring     FRL     0.349
-#> 3 Fall       Non-FRL Winter     FRL     0.531
-#> 4 Fall       Non-FRL Spring     Non-FRL 0.209
-#> 5 Fall       Non-FRL Fall       FRL     0.690
+#> 1 Fall       Non-FRL Winter     Non-FRL 0.640
+#> 2 Fall       Non-FRL Spring     FRL     0.649
+#> 3 Fall       Non-FRL Winter     FRL     0.469
+#> 4 Fall       Non-FRL Spring     Non-FRL 0.792
+#> 5 Fall       Non-FRL Fall       FRL     0.309
 ```

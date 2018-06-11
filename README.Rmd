@@ -53,14 +53,14 @@ theme_set(theme_minimal())
 ```
 
 
-```{r, binned_plot1, fig.width = 8, eval = FALSE}
+```{r, binned_plot1, fig.width = 8}
 library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the differences between the groups depends upon scale location, as evidence by the reversal of the effect (negative to positive) for the Non-ELL (non-English Language Learners) group. We could also change the reference group, change the level of quantile binning, and evaluate the effect within other factors. For example, we can look by season eligibility for free or reduced price lunch, with quintiles binning, and non-ELL students as the reference group with 
 
-```{r, binned_plot2, fig.width = 8, eval = FALSE}
+```{r, binned_plot2, fig.width = 8}
 binned_plot(benchmarks, 
             math ~ ell + frl + season, 
             ref_group = "Non-ELL",
@@ -72,7 +72,7 @@ The `ref_group` argument can also supplied as a formula.
 ### PP Plots
 Probability-probability plot can be produced with a call to `pp_plot` and an equivalent argument structure. In this case, we're visualizing the difference in reading achievement by race/ethnicity by season. 
 
-```{r, pp_plot1, fig.width = 8, eval = FALSE}
+```{r, pp_plot1, fig.width = 8}
 pp_plot(benchmarks, reading ~ ethnicity + season)
 ```
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
@@ -84,7 +84,7 @@ By default, the area under the curve is shaded, which itself is an effect-size l
 ### ECDF Plot
 Finally, the `ecdf_plot` function essentially dresses up the base `plot.ecdf` function, but also adds some nice referencing features through additional, optional arguments. Below, I have included the optional `hor_ref = TRUE` argument such that horizontal reference lines appear, relative to the cuts provided.
 
-```{r, ecdf_plot, fig.width = 8, eval = FALSE}
+```{r, ecdf_plot, fig.width = 8}
 ecdf_plot(benchmarks, math ~ season, 
 	cuts = c(190, 200, 215))
 ```
@@ -125,3 +125,16 @@ auc(benchmarks,
     math ~ season + frl, 
     ref_group = ~Fall + `Non-FRL`)
 ```
+
+
+```{r include = FALSE}
+files <- list.files(pattern = "README-")
+file.copy(files, file.path("docs", files), overwrite = TRUE)
+
+rm <- glue::glue("sed -i -e 's/!\\[\\]({file})//g' README.md", 
+                file = files)
+purrr::walk(rm, system)
+
+file.remove(c(files, "README.md-e"))
+```
+
