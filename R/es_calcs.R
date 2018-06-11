@@ -323,7 +323,7 @@ auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
   rhs <- labels(terms(formula))
   
   d <- paired_ecdf(data, formula) %>% 
-    mutate(auc = map_dbl(.data$matched, ~integrate.xy(.$y_ref, .$y_foc))) %>% 
+    mutate(auc = map_dbl(.data$matched, ~integrate.xy(.$y_foc, .$y_ref))) %>% 
     select(-.data$matched)
   
   if(!is.null(ref_group)) {
