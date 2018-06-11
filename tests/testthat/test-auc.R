@@ -8,7 +8,7 @@ test_data2 <- data.frame(g     = c(rep(1, 1e4), rep(2, 1e4)),
 
 test_that("Area under the curve computes and outputs correctly", {
 	expect_equal(auc(test_data1, score ~ g)$auc[1], .50, tolerance = 0.03)
-	expect_equal(auc(test_data2, score ~ g)$auc[1], .25, tolerance = 0.03)
+	expect_equal(auc(test_data2, score ~ g)$auc[1], .75, tolerance = 0.03)
 })
 
 # ((Levels 1 * Levels 2) * (Levels 1 * Levels 2)) - (Levels 1 * Levels 2) 

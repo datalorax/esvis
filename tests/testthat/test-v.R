@@ -8,7 +8,7 @@ test_data2 <- data.frame(g     = c(rep(1, 1e4), rep(2, 1e4)),
 
 test_that("V computes and outputs correctly", {
 	expect_equal(v(test_data1, score ~ g)$v[1], 0, tolerance = 0.03)
-	expect_equal(v(test_data2, score ~ g)$v[1], -1, tolerance = 0.03)
+	expect_equal(v(test_data2, score ~ g)$v[1], 1, tolerance = 0.03)
 })
 
 # ((Levels 1 * Levels 2) * (Levels 1 * Levels 2)) - (Levels 1 * Levels 2) 
