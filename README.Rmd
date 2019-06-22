@@ -57,7 +57,7 @@ library(esvis)
 binned_plot(benchmarks, math ~ ell)
 ```
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
-Note that in this plot one can clearly see that the magnitude of the differences between the groups depends upon scale location, as evidence by the reversal of the effect (negative to positive) for the Non-ELL (non-English Language Learners) group. We could also change the reference group, change the level of quantile binning, and evaluate the effect within other factors. For example, we can look by season eligibility for free or reduced price lunch, with quintiles binning, and non-ELL students as the reference group with 
+Note that in this plot one can clearly see that the magnitude of the differences between the groups depends upon scale location, as evidence by the reversal of the effect (negative to positive) for the Non-ELL (non-English Language Learners) group. We could also change the reference group, change the level of quantile binning, and evaluate the effect within other factors. For example, we can look by season eligibility for free or reduced price lunch, with quantiles binning, and non-ELL students as the reference group with 
 
 ```{r, binned_plot2, fig.width = 8}
 binned_plot(benchmarks, 
@@ -97,7 +97,7 @@ Compute effect sizes for all possible pairwise comparisons.
 coh_d(benchmarks, math ~ season + frl)
 ```
 
-Or specify a reference group. In this case, I've used the formula-based interface, but a string vector specifiying the specific reference group could also be supplied.
+Or specify a reference group. In this case, I've used the formula-based interface, but a string vector specifying the specific reference group could also be supplied.
 
 
 ```{r, coh_d2}
