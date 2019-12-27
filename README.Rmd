@@ -17,8 +17,8 @@ knitr::opts_chunk$set(
 R Package for effect size visualization and estimation.
 
 [![Build Status](https://travis-ci.org/datalorax/esvis.svg?branch=master)](https://travis-ci.org/datalorax/esvis)
-[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis) 
-[![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
+[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/datalorax/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/datalorax/esvis) 
+[![codecov](https://codecov.io/gh/datalorax/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/datalorax/esvis)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
 
 This package is designed to help you very quickly estimate and visualize distributional differences by categorical factors (e.g., the effect of treatment by gender and income category). Emphasis is placed on evaluating distributional differences across the entirety of the scale, rather than only by measures of central tendency (e.g., means). 

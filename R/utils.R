@@ -72,19 +72,24 @@ descrip_stats <- function(data, formula, ..., qtile_groups = NULL) {
   d
 }
 
+fix_names <- function(name) {
+  make.names(name, unique = TRUE) %>% 
+    gsub("\\.", "", .)
+}
+
 descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
   rhs  <- labels(terms(formula))
   f <- quos(...)
   
   d <- descrip_stats(data, formula, ..., qtile_groups = qtile_groups) %>%
-    crossing(., .)
+    crossing(., ., .name_repair = fix_names)
 
   zero_group <- paste(rhs, "==", paste0(rhs, 1), collapse = " & ")
   if(!is.null(qtile_groups)) zero_group <- paste0("q == q1 & ", zero_group)
 
   test <- filter(d, !!parse_quo(zero_group, env = parent.frame()))
-  var <- as.character(f[[1]])[2]
-  
+  var <- as.character(rlang::quo_get_expr(f[[1]]))
+
   if(any((test[ ,var] - test[ ,paste0(var, 1)]) != 0)) {
     stop("Reference Group Filtering failed. Use `all == TRUE` and
          filter manually.")

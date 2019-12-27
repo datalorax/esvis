@@ -271,7 +271,7 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
   ecdf_fun(data, formula, cuts) %>% 
     mutate(nd = map2(.data$nd, .data$ecdf, ~data.frame(x = .x, y = .y))) %>% 
     select(-.data$ecdf) %>% 
-    crossing(., .) %>% 
+    crossing(., .,  .name_repair = fix_names) %>% 
     filter(!map2_lgl(.data$nd, .data$nd1, ~identical(.x, .y))) %>% 
     mutate(matched = map2(.data$nd, .data$nd1,
                           ~data.frame(x = sort(unique(.x$x, .y$x))) %>% 
@@ -393,8 +393,8 @@ v <- function(data, formula, ref_group = NULL) {
 #' @examples
 #' # Compute differences for all pairwise comparisons for each of three cuts
 #' pac(star,
-#'     reading ~ condition, 
-#' 		 cut = c(450, 500, 550)) 
+#'     reading ~ condition,
+#' 		 cut = c(450, 500, 550))
 #' 		 
 #' pac(star,
 #'     reading ~ condition + freelunch + race, 
@@ -407,7 +407,7 @@ v <- function(data, formula, ref_group = NULL) {
 
 pac <- function(data, formula, cuts, ref_group = NULL) {
   d <- ecdf_fun(data, formula, cuts) %>% 
-    cbind(., data.frame(t(cuts))) %>% 
+    cbind(., data.frame(t(cuts)), .name_repair = fix_names) %>% 
     tbl_df() 
   
   if(length(cuts) == 1) {
@@ -459,7 +459,7 @@ pac <- function(data, formula, cuts, ref_group = NULL) {
 pac_compare <- function(data, formula, cuts, ref_group = NULL) {
   rhs <- labels(terms(formula))
   d <- pac(data, formula, cuts) %>% 
-    crossing(., .) %>% 
+    crossing(., ., .name_repair = fix_names) %>% 
     filter(cut == .data$cut1) %>% 
     mutate(pac_diff = .data$pac - .data$pac1) 
   

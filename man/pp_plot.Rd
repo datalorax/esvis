@@ -4,11 +4,24 @@
 \alias{pp_plot}
 \title{Produces the paired probability plot for two groups}
 \usage{
-pp_plot(data, formula, ref_group = NULL, cuts = NULL, cut_labels = TRUE,
-  cut_label_x = 0.02, cut_label_size = 3, lines = TRUE,
-  linetype = "solid", linewidth = 1.1, shade = TRUE, shade_alpha = 0.2,
-  refline = TRUE, refline_col = "gray40", refline_type = "dashed",
-  refline_width = 1.1)
+pp_plot(
+  data,
+  formula,
+  ref_group = NULL,
+  cuts = NULL,
+  cut_labels = TRUE,
+  cut_label_x = 0.02,
+  cut_label_size = 3,
+  lines = TRUE,
+  linetype = "solid",
+  linewidth = 1.1,
+  shade = TRUE,
+  shade_alpha = 0.2,
+  refline = TRUE,
+  refline_col = "gray40",
+  refline_type = "dashed",
+  refline_width = 1.1
+)
 }
 \arguments{
 \item{data}{The data frame to be plotted}

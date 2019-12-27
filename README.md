@@ -8,8 +8,8 @@ R Package for effect size visualization and estimation.
 [![Build
 Status](https://travis-ci.org/datalorax/esvis.svg?branch=master)](https://travis-ci.org/datalorax/esvis)
 [![AppVeyor Build
-Status](https://ci.appveyor.com/api/projects/status/github/DJAnderson07/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/DJAnderson07/esvis)
-[![codecov](https://codecov.io/gh/DJAnderson07/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/DJAnderson07/esvis)
+Status](https://ci.appveyor.com/api/projects/status/github/datalorax/esvis?branch=master&svg=true)](https://ci.appveyor.com/project/datalorax/esvis)
+[![codecov](https://codecov.io/gh/datalorax/esvis/branch/master/graph/badge.svg)](https://codecov.io/gh/datalorax/esvis)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/esvis)](https://cran.r-project.org/package=esvis)
 
 This package is designed to help you very quickly estimate and visualize
@@ -60,9 +60,11 @@ quantile). For example
 ``` r
 library(esvis)
 binned_plot(benchmarks, math ~ ell)
+#> Warning: `cols` is now required when using unnest().
+#> Please use `cols = c(data, q)`
 ```
 
-<!-- -->
+![](README-binned_plot1-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot1-1.png)
 Note that in this plot one can clearly see that the magnitude of the
 differences between the groups depends upon scale location, as evidence
@@ -70,7 +72,7 @@ by the reversal of the effect (negative to positive) for the Non-ELL
 (non-English Language Learners) group. We could also change the
 reference group, change the level of quantile binning, and evaluate the
 effect within other factors. For example, we can look by season
-eligibility for free or reduced price lunch, with quintiles binning, and
+eligibility for free or reduced price lunch, with quantiles binning, and
 non-ELL students as the reference group with
 
 ``` r
@@ -78,9 +80,11 @@ binned_plot(benchmarks,
             math ~ ell + frl + season, 
             ref_group = "Non-ELL",
             qtile_groups = 5)
+#> Warning: `cols` is now required when using unnest().
+#> Please use `cols = c(data, q)`
 ```
 
-<!-- -->
+![](README-binned_plot2-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-binned_plot2-1.png)
 The `ref_group` argument can also supplied as a formula.
 
@@ -92,9 +96,11 @@ the difference in reading achievement by race/ethnicity by season.
 
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
+#> Warning: `cols` is now required when using unnest().
+#> Please use `cols = c(matched)`
 ```
 
-<!-- -->
+![](README-pp_plot1-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-pp_plot1-1.png)
 
 Essentially, the empirical cummulative distribution function (ECDF) for
@@ -118,9 +124,11 @@ appear, relative to the cuts provided.
 ``` r
 ecdf_plot(benchmarks, math ~ season, 
     cuts = c(190, 200, 215))
+#> Warning: `cols` is now required when using unnest().
+#> Please use `cols = c(ecdf, nd)`
 ```
 
-<!-- -->
+![](README-ecdf_plot-1.png)<!-- -->
 ![](https://github.com/datalorax/esvis/raw/master/docs/README-ecdf_plot-1.png)
 These are the curves that go into the PP-Plot, but occasionally can be
 useful on their own.
@@ -132,23 +140,23 @@ Compute effect sizes for all possible pairwise comparisons.
 ``` r
 coh_d(benchmarks, math ~ season + frl)
 #> # A tibble: 30 x 6
-#>    season_ref frl_ref season_foc frl_foc  coh_d coh_se
-#>    <chr>      <chr>   <chr>      <chr>    <dbl>  <dbl>
-#>  1 Fall       FRL     Fall       Non-FRL  0.744 0.0706
-#>  2 Fall       FRL     Spring     FRL      1.32  0.0496
-#>  3 Fall       FRL     Spring     Non-FRL  2.01  0.0787
-#>  4 Fall       FRL     Winter     FRL      0.625 0.0472
-#>  5 Fall       FRL     Winter     Non-FRL  1.30  0.0733
-#>  6 Fall       Non-FRL Fall       FRL     -0.744 0.0706
-#>  7 Fall       Non-FRL Spring     FRL      0.550 0.0694
-#>  8 Fall       Non-FRL Spring     Non-FRL  1.14  0.0919
-#>  9 Fall       Non-FRL Winter     FRL     -0.127 0.0693
-#> 10 Fall       Non-FRL Winter     Non-FRL  0.501 0.0872
-#> # ... with 20 more rows
+#>    season_ref frl_ref season_foc frl_foc      coh_d     coh_se
+#>    <chr>      <chr>   <chr>      <chr>        <dbl>      <dbl>
+#>  1 Fall       FRL     Fall       Non-FRL  0.7443868 0.07055679
+#>  2 Fall       FRL     Spring     FRL      1.321191  0.04957348
+#>  3 Fall       FRL     Spring     Non-FRL  2.008066  0.07873488
+#>  4 Fall       FRL     Winter     FRL      0.6246112 0.04716189
+#>  5 Fall       FRL     Winter     Non-FRL  1.300031  0.07326622
+#>  6 Fall       Non-FRL Fall       FRL     -0.7443868 0.07055679
+#>  7 Fall       Non-FRL Spring     FRL      0.5498306 0.06939873
+#>  8 Fall       Non-FRL Spring     Non-FRL  1.140492  0.09189070
+#>  9 Fall       Non-FRL Winter     FRL     -0.1269229 0.06934576
+#> 10 Fall       Non-FRL Winter     Non-FRL  0.5009081 0.08716735
+#> # … with 20 more rows
 ```
 
 Or specify a reference group. In this case, I’ve used the formula-based
-interface, but a string vector specifiying the specific reference group
+interface, but a string vector specifying the specific reference group
 could also be supplied.
 
 ``` r
@@ -156,13 +164,13 @@ coh_d(benchmarks,
       math ~ season + frl, 
       ref_group = ~Fall + `Non-FRL`)
 #> # A tibble: 5 x 6
-#>   season_ref frl_ref season_foc frl_foc  coh_d coh_se
-#>   <chr>      <chr>   <chr>      <chr>    <dbl>  <dbl>
-#> 1 Fall       Non-FRL Fall       FRL     -0.744 0.0706
-#> 2 Fall       Non-FRL Spring     FRL      0.550 0.0694
-#> 3 Fall       Non-FRL Spring     Non-FRL  1.14  0.0919
-#> 4 Fall       Non-FRL Winter     FRL     -0.127 0.0693
-#> 5 Fall       Non-FRL Winter     Non-FRL  0.501 0.0872
+#>   season_ref frl_ref season_foc frl_foc      coh_d     coh_se
+#>   <chr>      <chr>   <chr>      <chr>        <dbl>      <dbl>
+#> 1 Fall       Non-FRL Fall       FRL     -0.7443868 0.07055679
+#> 2 Fall       Non-FRL Spring     FRL      0.5498306 0.06939873
+#> 3 Fall       Non-FRL Spring     Non-FRL  1.140492  0.09189070
+#> 4 Fall       Non-FRL Winter     FRL     -0.1269229 0.06934576
+#> 5 Fall       Non-FRL Winter     Non-FRL  0.5009081 0.08716735
 ```
 
 Notice that the reference to Non-FRL is wrapped in back-ticks, which
@@ -178,13 +186,13 @@ v(benchmarks,
   math ~ season + frl, 
   ref_group = ~Fall + `Non-FRL`)
 #> # A tibble: 5 x 5
-#>   season_ref frl_ref season_foc frl_foc      v
-#>   <chr>      <chr>   <chr>      <chr>    <dbl>
-#> 1 Fall       Non-FRL Winter     Non-FRL  0.507
-#> 2 Fall       Non-FRL Spring     FRL      0.543
-#> 3 Fall       Non-FRL Winter     FRL     -0.112
-#> 4 Fall       Non-FRL Spring     Non-FRL  1.15 
-#> 5 Fall       Non-FRL Fall       FRL     -0.705
+#>   frl_ref season_ref frl_foc season_foc          v
+#>   <chr>   <chr>      <chr>   <chr>           <dbl>
+#> 1 Non-FRL Fall       FRL     Fall       -0.7051069
+#> 2 Non-FRL Fall       FRL     Spring      0.5454666
+#> 3 Non-FRL Fall       FRL     Winter     -0.1117226
+#> 4 Non-FRL Fall       Non-FRL Spring      1.139235 
+#> 5 Non-FRL Fall       Non-FRL Winter      0.5070737
 ```
 
 or *AUC* with
@@ -194,11 +202,11 @@ auc(benchmarks,
     math ~ season + frl, 
     ref_group = ~Fall + `Non-FRL`)
 #> # A tibble: 5 x 5
-#>   season_ref frl_ref season_foc frl_foc   auc
-#>   <chr>      <chr>   <chr>      <chr>   <dbl>
-#> 1 Fall       Non-FRL Winter     Non-FRL 0.640
-#> 2 Fall       Non-FRL Spring     FRL     0.649
-#> 3 Fall       Non-FRL Winter     FRL     0.469
-#> 4 Fall       Non-FRL Spring     Non-FRL 0.792
-#> 5 Fall       Non-FRL Fall       FRL     0.309
+#>   frl_ref season_ref frl_foc season_foc       auc
+#>   <chr>   <chr>      <chr>   <chr>          <dbl>
+#> 1 Non-FRL Fall       FRL     Fall       0.3090356
+#> 2 Non-FRL Fall       FRL     Spring     0.6501417
+#> 3 Non-FRL Fall       FRL     Winter     0.4685164
+#> 4 Non-FRL Fall       Non-FRL Spring     0.7897519
+#> 5 Non-FRL Fall       Non-FRL Winter     0.6400361
 ```

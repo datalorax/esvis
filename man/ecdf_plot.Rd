@@ -4,9 +4,18 @@
 \alias{ecdf_plot}
 \title{Empirical Cumulative Distribution Plot}
 \usage{
-ecdf_plot(data, formula, cuts = NULL, linewidth = 1.2,
-  ref_line_cols = "gray40", ref_linetype = "solid", center = FALSE,
-  ref_rect = TRUE, ref_rect_col = "gray40", ref_rect_alpha = 0.15)
+ecdf_plot(
+  data,
+  formula,
+  cuts = NULL,
+  linewidth = 1.2,
+  ref_line_cols = "gray40",
+  ref_linetype = "solid",
+  center = FALSE,
+  ref_rect = TRUE,
+  ref_rect_col = "gray40",
+  ref_rect_alpha = 0.15
+)
 }
 \arguments{
 \item{data}{A tidy data frame containing the data to be plotted.}

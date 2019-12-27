@@ -4,10 +4,24 @@
 \alias{binned_plot}
 \title{Quantile-binned effect size plot}
 \usage{
-binned_plot(data, formula, ref_group = NULL, qtile_groups = 3, es = "g",
-  lines = TRUE, points = TRUE, shade = TRUE, shade_alpha = 0.4,
-  rects = TRUE, rect_fill = "gray20", rect_alpha = 0.35, refline = TRUE,
-  refline_col = "gray40", refline_lty = "solid", refline_lwd = 1.1)
+binned_plot(
+  data,
+  formula,
+  ref_group = NULL,
+  qtile_groups = 3,
+  es = "g",
+  lines = TRUE,
+  points = TRUE,
+  shade = TRUE,
+  shade_alpha = 0.4,
+  rects = TRUE,
+  rect_fill = "gray20",
+  rect_alpha = 0.35,
+  refline = TRUE,
+  refline_col = "gray40",
+  refline_lty = "solid",
+  refline_lwd = 1.1
+)
 }
 \arguments{
 \item{data}{The data frame to be plotted}

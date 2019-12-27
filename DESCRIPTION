@@ -40,14 +40,14 @@ Imports:
     magrittr,
     dplyr,
     rlang,
-    tidyr,
+    tidyr (>= 1.0.0),
     purrr,
     Hmisc
-URL: https://github.com/DJAnderson07/esvis
-BugReports: https://github.com/DJAnderson07/esvis/issues
+URL: https://github.com/datalorax/esvis
+BugReports: https://github.com/datalorax/esvis/issues
 License: MIT + file LICENSE
 LazyData: true
-RoxygenNote: 6.0.1
+RoxygenNote: 7.0.2
 Suggests:
 	testthat, 
 	viridisLite

@@ -4,8 +4,14 @@
 \alias{binned_es}
 \title{Calculate binned effect sizes}
 \usage{
-binned_es(data, formula, ref_group = NULL, qtile_groups = 3, es = "g",
-  rename = TRUE)
+binned_es(
+  data,
+  formula,
+  ref_group = NULL,
+  qtile_groups = 3,
+  es = "g",
+  rename = TRUE
+)
 }
 \arguments{
 \item{data}{The data frame used for estimation - ideally structured in a tidy 
