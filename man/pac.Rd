@@ -41,16 +41,16 @@ Computes the proportion of the corresponding group, as specified by the
 \examples{
 # Compute differences for all pairwise comparisons for each of three cuts
 pac(star,
-    reading ~ condition, 
-		 cut = c(450, 500, 550)) 
+    reading ~ condition,
+		 cuts = c(450, 500, 550))
 		 
 pac(star,
     reading ~ condition + freelunch + race, 
-		 cut = c(450, 500))
+		 cuts = c(450, 500))
 
 pac(star,
     reading ~ condition + freelunch + race, 
-		 cut = c(450, 500),
+		 cuts = c(450, 500),
 		 ref_group = ~small + no + white) 
 }
 \seealso{

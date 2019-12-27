@@ -394,31 +394,37 @@ v <- function(data, formula, ref_group = NULL) {
 #' # Compute differences for all pairwise comparisons for each of three cuts
 #' pac(star,
 #'     reading ~ condition,
-#' 		 cut = c(450, 500, 550))
+#' 		 cuts = c(450, 500, 550))
 #' 		 
 #' pac(star,
 #'     reading ~ condition + freelunch + race, 
-#' 		 cut = c(450, 500))
+#' 		 cuts = c(450, 500))
 #' 
 #' pac(star,
 #'     reading ~ condition + freelunch + race, 
-#' 		 cut = c(450, 500),
+#' 		 cuts = c(450, 500),
 #' 		 ref_group = ~small + no + white) 
 
 pac <- function(data, formula, cuts, ref_group = NULL) {
-  d <- ecdf_fun(data, formula, cuts) %>% 
-    cbind(., data.frame(t(cuts)), .name_repair = fix_names) %>% 
-    tbl_df() 
+  rhs <- labels(terms(formula))
+  d <- ecdf_fun(data, formula, cuts) 
+  
+  cut_tbl <- data.frame(matrix(rep(cuts, each = nrow(d)), nrow = nrow(d)))
   
   if(length(cuts) == 1) {
-    d <- d %>% 
-      rename("cuts" = "t.cuts.") %>% 
-      unnest()
+    names(cut_tbl) <- "cut"
   }
+  
+  d <- dplyr::bind_cols(d, cut_tbl) 
+  
+  if(length(cuts) == 1) {
+    d <- unnest(d, cols = c(.data$ecdf, .data$nd))
+  }
+  
   if(length(cuts) > 1) {
     d <- d %>% 
       gather("dis", "cut", matches("^X\\d")) %>% 
-      unnest() %>% 
+      unnest(cols = c(.data$ecdf, .data$nd)) %>% 
       filter(.data$nd == .data$cut)
   }  
   if(!is.null(ref_group)) {
@@ -427,7 +433,7 @@ pac <- function(data, formula, cuts, ref_group = NULL) {
   d %>% 
     mutate(pac = 1 - .data$ecdf) %>% 
     distinct() %>% 
-    select(-.data$ecdf, -.data$nd, -.data$dis)
+    select(rhs, cut, pac)
 }
 
 #' Compute the difference in the proportion above a specific cut location
