@@ -72,23 +72,18 @@ descrip_stats <- function(data, formula, ..., qtile_groups = NULL) {
   d
 }
 
-fix_names <- function(name) {
-  make.names(name, unique = TRUE) %>% 
-    gsub("\\.", "", .)
-}
-
 descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
   rhs  <- labels(terms(formula))
   f <- quos(...)
   
   d <- descrip_stats(data, formula, ..., qtile_groups = qtile_groups) %>%
-    crossing(., ., .name_repair = fix_names)
+    cross(., .)
 
   zero_group <- paste(rhs, "==", paste0(rhs, 1), collapse = " & ")
   if(!is.null(qtile_groups)) zero_group <- paste0("q == q1 & ", zero_group)
 
   test <- filter(d, !!parse_quo(zero_group, env = parent.frame()))
-  var <- as.character(rlang::quo_get_expr(f[[1]]))
+  var <- as.character(quo_get_expr(f[[1]]))
 
   if(any((test[ ,var] - test[ ,paste0(var, 1)]) != 0)) {
     stop("Reference Group Filtering failed. Use `all == TRUE` and
@@ -114,3 +109,52 @@ descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
  d
 }
 
+
+
+#### Old version of tidyr::crossing
+drop_empty <- function(x, factor = TRUE) {
+  empty <- map_lgl(x, function(x) length(x) == 0 & (!factor | !is.factor(x)))
+  x[!empty]
+}
+seq_nrow <- function(x) seq_len(nrow(x))
+
+cross_df <- function(x, y) {
+  x_idx <- rep(seq_nrow(x), each = nrow(y))
+  y_idx <- rep(seq_nrow(y), nrow(x))
+  bind_cols(x[x_idx, , drop = FALSE], y[y_idx, , drop = FALSE])
+}
+
+is_list <- function(x) map_lgl(x, is.list)
+
+ulevels <- function(x) {
+  if (is.factor(x)) {
+    orig_levs <- levels(x)
+    x <- addNA(x, ifany = TRUE)
+    levs <- levels(x)
+    factor(levs, levels = orig_levs, ordered = is.ordered(x), exclude = NULL)
+  } else if (is.list(x)) {
+    unique(x)
+  } else {
+    sort(unique(x), na.last = TRUE)
+  }
+}
+
+cross <- function(...) {
+  x <- lst(...)
+  stopifnot(is_list(x))
+  
+  x <- drop_empty(x)
+  if (length(x) == 0) {
+    return(data.frame())
+  }
+  
+  is_atomic <- map_lgl(x, is_atomic)
+  is_df <- map_lgl(x, is.data.frame)
+  
+  # turn each atomic vector into single column data frame
+  col_df <- map(x[is_atomic], function(x) tibble(x = ulevels(x)))
+  col_df <- map2(col_df, names(x)[is_atomic], set_names)
+  x[is_atomic] <- col_df
+  
+  Reduce(cross_df, x)
+}

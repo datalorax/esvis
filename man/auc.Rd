@@ -60,7 +60,7 @@ auc(star,
 # Report by ELL and FRL groups for each season, compare to non-ELL students
 # who were not eligible for free or reduced price lunch in the fall (using
 # the formula interface for reference group referencing).
-
+\dontrun{
 auc(benchmarks, 
       math ~ ell + frl + season,
       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
@@ -69,4 +69,6 @@ auc(benchmarks,
 auc(benchmarks, 
       math ~ ell + frl + season,
       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+}
+
 }

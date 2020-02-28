@@ -43,8 +43,9 @@
 #' binned_plot(star, math ~ condition + sex)
 #' 
 #' # Same plot by sex and race
-#' pp_plot(star, math ~ condition + sex + race)
-#' 
+#' \dontrun{
+#'   pp_plot(star, math ~ condition + sex + race)
+#' }
 #' ## Evaluate with simulated data: Plot is most interesting when variance
 #' # in the distributions being compared differ.
 #' 
@@ -143,8 +144,8 @@ binned_plot <- function(data, formula, ref_group = NULL, qtile_groups = 3,
                         lty   = refline_lty,
                         lwd   = refline_lwd)
   }
-  if(lines)   p <- p + geom_line(aes_(color = as.name(paste0(rhs[1], 1))))
-  if(points)  p <- p + geom_point(aes_(color = as.name(paste0(rhs[1], 1))))
+  if(lines)   p <- p + geom_line(aes_(group = as.name(paste0(rhs[1], 1)), color = as.name(paste0(rhs[1], 1))))
+  if(points)  p <- p + geom_point(aes_(group = as.name(paste0(rhs[1], 1)), color = as.name(paste0(rhs[1], 1))))
     
   if(length(rhs) == 2) p <- p + facet_wrap(as.formula(paste0("~", rhs[2])))
   if(length(rhs) == 3) {

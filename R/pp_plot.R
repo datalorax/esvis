@@ -49,42 +49,33 @@
 #' @examples
 #' # PP plot examining differences by condition
 #' pp_plot(star, math ~ condition)
-#'  
-#' # Evaluate if condition effect differs by sex
-#' pp_plot(star, math ~ condition + sex)
-#' 
-#' # Evaluate if condition effect differs by sex and race
-#' pp_plot(star, math ~ condition + sex + race)
 #' 
 #' # The sample size gets very small in the above within cells (e.g., wild 
 #' # changes within the "other" group in particular). Overall, the effect doesn't
 #' # seem to change much by condition.
 #' 
-#' # Produce default PP plot w/multiple groups
-#' pp_plot(seda, mean ~ grade)
-#'  
 #' # Look at something a little more interesting
+#' \dontrun{
 #' pp_plot(benchmarks, math ~ ell + season + frl)
-#' 
+#' }
 #' # Add some cut scores
-#' pp_plot(benchmarks, 
-#'         math ~ ell + season + frl,
-#'         cuts = c(190, 210, 215))
+#' pp_plot(benchmarks, math ~ ell, cuts = c(190, 210, 215))
 #' 
 #' ## Make another interesting plot. Use ggplot to customize
+#' \dontrun{
 #' library(tidyr)
 #' library(ggplot2)
-#'
 #' benchmarks %>% 
 #'   gather(subject, score, reading, math) %>% 
 #'   pp_plot(score ~ ell + subject + season,
 #'           ref_group = "Non-ELL") +
-#'     scale_fill_brewer(palette = "Pastel2") +
-#'     scale_color_brewer(palette = "Pastel2") +
-#'     labs(title = "Differences among English Language Learning Groups",
-#'          subtitle = "Note crossing of reference line") +
-#'     theme_minimal()
-
+#'   scale_fill_brewer(name = "ELL Status", palette = "Pastel2") +
+#'   scale_color_brewer(name = "ELL Status", palette = "Pastel2") +
+#'   labs(title = "Differences among English Language Learning Groups",
+#'        subtitle = "Note crossing of reference line") +
+#'   theme_minimal()
+#' }
+#' 
 pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL, 
                     cut_labels = TRUE, cut_label_x = 0.02, cut_label_size = 3, 
                     lines = TRUE, linetype = "solid", linewidth = 1.1, 

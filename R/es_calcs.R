@@ -271,7 +271,7 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
   ecdf_fun(data, formula, cuts) %>% 
     mutate(nd = map2(.data$nd, .data$ecdf, ~data.frame(x = .x, y = .y))) %>% 
     select(-.data$ecdf) %>% 
-    crossing(., .,  .name_repair = fix_names) %>% 
+    cross(., .) %>% 
     filter(!map2_lgl(.data$nd, .data$nd1, ~identical(.x, .y))) %>% 
     mutate(matched = map2(.data$nd, .data$nd1,
                           ~data.frame(x = sort(unique(.x$x, .y$x))) %>% 
@@ -309,7 +309,7 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
 #' # Report by ELL and FRL groups for each season, compare to non-ELL students
 #' # who were not eligible for free or reduced price lunch in the fall (using
 #' # the formula interface for reference group referencing).
-#' 
+#' \dontrun{
 #' auc(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
@@ -318,6 +318,8 @@ paired_ecdf <- function(data, formula, cuts = NULL) {
 #' auc(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+#' }
+#' 
 
 auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
   rhs <- labels(terms(formula))
@@ -337,7 +339,7 @@ auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
 #' Calculate the V effect size statistic
 #' 
 #' This function calculates the effect size V, as discussed by 
-#' \href{http://www.jstor.org/stable/40263526}{Ho, 2009}. The V
+#' \href{https://journals.sagepub.com/doi/abs/10.3102/1076998609332755}{Ho, 2009}. The V
 #' statistic is a transformation of \code{\link{auc}}, interpreted as the 
 #' average difference between the distributions in standard deviation units.
 #' @inheritParams coh_d
@@ -360,6 +362,7 @@ auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
 #' # who were not eligible for free or reduced price lunch in the fall (using
 #' # the formula interface for reference group referencing).
 #' 
+#' \dontrun{
 #' v(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
@@ -368,6 +371,8 @@ auc <- function(data, formula, ref_group = NULL, rename = TRUE) {
 #' v(benchmarks, 
 #'       math ~ ell + frl + season,
 #'       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+#' }
+#' 
 
 v <- function(data, formula, ref_group = NULL) {
   d <- auc(data, formula, rename = FALSE) %>% 
@@ -451,21 +456,21 @@ pac <- function(data, formula, cuts, ref_group = NULL) {
 #' # Compute differences for all pairwise comparisons for each of three cuts
 #' pac_compare(star,
 #'     reading ~ condition, 
-#' 		 cut = c(450, 500, 550)) 
+#' 		 cuts = c(450, 500, 550)) 
 #' 		 
 #' pac_compare(star,
 #'     reading ~ condition + freelunch + race, 
-#' 		 cut = c(450, 500))
+#' 		 cuts = c(450, 500))
 #' 
 #' pac_compare(star,
 #'     reading ~ condition + freelunch + race, 
-#' 		 cut = c(450, 500),
+#' 		 cuts = c(450, 500),
 #' 		 ref_group = ~small + no + white) 
 
 pac_compare <- function(data, formula, cuts, ref_group = NULL) {
   rhs <- labels(terms(formula))
   d <- pac(data, formula, cuts) %>% 
-    crossing(., ., .name_repair = fix_names) %>% 
+    cross(., .) %>% 
     filter(cut == .data$cut1) %>% 
     mutate(pac_diff = .data$pac - .data$pac1) 
   
@@ -479,13 +484,14 @@ pac_compare <- function(data, formula, cuts, ref_group = NULL) {
   d <- rename_ref_foc(d, formula)
   
   d %>%
-     rename("pac_ref" = "pac",
-            "pac_foc" = "pac1") %>%
-     select(.data$cut,
-            ends_with("_ref"),
-            ends_with("_foc"),
-            .data$pac_diff, 
-            -.data$cut1)
+    ungroup() %>% 
+    rename("pac_ref" = "pac",
+           "pac_foc" = "pac1") %>%
+    select(.data$cut,
+           ends_with("_ref"),
+           ends_with("_foc"),
+           .data$pac_diff, 
+           -.data$cut1)
     
 }
 

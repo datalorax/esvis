@@ -94,8 +94,9 @@ binned_plot(star, math ~ condition)
 binned_plot(star, math ~ condition + sex)
 
 # Same plot by sex and race
-pp_plot(star, math ~ condition + sex + race)
-
+\dontrun{
+  pp_plot(star, math ~ condition + sex + race)
+}
 ## Evaluate with simulated data: Plot is most interesting when variance
 # in the distributions being compared differ.
 

@@ -3,7 +3,7 @@
 #' The full SEDA dataset contains mean test scores on statewide testing data in
 #' reading and math for every school district in the United States. See a
 #' description of the data 
-#' \href{https://cepa.stanford.edu/seda/data-archive}{here}. The data 
+#' \href{https://purl.stanford.edu/db586ns4974}{here}. The data 
 #' represented in this package represent a random sample of 10% of all the 
 #' cases in the full dataset. To access the full data, please visit the 
 #' data archive in the above link.
@@ -28,5 +28,5 @@
 #' Erin Fahle. (2016). Stanford Education Data Archive. 
 #' \href{http://purl.stanford.edu/db586ns4974}{
 #'  http://purl.stanford.edu/db586ns4974}. For more information, please visit
-#' \href{http://seda.stanford.edu}{http://seda.stanford.edu}.
+#' \href{https://edopportunity.org}{https://edopportunity.org}.
 "seda"

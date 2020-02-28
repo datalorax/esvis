@@ -1,3 +1,6 @@
+# esvis 0.2.1.0000
+This releases fixes bugs introduced from dependency updates.
+
 # esvis 0.2.0.0000
 
 This release is mostly about reformatting code and minor bug fixes. A few changes:

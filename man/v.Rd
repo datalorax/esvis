@@ -34,7 +34,7 @@ reference group can be returned.
 }
 \description{
 This function calculates the effect size V, as discussed by 
-\href{http://www.jstor.org/stable/40263526}{Ho, 2009}. The V
+\href{https://journals.sagepub.com/doi/abs/10.3102/1076998609332755}{Ho, 2009}. The V
 statistic is a transformation of \code{\link{auc}}, interpreted as the 
 average difference between the distributions in standard deviation units.
 }
@@ -52,6 +52,7 @@ v(star,
 # who were not eligible for free or reduced price lunch in the fall (using
 # the formula interface for reference group referencing).
 
+\dontrun{
 v(benchmarks, 
       math ~ ell + frl + season,
       ref_group = ~`Non-ELL` + `Non-FRL` + Fall)
@@ -60,4 +61,6 @@ v(benchmarks,
 v(benchmarks, 
       math ~ ell + frl + season,
       ref_group = c("Non-ELL", "Non-FRL", "Fall"))
+}
+
 }

@@ -43,15 +43,15 @@ for all possible pairwise comparisons of the groups specified by the
 # Compute differences for all pairwise comparisons for each of three cuts
 pac_compare(star,
     reading ~ condition, 
-		 cut = c(450, 500, 550)) 
+		 cuts = c(450, 500, 550)) 
 		 
 pac_compare(star,
     reading ~ condition + freelunch + race, 
-		 cut = c(450, 500))
+		 cuts = c(450, 500))
 
 pac_compare(star,
     reading ~ condition + freelunch + race, 
-		 cut = c(450, 500),
+		 cuts = c(450, 500),
 		 ref_group = ~small + no + white) 
 }
 \seealso{
