@@ -1,6 +1,7 @@
 ## Release Summary
 
-This is the release of esvis, version 0.2.1, an R package for visualizing and estimating effect sizes. This release should fix the failing tests for the version currently on CRAN.
+This is the release of esvis, version 0.3.0, an R package for visualizing and estimating effect sizes. This release should fix the failing tests for the version currently on CRAN. This is a major revision of the package that
+moves the plotting from base R to ggplot2.
 
 ## Test environments
 * Local OS X install, R 3.6.0

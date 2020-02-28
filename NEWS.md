@@ -1,4 +1,15 @@
-# esvis 0.2.1.0000
+# esvis 0.3.0.0000
+This is a major update that:
+
+* Moves all the plottingfunctionality to ggplot2. 
+
+* Extends the plotting by allowing faceting with `+` in the
+  formula. Up to two additional variables are possible.
+  
+* Changed the API so the data argument comes first, followed 
+  by the formula.
+
+# esvis 0.2.1.0000 (no submitted to CRAN)
 This releases fixes bugs introduced from dependency updates.
 
 # esvis 0.2.0.0000
