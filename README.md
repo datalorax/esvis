@@ -26,8 +26,7 @@ Install directly from CRAN with
 install.packages("esvis")
 ```
 
-Or the development version (heavily updated, a new CRAN release is
-planned soon) from GitHub with:
+Or the development version from GitHub with:
 
 ``` r
 # install.packages("devtools")
@@ -60,7 +59,7 @@ quantile). For example
 ``` r
 library(esvis)
 binned_plot(benchmarks, math ~ ell)
-#> Warning: `cols` is now required when using unnest().
+#> Warning: `cols` is now required.
 #> Please use `cols = c(data, q)`
 ```
 
@@ -80,7 +79,7 @@ binned_plot(benchmarks,
             math ~ ell + frl + season, 
             ref_group = "Non-ELL",
             qtile_groups = 5)
-#> Warning: `cols` is now required when using unnest().
+#> Warning: `cols` is now required.
 #> Please use `cols = c(data, q)`
 ```
 
@@ -96,7 +95,7 @@ the difference in reading achievement by race/ethnicity by season.
 
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
-#> Warning: `cols` is now required when using unnest().
+#> Warning: `cols` is now required.
 #> Please use `cols = c(matched)`
 ```
 
@@ -124,7 +123,7 @@ appear, relative to the cuts provided.
 ``` r
 ecdf_plot(benchmarks, math ~ season, 
     cuts = c(190, 200, 215))
-#> Warning: `cols` is now required when using unnest().
+#> Warning: `cols` is now required.
 #> Please use `cols = c(ecdf, nd)`
 ```
 
@@ -139,6 +138,8 @@ Compute effect sizes for all possible pairwise comparisons.
 
 ``` r
 coh_d(benchmarks, math ~ season + frl)
+#> `mutate_if()` ignored the following grouping variables:
+#> Column `season`
 #> # A tibble: 30 x 6
 #>    season_ref frl_ref season_foc frl_foc      coh_d     coh_se
 #>    <chr>      <chr>   <chr>      <chr>        <dbl>      <dbl>
@@ -163,6 +164,8 @@ could also be supplied.
 coh_d(benchmarks, 
       math ~ season + frl, 
       ref_group = ~Fall + `Non-FRL`)
+#> `mutate_if()` ignored the following grouping variables:
+#> Column `season`
 #> # A tibble: 5 x 6
 #>   season_ref frl_ref season_foc frl_foc      coh_d     coh_se
 #>   <chr>      <chr>   <chr>      <chr>        <dbl>      <dbl>
@@ -186,13 +189,14 @@ v(benchmarks,
   math ~ season + frl, 
   ref_group = ~Fall + `Non-FRL`)
 #> # A tibble: 5 x 5
+#> # Groups:   frl, season [1]
 #>   frl_ref season_ref frl_foc season_foc          v
 #>   <chr>   <chr>      <chr>   <chr>           <dbl>
-#> 1 Non-FRL Fall       FRL     Fall       -0.7051069
+#> 1 Non-FRL Fall       Non-FRL Winter      0.5070737
 #> 2 Non-FRL Fall       FRL     Spring      0.5454666
 #> 3 Non-FRL Fall       FRL     Winter     -0.1117226
 #> 4 Non-FRL Fall       Non-FRL Spring      1.139235 
-#> 5 Non-FRL Fall       Non-FRL Winter      0.5070737
+#> 5 Non-FRL Fall       FRL     Fall       -0.7051069
 ```
 
 or *AUC* with
@@ -202,11 +206,12 @@ auc(benchmarks,
     math ~ season + frl, 
     ref_group = ~Fall + `Non-FRL`)
 #> # A tibble: 5 x 5
+#> # Groups:   frl, season [1]
 #>   frl_ref season_ref frl_foc season_foc       auc
 #>   <chr>   <chr>      <chr>   <chr>          <dbl>
-#> 1 Non-FRL Fall       FRL     Fall       0.3090356
+#> 1 Non-FRL Fall       Non-FRL Winter     0.6400361
 #> 2 Non-FRL Fall       FRL     Spring     0.6501417
 #> 3 Non-FRL Fall       FRL     Winter     0.4685164
 #> 4 Non-FRL Fall       Non-FRL Spring     0.7897519
-#> 5 Non-FRL Fall       Non-FRL Winter     0.6400361
+#> 5 Non-FRL Fall       FRL     Fall       0.3090356
 ```

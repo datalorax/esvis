@@ -31,7 +31,7 @@ Install directly from CRAN with
 install.packages("esvis")
 ```
 
-Or the development version (heavily updated, a new CRAN release is planned soon) from GitHub with:
+Or the development version from GitHub with:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
