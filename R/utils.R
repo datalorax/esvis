@@ -43,16 +43,15 @@ ref_subset <- function(out, formula, ref_group) {
 descrip_stats <- function(data, formula, ..., qtile_groups = NULL) {
   rhs  <- labels(terms(formula))
   lhs  <- all.vars(formula)[1]
-  f <- quos(...)
   
-  if(length(f) == 0) {
+  if (missing(...)) {
     stop("No function supplied to ...")
   }
   
   d <- data %>%
     select(rhs, lhs) %>% 
     na.omit() %>% 
-    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>%
+    mutate_at(vars(!!!syms(rhs)), list(as.character)) %>%
     group_by(!!!syms(rhs)) 
   
   if(!is.null(qtile_groups)) {
@@ -64,11 +63,8 @@ descrip_stats <- function(data, formula, ..., qtile_groups = NULL) {
       group_by(!!!syms(rhs), .data$q)
   }
   d <- d %>%
-    summarize_at(lhs, funs(!!!f)) 
+    summarize_at(vars(!!!syms(lhs)), list(...)) 
   
-  if(length(f) == 1) {
-    names(d)[grep(lhs, names(d))] <- gsub("~", "", as.character(f))
-  }
   d
 }
 
