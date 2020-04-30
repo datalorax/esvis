@@ -95,8 +95,6 @@ the difference in reading achievement by race/ethnicity by season.
 
 ``` r
 pp_plot(benchmarks, reading ~ ethnicity + season)
-#> Warning: `cols` is now required.
-#> Please use `cols = c(matched)`
 ```
 
 ![](README-pp_plot1-1.png)<!-- -->
@@ -123,8 +121,6 @@ appear, relative to the cuts provided.
 ``` r
 ecdf_plot(benchmarks, math ~ season, 
     cuts = c(190, 200, 215))
-#> Warning: `cols` is now required.
-#> Please use `cols = c(ecdf, nd)`
 ```
 
 ![](README-ecdf_plot-1.png)<!-- -->
@@ -181,8 +177,8 @@ should be used anytime there are spaces or other non-standard
 characters.
 
 Other effect sizes are estimated equivalently. For example, compute *V*
-([Ho, 2009](https://www.jstor.org/stable/40263526?seq=1#page_scan_tab_contents))
-can be estimated with
+([Ho, 2009](https://www.jstor.org/stable/40263526)) can be estimated
+with
 
 ``` r
 v(benchmarks, 
