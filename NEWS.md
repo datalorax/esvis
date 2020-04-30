@@ -1,3 +1,6 @@
+# esvis 0.3.1.0000
+Minor update to fix breaking changes with the release of dplyr 1.0
+
 # esvis 0.3.0.0000
 This is a major update that:
 

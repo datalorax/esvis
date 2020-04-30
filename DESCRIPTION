@@ -1,7 +1,7 @@
 Package: esvis
 Type: Package
 Title: Visualization and Estimation of Effect Sizes
-Version: 0.3.0
+Version: 0.3.1
 Authors@R: person("Daniel", "Anderson", email = "daniela@uoregon.edu", 
 	   role = c("aut", "cre"))
 Description: A variety of methods are provided to estimate and visualize
