@@ -91,7 +91,7 @@ coh_se <- function(n1, n2, d) {
 coh_d <- function(data, formula, ref_group = NULL, se = TRUE) {
   rhs  <- labels(terms(formula))
 
-  stats <- descrip_cross(data, formula, length, mean, var) %>% 
+  stats <- descrip_cross(data, formula, length = length, mean = mean, var = var) %>% 
     mutate_if(is.integer, as.double)
   
   d <- stats %>% 
@@ -170,7 +170,7 @@ hedg <- function(n1, n2, d) {
 hedg_g <- function(data, formula, ref_group = NULL,
                    keep_d = TRUE) {
   stats <- descrip_cross(data, formula,
-                         length, mean, var)
+                         length = length, mean = mean, var = var)
   
   g <- stats %>% 
     mutate(coh_d  = coh(.data$length, .data$length1, 
@@ -190,13 +190,13 @@ hedg_g <- function(data, formula, ref_group = NULL,
 }
 
 mean_diff <- function(data, formula, ref_group, qtile_groups = NULL) {
-  descrip_cross(data, formula, mean, qtile_groups = qtile_groups) %>% 
+  descrip_cross(data, formula, mean = mean, qtile_groups = qtile_groups) %>% 
     mutate(mean_diff = .data$mean1 - .data$mean) %>% 
     select(-.data$mean, -.data$mean1)
 }
 
 pooled_sd <- function(data, formula, ref_group, keep_n = FALSE) {
-  out <- descrip_cross(data, formula, length, var) %>% 
+  out <- descrip_cross(data, formula, length = length, var = var) %>% 
     mutate(psd = psd(.data$length, .data$length1, .data$var, .data$var1)) %>% 
     select(-.data$var, -.data$var1)
   
@@ -253,7 +253,7 @@ ecdf_fun <- function(data, formula, cuts = NULL) {
   lhs  <- all.vars(formula)[1]
   
   data %>% 
-    mutate_at(vars(!!!syms(rhs)), funs(as.character)) %>% 
+    mutate_at(vars(!!!syms(rhs)), list(as.character)) %>% 
     group_by(!!!syms(rhs)) %>% 
     nest() %>% 
     mutate(ecdf = map(.data$data, ~ecdf(.[[lhs]])),
@@ -268,10 +268,12 @@ ecdf_fun <- function(data, formula, cuts = NULL) {
 #' @keywords internal
 
 paired_ecdf <- function(data, formula, cuts = NULL) {
-  ecdf_fun(data, formula, cuts) %>% 
+  ecdf <- ecdf2 <- ecdf_fun(data, formula, cuts) %>% 
     mutate(nd = map2(.data$nd, .data$ecdf, ~data.frame(x = .x, y = .y))) %>% 
-    select(-.data$ecdf) %>% 
-    cross(., .) %>% 
+    select(-.data$ecdf)
+  names(ecdf2) <- paste0(names(ecdf), "1")
+  
+  cross(ecdf, ecdf2) %>% 
     filter(!map2_lgl(.data$nd, .data$nd1, ~identical(.x, .y))) %>% 
     mutate(matched = map2(.data$nd, .data$nd1,
                           ~data.frame(x = sort(unique(.x$x, .y$x))) %>% 
@@ -469,8 +471,10 @@ pac <- function(data, formula, cuts, ref_group = NULL) {
 
 pac_compare <- function(data, formula, cuts, ref_group = NULL) {
   rhs <- labels(terms(formula))
-  d <- pac(data, formula, cuts) %>% 
-    cross(., .) %>% 
+  d1 <- d2 <- pac(data, formula, cuts)
+  names(d2) <- paste0(names(d1), "1")
+  
+  d <- cross(d1, d2) %>% 
     filter(cut == .data$cut1) %>% 
     mutate(pac_diff = .data$pac - .data$pac1) 
   
