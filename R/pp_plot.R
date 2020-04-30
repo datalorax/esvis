@@ -92,7 +92,7 @@ pp_plot <- function(data, formula, ref_group = NULL, cuts = NULL,
   }
   
   d <- paired_ecdf(data, formula, cuts) %>%
-    unnest() %>%
+    unnest(cols = .data$matched) %>%
     filter(!!sym(rhs[1]) == ref_group) 
   
   if(length(rhs) == 2) {

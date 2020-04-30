@@ -72,7 +72,7 @@ ecdf_plot <- function(data, formula, cuts = NULL, linewidth = 1.2,
   }
   
   d <- ecdf_fun(data, formula, cuts) %>% 
-    unnest()
+    unnest(cols = c(.data$ecdf, .data$nd))
 
   p <- ggplot(d, aes_(~nd, ~ecdf))
 
