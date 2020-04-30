@@ -177,8 +177,8 @@ should be used anytime there are spaces or other non-standard
 characters.
 
 Other effect sizes are estimated equivalently. For example, compute *V*
-([Ho, 2009](https://www.jstor.org/stable/40263526)) can be estimated
-with
+([Ho, 2009](https://journals.sagepub.com/doi/10.3102/1076998609332755))
+can be estimated with
 
 ``` r
 v(benchmarks, 
