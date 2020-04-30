@@ -76,8 +76,9 @@ descrip_cross <- function(data, formula, ..., qtile_groups = NULL) {
   rhs  <- labels(terms(formula))
   f <- quos(...)
   
-  d <- descrip_stats(data, formula, ..., qtile_groups = qtile_groups) %>%
-    cross(., .)
+  d1 <- d2 <- descrip_stats(data, formula, ..., qtile_groups = qtile_groups) 
+  names(d2) <- paste0(names(d1), "1")
+  d <- cross(d1, d2)
 
   zero_group <- paste(rhs, "==", paste0(rhs, 1), collapse = " & ")
   if(!is.null(qtile_groups)) zero_group <- paste0("q == q1 & ", zero_group)

@@ -268,10 +268,12 @@ ecdf_fun <- function(data, formula, cuts = NULL) {
 #' @keywords internal
 
 paired_ecdf <- function(data, formula, cuts = NULL) {
-  ecdf_fun(data, formula, cuts) %>% 
+  ecdf <- ecdf2 <- ecdf_fun(data, formula, cuts) %>% 
     mutate(nd = map2(.data$nd, .data$ecdf, ~data.frame(x = .x, y = .y))) %>% 
-    select(-.data$ecdf) %>% 
-    cross(., .) %>% 
+    select(-.data$ecdf)
+  names(ecdf2) <- paste0(names(ecdf), "1")
+  
+  cross(ecdf, ecdf2) %>% 
     filter(!map2_lgl(.data$nd, .data$nd1, ~identical(.x, .y))) %>% 
     mutate(matched = map2(.data$nd, .data$nd1,
                           ~data.frame(x = sort(unique(.x$x, .y$x))) %>% 
@@ -469,8 +471,10 @@ pac <- function(data, formula, cuts, ref_group = NULL) {
 
 pac_compare <- function(data, formula, cuts, ref_group = NULL) {
   rhs <- labels(terms(formula))
-  d <- pac(data, formula, cuts) %>% 
-    cross(., .) %>% 
+  d1 <- d2 <- pac(data, formula, cuts)
+  names(d2) <- paste0(names(d1), "1")
+  
+  d <- cross(d1, d2) %>% 
     filter(cut == .data$cut1) %>% 
     mutate(pac_diff = .data$pac - .data$pac1) 
   
